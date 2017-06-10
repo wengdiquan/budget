@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bjsj.budget.dao.AuthorityDao">
+	<resultMap id="AuthorityInfoMap" type="com.bjsj.budget.model.Authority">
+		<result column="ID" jdbcType="BIGINT" property="id" />
+		<result column="CHECKED" jdbcType="BOOLEAN" property="checked" />
+		<result column="EXPANDED" jdbcType="BOOLEAN" property="expanded" />
+		<result column="ICON_CLS" jdbcType="VARCHAR" property="iconCls" />
+		<result column="LEAF" jdbcType="BOOLEAN" property="leaf" />
+		<result column="MENU_CODE" jdbcType="VARCHAR" property="menuCode" />
+		<result column="MENU_NAME" jdbcType="VARCHAR" property="menuName" />
+		<result column="MENU_CONFIG" jdbcType="VARCHAR" property="menuConfig" />
+		<result column="PARENT_ID" jdbcType="BIGINT" property="parentId" />
+		<result column="ENABLE_FLAG" jdbcType="BOOLEAN" property="enableFlag" />
+		<result column="SORT_ORDER" jdbcType="BIGINT" property="sortOrder" />
+		<result column="URL" jdbcType="VARCHAR" property="url" />
+	</resultMap>
+	
+	<sql id="Base_Column_List">
+		t.id as ID,
+		t.CHECKED as CHECKED,
+		t.EXPANDED as EXPANDED,
+		t.ICON_CLS as ICON_CLS,
+		t.LEAF as LEAF,
+		t.MENU_CODE as MENU_CODE,
+		t.MENU_CONFIG as MENU_CONFIG,
+		t.MENU_NAME as MENU_NAME,
+		t.PARENT_ID as PARENT_ID,
+		t.SORT_ORDER as SORT_ORDER,
+		t.URL as URL,
+		t.ENABLE_FLAG as ENABLE_FLAG
+	</sql>
+	
+    <select id="getMenuInfo" parameterType="HashMap" resultMap="AuthorityInfoMap">
+        select
+		<include refid="Base_Column_List" />
+		from tm_authority t where t.ENABLE_FLAG = 1
+		<if test="map.parentId != null and map.parentId != ''">
+			<![CDATA[  
+              and t.PARENT_ID = #{map.parentId}
+            ]]>
+		</if>
+		<if test="map.parentId == null or map.parentId == ''">
+			<![CDATA[  
+              and t.PARENT_ID is null
+            ]]>
+		</if>
+		
+    </select>
+</mapper>

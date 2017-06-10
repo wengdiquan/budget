@@ -39,7 +39,7 @@ Ext.onReady(function() {
 		autoLoad : true,
 		proxy : {
 			type : 'ajax',
-			url : appBaseUri + '/sys/authority/getAuthority?userId=' + userID,
+			url : appBaseUri + '/menu',
 			reader : {
 				type : 'json',
 				root : 'children'
