@@ -7,6 +7,8 @@
 <title>Insert title here</title>
 </head>
 <body>
-111
+	<script type="text/javascript">
+		window.location.href="home"
+	</script>
 </body>
 </html>
