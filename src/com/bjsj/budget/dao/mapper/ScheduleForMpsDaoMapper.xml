@@ -1,0 +1,1198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bjsj.budget.dao.ScheduleForMpsDao">
+	<resultMap id="ScheduleForMpsMap" type="com.bjsj.budget.model.ScheduleForMpsBean">
+		<result column="HEADER_ID" jdbcType="DECIMAL" property="headerId" />
+		<result column="REF_HEADER_ID" jdbcType="DECIMAL" property="refHeaderId" />
+		<result column="VERSION_ID" jdbcType="DECIMAL" property="versionId" />
+		<result column="VERSION_NO" jdbcType="VARCHAR" property="versionNo" />
+		<result column="VERSION_DATE" jdbcType="VARCHAR" property="versionDate" />
+		<result column="VER_NO" jdbcType="DECIMAL" property="verNo" />
+		<result column="ROLE_NAME" jdbcType="VARCHAR" property="roleName" />
+		<result column="ROLE_ID" jdbcType="DECIMAL" property="roleId" />
+		<result column="REMARK" jdbcType="VARCHAR" property="remark" />
+		<result column="STATUS" jdbcType="VARCHAR" property="status" />
+		<result column="STATUS_CODE" jdbcType="VARCHAR" property="statusCode" />
+		<result column="STATUS_DATE" jdbcType="VARCHAR" property="statusDate" />
+		<result column="CUT_DATE" jdbcType="VARCHAR" property="cutDate" />
+		<result column="CUT_TRANSATION_ID" jdbcType="DECIMAL" property="cutTransationId" />
+		<result column="LOG_FLAG" jdbcType="VARCHAR" property="logFlag" />
+		<result column="TEMPLET_ID" jdbcType="DECIMAL" property="templetId" />
+		<result column="TEMPLET_NAME" jdbcType="VARCHAR" property="templetName" />
+		<result column="URL" jdbcType="VARCHAR" property="url" />
+		<result column="BATCH_ID" jdbcType="DECIMAL" property="batchId" />
+		<result property="creationDate" column="Creation_Date" />
+		<result property="createdBy" column="Created_By" />
+		<result property="createdByName" column="Created_By_name" />
+		<result property="lastUpdateDate" column="Last_Update_Date" />
+		<result property="lastUpdateBy" column="Last_Updated_By" />	
+		<result property="lastUpdateByName" column="Last_Updated_By_Name" />	
+	</resultMap>
+	
+	<resultMap id="scheduleConfigMap" type="com.bjsj.budget.model.ScheduleConfgExcelForMpsBean">
+	    <result column="HEADER_ID" jdbcType="DECIMAL" property="headerId" />
+	    <result column="TEMPLET_ID" jdbcType="DECIMAL" property="templetId" />
+	    <result column="COL_SEQ" jdbcType="DECIMAL" property="colSeq" />
+	    <result column="COL_CODE" jdbcType="VARCHAR" property="colCode" />
+	    <result column="COL_TITLE1" jdbcType="VARCHAR" property="colTitle1" />
+	    <result column="COL_TYPE" jdbcType="VARCHAR" property="colType" />
+	    <result column="SHOW_TYPE" jdbcType="VARCHAR" property="showType" />
+	    <result column="SHOW_VALUE" jdbcType="VARCHAR" property="showValue" />
+	    <result column="UPDATE_FLAG" jdbcType="VARCHAR" property="updateFlag" />
+	    <result column="ENABLE_FLAG" jdbcType="VARCHAR" property="enableFlag" />
+	    <result column="CREATION_DATE" jdbcType="VARCHAR" property="creationDate" />
+	    <result column="CREATED_BY" jdbcType="DECIMAL" property="createdBy" />
+	    <result column="LAST_UPDATE_DATE" jdbcType="VARCHAR" property="lastUpdateDate" />
+	    <result column="LAST_UPDATED_BY" jdbcType="DECIMAL" property="lastUpdatedBy" />
+	    <result column="COLOR" jdbcType="VARCHAR" property="color" />
+	    <result column="COL_TITLE2" jdbcType="VARCHAR" property="colTitle2" />
+	    <result column="COL_TITLE3" jdbcType="VARCHAR" property="colTitle3" />
+	    <result column="BASE_TABLE" jdbcType="VARCHAR" property="baseTable" />
+	   	<result column="TEMPLET_NAME" jdbcType="VARCHAR" property="templetName" />
+ 	</resultMap>
+	
+	
+	<sql id="Base_Column_List">
+		t.HEADER_ID as HEADER_ID,
+		t.VERSION_ID as VERSION_ID,
+		t.VERSION_NO as VERSION_NO,
+		to_char(t.VERSION_DATE, 'yyyy/mm/dd') as VERSION_DATE,
+		t.VER_NO as VER_NO,
+		t.ROLE_NAME as ROLE_NAME,
+		t.ROLE_ID as ROLE_ID,
+		t.REMARK as REMARK,
+		t.STATUS as STATUS,
+		t.STATUS_CODE as STATUS_CODE,
+		t.STATUS_DATE as STATUS_DATE,
+		to_char(t.CUT_DATE, 'yyyy/mm/dd hh24:mi:ss') as CUT_DATE,
+		t.CUT_TRANSATION_ID as CUT_TRANSATION_ID,
+		t.LOG_FLAG as LOG_FLAG,
+		t.TEMPLET_ID as TEMPLET_ID,
+		t.TEMPLET_NAME as TEMPLET_NAME,
+		t.URL as URL,
+		t.BATCH_ID as BATCH_ID,
+	</sql>
+	
+	<select id="getCurrHeaderId" statementType="CALLABLE" parameterType="java.util.HashMap">
+	      {call mps_schedule_pkg.Gen_Mps_Headers
+                (
+                 #{roleId,mode=IN,jdbcType=INTEGER},
+                 #{userId,mode=IN,jdbcType=INTEGER},
+                 #{newFlag,mode=IN,jdbcType=INTEGER},
+                 #{currHeaderId,mode=OUT,jdbcType=INTEGER},
+                 #{returnStatus,mode=OUT,jdbcType=VARCHAR},
+                 #{returnMessage,mode=OUT,jdbcType=VARCHAR}
+           )} 
+    </select>
+	
+	<select id="queryScheduleInfo" parameterType="HashMap" resultMap="ScheduleForMpsMap">
+		select
+		<include refid="Base_Column_List" />
+		to_char(t.Creation_Date, 'yyyy/mm/dd hh24:mi:ss') Creation_Date,
+        t.Created_By,
+        dtu1.user_name as created_by_name,
+        to_char(t.Last_Update_Date, 'yyyy/mm/dd hh24:mi:ss') Last_Update_Date,
+        t.Last_Updated_By,
+        dtu2.user_name as last_updated_by_name
+		from CDM.MPS_HEADERS_V t
+		left join  Com_Users dtu1 on dtu1.ts_user_id = t.created_by
+		left join  Com_Users dtu2 on dtu2.ts_user_id = t.last_updated_by
+		where t.ROLE_ID = #{map.roleId}
+		<if test="map.versionDateS != null and map.versionDateS != ''">
+			<![CDATA[  
+              and t.VERSION_DATE >= to_date(#{map.versionDateS}, 'yyyy/mm/dd')
+            ]]>
+		</if>
+		<if test="map.versionDateE != null and map.versionDateE != ''">
+			<![CDATA[  
+              and t.VERSION_DATE <= to_date(#{map.versionDateE}, 'yyyy/mm/dd')
+            ]]>
+		</if>
+		<if test="map.status != null and map.status != ''">
+			<![CDATA[  
+              and t.STATUS_CODE = #{map.status}
+            ]]>
+		</if>
+		<if test="map.versionNo != null and map.versionNo != ''">
+			<![CDATA[  
+              and upper(t.VERSION_NO) like upper(#{map.versionNo})
+            ]]>
+		</if>
+		<if test='map.enableFlag != null and map.enableFlag == "Y"'>
+			<![CDATA[  
+				and t.STATUS_CODE = 1 or t.HEADER_ID = #{map.currHeaderId}
+            ]]>
+		</if>
+		<if test='map.enableFlag != null and map.enableFlag == "N"'>
+			<![CDATA[  
+				and t.STATUS_CODE = 0 and t.HEADER_ID != #{map.currHeaderId}
+            ]]>
+		</if>
+		order by t.HEADER_ID desc
+	</select>
+	
+	<select id="getScheduleInfoByMap" parameterType="HashMap" resultMap="ScheduleForMpsMap">
+		select
+		<include refid="Base_Column_List" />
+		from CDM.MPS_HEADERS_V t
+		where t.ROLE_ID = #{map.roleId}
+		<if test="map.versionNo != null and map.versionNo != ''">
+			<![CDATA[  
+              and upper(t.VERSION_NO) like upper(#{map.versionNo})
+            ]]>
+		</if>
+	</select>
+
+	<select id="getScheduleInfoCount" parameterType="HashMap" resultType="java.lang.Integer">
+		select count(1) 
+		from CDM.MPS_HEADERS_V t
+		where t.ROLE_ID = #{map.roleId}
+		<if test="map.versionDateS != null and map.versionDateS != ''">
+			<![CDATA[  
+              and t.VERSION_DATE >= to_date(#{map.versionDateS}, 'yyyy/mm/dd')
+            ]]>
+		</if>
+		<if test="map.versionDateE != null and map.versionDateE != ''">
+			<![CDATA[  
+              and t.VERSION_DATE <= to_date(#{map.versionDateE}, 'yyyy/mm/dd')
+            ]]>
+		</if>
+		<if test="map.status != null and map.status != ''">
+			<![CDATA[  
+              and t.STATUS_CODE = #{map.status}
+            ]]>
+		</if>
+		<if test="map.versionNo != null and map.versionNo != ''">
+			<![CDATA[  
+              and upper(t.VERSION_NO) like upper(#{map.versionNo})
+            ]]>
+		</if>
+		<if test='map.enableFlag != null and map.enableFlag == "Y"'>
+			<![CDATA[  
+				and t.STATUS_CODE = 1 or t.HEADER_ID = #{map.currHeaderId}
+            ]]>
+		</if>
+		<if test='map.enableFlag != null and map.enableFlag == "N"'>
+			<![CDATA[  
+				and t.STATUS_CODE = 0 and t.HEADER_ID != #{map.currHeaderId}
+            ]]>
+		</if>
+	</select>
+	
+	<select id="queryRelationScheduleInfo" parameterType="HashMap" resultMap="ScheduleForMpsMap">
+		select
+		t.ref_header_id,
+		<include refid="Base_Column_List" />
+		to_char(t.Creation_Date, 'yyyy/mm/dd hh24:mi:ss') Creation_Date,
+        t.Created_By,
+        dtu1.user_name as created_by_name,
+        to_char(t.Last_Update_Date, 'yyyy/mm/dd hh24:mi:ss') Last_Update_Date,
+        t.Last_Updated_By,
+        dtu2.user_name as last_updated_by_name
+		from CDM.Mps_Headers_Ref_v t
+		left join  Com_Users dtu1 on dtu1.ts_user_id = t.created_by
+		left join  Com_Users dtu2 on dtu2.ts_user_id = t.last_updated_by
+		where 1 = 1
+		<if test="map.headerId != null and map.headerId != ''">
+			<![CDATA[  
+              and ref_header_id = #{map.headerId}
+            ]]>
+		</if>
+		order by t.HEADER_ID desc
+	</select>
+	
+	<select id="getRelationScheduleInfoCount" parameterType="HashMap" resultType="java.lang.Integer">
+		select count(1) 
+		from CDM.Mps_Headers_Ref_v t
+		where 1 = 1
+		<if test="map.headerId != null and map.headerId != ''">
+			<![CDATA[  
+              and ref_header_id = #{map.headerId}
+            ]]>
+		</if>
+	</select>
+	
+	<select id="getStatus" resultType="HashMap">
+		select c.lookup_code FCSTID, 
+			c.meaning FCSTNAME
+		from Com_Lookup_Values c
+		where c.type_id = 5 and c.enabled_flag = 'Y'
+		order by c.lookup_code
+	</select>
+	
+	<select id="getTemplates" resultType="HashMap" parameterType="HashMap">
+		SELECT 
+			mth.templet_id FCSTID,
+			mth.templet_name FCSTNAME,
+			'N' FROMTEMP 
+		FROM mps_templet_headers mth
+		where mth.enable_flag = 'Y'
+		order by mth.templet_name
+	</select>
+	
+	<select id="getDefaultTemplateByRoleId" resultType="Integer" parameterType="HashMap">
+		SELECT
+			nvl(mrp.templet_id, 0)
+		FROM mps_role_profile mrp
+		where mrp.role_id = #{map.roleId}
+	</select>
+	
+	<select id="freshMpsData" statementType="CALLABLE" parameterType="java.util.HashMap">
+	      {call mps_schedule_pkg.Refresh_Mps_Data
+                (
+                 #{headerId,mode=IN,jdbcType=INTEGER},
+                 #{userId,mode=IN,jdbcType=INTEGER},
+                 #{returnStatus,mode=OUT,jdbcType=VARCHAR},
+                 #{returnMessage,mode=OUT,jdbcType=VARCHAR}
+           )} 
+    </select>
+	
+	<select id="getCopySetup" resultType="HashMap" parameterType="HashMap">
+		select 
+			rd.data_type code,
+			v.meaning name
+		from mps_role_display rd 
+		left join com_lookup_values v on v.lookup_code = rd.data_type and v.type_id = 1
+		where rd.copy_flag = 'Y' and rd.role_id = #{map.roleId}
+		order by rd.seq_no
+	</select>
+	
+	<select id="copy" statementType="CALLABLE" parameterType="java.util.HashMap">
+      	{call mps_schedule_pkg.Copy_Mps
+               (
+                #{mpsType,mode=IN,jdbcType=VARCHAR},
+                #{headerId,mode=IN,jdbcType=INTEGER},
+                #{userId,mode=IN,jdbcType=INTEGER},
+                #{returnStatus,mode=OUT,jdbcType=VARCHAR},
+                #{returnMessage,mode=OUT,jdbcType=VARCHAR}
+        )} 
+    </select>
+    
+    <select id="genMps" statementType="CALLABLE" parameterType="java.util.HashMap">
+      	{call mps_schedule_pkg.Download_Mps
+               (
+                #{headerId,mode=IN,jdbcType=INTEGER},
+                #{templateId,mode=IN,jdbcType=INTEGER},
+                #{userId,mode=IN,jdbcType=INTEGER},
+                #{batchId,mode=IN,jdbcType=VARCHAR},
+                #{returnStatus,mode=OUT,jdbcType=VARCHAR},
+                #{returnMessage,mode=OUT,jdbcType=VARCHAR}
+        )} 
+    </select>
+    
+    <select id="getExcelConfig" parameterType="HashMap" resultMap="scheduleConfigMap">
+	    select
+	     	t.HEADER_ID as HEADER_ID, 
+		    t.TEMPLET_ID as TEMPLET_ID, 
+		    t.COL_SEQ as COL_SEQ, 
+		    t.COL_CODE as COL_CODE, 
+		    t.COL_TITLE1 as COL_TITLE1, 
+		    t.COL_TYPE as COL_TYPE, 
+		    t.SHOW_TYPE as SHOW_TYPE, 
+		    t.SHOW_VALUE as SHOW_VALUE, 
+		    t.UPDATE_FLAG as UPDATE_FLAG, 
+		    t.ENABLE_FLAG as ENABLE_FLAG, 
+		    t.CREATION_DATE as CREATION_DATE, 
+		    t.CREATED_BY as CREATED_BY, 
+		    t.LAST_UPDATE_DATE as LAST_UPDATE_DATE, 
+		    t.LAST_UPDATED_BY as LAST_UPDATED_BY, 
+		    t.COLOR as COLOR, 
+		    t.COL_TITLE2 as COL_TITLE2,
+		    t.COL_TITLE3 as COL_TITLE3,
+		    mth.base_table as BASE_TABLE,
+		    mth.TEMPLET_NAME
+	    from CDM.MPS_HEADER_TEMPLET t
+	    left join mps_templet_headers mth on mth.TEMPLET_ID = t.TEMPLET_ID
+	    where t.ENABLE_FLAG = 'Y' and
+	    t.HEADER_ID = #{map.headerId, jdbcType=VARCHAR}
+	    order by t.COL_SEQ
+  	</select>
+  	
+  	<select id="getDownData" parameterType="HashMap" resultType="HashMap">
+		${sql}
+  	</select>
+
+  	<update id="updateHeaderUrl" parameterType="HashMap">
+  		update mps_headers mh set mh.url = #{map.url} 
+  		where mh.header_id = #{map.headerId, jdbcType=VARCHAR}
+  	</update>
+  	
+	<insert id="batchInsert" parameterType="String">
+		${sql}
+	</insert> 
+	
+	 <select id="updateMps" statementType="CALLABLE" parameterType="java.util.HashMap">
+      	{call mps_schedule_pkg.Upload_Mps
+               (
+                #{headerId,mode=IN,jdbcType=INTEGER},
+                #{userId,mode=IN,jdbcType=INTEGER},
+                #{returnStatus,mode=OUT,jdbcType=VARCHAR},
+                #{returnMessage,mode=OUT,jdbcType=VARCHAR}
+        )} 
+    </select>
+	 
+	<select id="updateRemarkByHeaderId" statementType="CALLABLE" parameterType="java.util.HashMap">	
+		{call mps_schedule_pkg.Remark_Mps(
+                #{headerId,mode=IN,jdbcType=INTEGER},
+                #{remark,mode=IN,jdbcType=VARCHAR},
+                #{userId,mode=IN,jdbcType=INTEGER},
+                #{returnStatus,mode=OUT,jdbcType=VARCHAR},
+                #{returnMessage,mode=OUT,jdbcType=VARCHAR}
+        )} 
+	</select> 	
+	 	
+	<delete id="truncateTemp" parameterType="String">
+		truncate table ${str}	
+	</delete> 	
+	
+	
+	<select id="submit" statementType="CALLABLE" parameterType="java.util.HashMap">
+	      {call mps_schedule_pkg.Submit_Mps
+                (
+                 #{headerId,mode=IN,jdbcType=INTEGER},
+                 #{userId,mode=IN,jdbcType=INTEGER},
+                 #{returnStatus,mode=OUT,jdbcType=VARCHAR},
+                 #{returnMessage,mode=OUT,jdbcType=VARCHAR}
+           )} 
+    </select>
+    
+    
+    <select id="urge" statementType="CALLABLE" parameterType="java.util.HashMap">
+	      {call mps_schedule_pkg.Urge_Mps
+                (
+                 #{headerId,mode=IN,jdbcType=INTEGER},
+                 #{userId,mode=IN,jdbcType=INTEGER},
+                 #{returnStatus,mode=OUT,jdbcType=VARCHAR},
+                 #{returnMessage,mode=OUT,jdbcType=VARCHAR}
+           )} 
+    </select>
+    
+    <select id="getTemplatesSetup" resultType="HashMap" parameterType="HashMap">
+		select 
+			mrp.templet_id FCSTID, 
+			mth.templet_name FCSTNAME,
+			'Y' FROMTEMP
+		from mps_role_profile mrp
+		inner join mps_templet_headers mth on mth.templet_id = mrp.templet_id
+		where mrp.role_id = #{roleId,jdbcType=INTEGER}
+		order by mth.templet_name
+	</select>
+	
+	<select id="getRelationAndMpsFlag" resultType="HashMap" parameterType="HashMap">
+		select
+			mrp.reference_item_flag RELATIONFLAG, 
+			mrp.mps_only_flag MPSFLAG		
+		from mps_role_profile mrp
+		where mrp.role_id = #{roleId,jdbcType=INTEGER}  and mrp.templet_id = #{templateId,jdbcType=INTEGER}
+	</select>
+		
+	<select id="queryProfile" resultMap="profileResult" parameterType="HashMap">
+		select mrd.role_id, 
+	       cr.role_name,
+	       mrd.data_type,
+	       clv.meaning data_type_name, 
+	       clv2.meaning color,
+	       clv.tag color_code,
+	       mrd.display_flag,
+	       mrd.copy_flag,
+	       mrd.seq_no,
+		   to_char(mrd.creation_date, 'yyyy/mm/dd hh24:mi:ss') creation_date,
+	       mrd.created_by,
+	       cu1.user_name created_by_name,
+	       to_char(mrd.last_update_date, 'yyyy/mm/dd hh24:mi:ss') last_update_date,
+	       mrd.last_updated_by,
+	       cu2.user_name last_updated_by_name
+		from mps_role_display mrd
+		left join com_roles cr on cr.role_id = mrd.role_id
+		left join Com_Users cu1 on cu1.ts_user_id = mrd.created_by
+		left join Com_Users cu2 on cu2.ts_user_id = mrd.last_updated_by
+		left join Com_Lookup_Values clv on clv.lookup_code = mrd.data_type and clv.type_id = 1
+		left join Com_Lookup_Values clv2 on clv2.lookup_code = clv.tag  and clv2.type_id = 8
+		where mrd.role_id = #{map.roleId,jdbcType=INTEGER} 
+		order by mrd.seq_no
+	</select>		
+		
+	<select id="getProfileCount" resultType="Integer" parameterType="HashMap">
+		select
+			count(1)
+		from mps_role_display mrd
+		where mrd.role_id = #{roleId,jdbcType=INTEGER} 
+	</select>		
+	
+	<update id="updateSetup" parameterType="HashMap">
+		update 
+			mps_role_display mrd
+		set
+			mrd.display_flag = #{displayFlag},
+	       	mrd.copy_flag = #{copyFlag},
+	       	mrd.seq_no = #{seqNo,jdbcType=INTEGER},
+	       	mrd.last_update_date = sysdate,
+	       	mrd.last_updated_by = #{userId,jdbcType=INTEGER}
+		where mrd.role_id = #{roleId,jdbcType=INTEGER} and mrd.data_type = #{dataType}
+	</update>
+	
+	<update id="updateTemplateSetup" parameterType="HashMap">
+		update
+			mps_role_profile mrp
+		set mrp.reference_item_flag = #{relationItemFlag},
+			mrp.mps_only_flag = #{mpsOnlyFlag},
+			mrp.templet_id = #{templateId,jdbcType=INTEGER}
+		where mrp.role_id = #{roleId,jdbcType=INTEGER} 	
+	</update>
+	
+	
+	<select id="getTableColType" parameterType="String" resultType="HashMap">
+		select 
+			column_name NAME,
+			data_type TYPE
+		from user_tab_cols  atc where table_name = upper(#{tableName})
+	</select>
+	
+	   
+    <select id="validate" statementType="CALLABLE" parameterType="java.util.HashMap">
+	      {call mps_schedule_pkg.Validate_Mps
+                (
+                 #{headerId,mode=IN,jdbcType=INTEGER},
+                 #{userId,mode=IN,jdbcType=INTEGER},
+                 #{returnStatus,mode=OUT,jdbcType=VARCHAR},
+                 #{returnMessage,mode=OUT,jdbcType=VARCHAR}
+           )} 
+    </select>
+    
+    <select id="loadSetUp" statementType="CALLABLE" parameterType="java.util.HashMap">
+	      {call mps_schedule_pkg.Load_Setup
+                (
+                 #{roleId,mode=IN,jdbcType=INTEGER},
+                 #{userId,mode=IN,jdbcType=INTEGER},
+                 #{returnStatus,mode=OUT,jdbcType=VARCHAR},
+                 #{returnMessage,mode=OUT,jdbcType=VARCHAR}
+           )} 
+    </select>
+    
+    <select id="getVersionInfo" resultType="HashMap" parameterType="HashMap">
+		select 
+			distinct
+			mvv.Version_Id FCSTID, 
+			mvv.Version_No || '-' || mvv.Ver_No  || '-' || h.ver_no FCSTNAME
+		from mps_versions_v mvv
+		left join mps_headers h on mvv.Version_Id = h.version_id
+		order by 2 desc
+	</select>
+	
+	<select id="getRoleNameInfo" resultType="HashMap" parameterType="HashMap">
+		select 
+			cv.Role_Id FCSTID, 
+			cv.Role_Name FCSTNAME
+		from Com_Roles_v cv
+		where (cv.End_Date >= to_date(to_char(sysdate, 'yyyy/mm/dd') || ' 00:00:00', 'yyyy/mm/dd hh24:mi:ss')  or cv.End_Date is null)
+		order by 2 desc
+	</select>
+	
+	<select id="getStatusInfo" resultType="HashMap" parameterType="HashMap">
+		select 
+			cv.lookup_code FCSTID, 
+			cv.meaning FCSTNAME
+		from Com_Lookup_Values cv
+		where cv.type_id = 5 and cv.enabled_flag = 'Y'
+		order by 2 desc
+	</select>
+	
+	<select id="downSubMitStatusInfo" resultType="HashMap" parameterType="HashMap">
+		Select h.Version_No,
+     	   to_char(h.Version_Date, 'yyyy/mm/dd') Version_Date,
+	       h.Role_Name,
+	       h.Role_Name_Des,
+	       h.Status,
+	       Decode(h.Url, Null, '未上传', '已上传') Upload_Flag,
+	       to_char((Select Count(1)
+	          From Mps_Details d, Mps_Lines l
+	         Where d.Qty > 0
+	           And l.Line_Id = d.Line_Id
+	           And l.Header_Id = d.Header_Id
+	           And l.Enable_Flag = 'Y'
+	           And l.Data_Type_Code = 'MPS'
+	           And l.Header_Id = h.Header_Id)) Cnt,
+	       to_char((Select Sum(d.Qty)
+	          From Mps_Details d, Mps_Lines l
+	         Where d.Qty > 0
+	           And d.Mps_Type = 'MPS'
+	           And l.Line_Id = d.Line_Id
+	           And l.Header_Id = d.Header_Id
+	           And l.Enable_Flag = 'Y'
+	           And l.Data_Type_Code = 'MPS'
+	           And l.Header_Id = h.Header_Id)) Mps_Qty,
+	       to_char((Select Sum(d.Qty)
+	          From Mps_Details d, Mps_Lines l
+	         Where d.Qty > 0
+	           And d.Mps_Type = 'PRE-MPS'
+	           And l.Line_Id = d.Line_Id
+	           And l.Header_Id = d.Header_Id
+	           And l.Enable_Flag = 'Y'
+	           And l.Data_Type_Code = 'MPS'
+	           And l.Header_Id = h.Header_Id)) Pre_Mps_Qty,
+	       h.Remark,
+	       h.Log_Flag
+  		From Mps_Headers_v h
+  		where 1 = 1
+  		<if test="versionNo != null and versionNo != ''">
+			<![CDATA[  
+              and h.Version_No = #{versionNo}
+            ]]>
+		</if>
+  		<if test="startDate != null and startDate != ''">
+			<![CDATA[  
+			 	and h.Version_Date >= to_date(to_char(#{startDate}), 'yyyy/mm/dd')
+            ]]>
+		</if>
+		<if test="endDate != null and endDate != ''">
+			<![CDATA[  
+			 	and h.Version_Date <= to_date(to_char(#{endDate}), 'yyyy/mm/dd')
+            ]]>
+		</if>
+		<if test="roleName != null and roleName != ''">
+			<![CDATA[  
+			   and h.Role_Name = #{roleName}
+            ]]>
+		</if>
+		<if test="roleDesc != null and roleDesc != ''">
+			<![CDATA[  
+			   and h.Role_Name_Des like #{roleDesc}
+            ]]>
+		</if>
+		<if test="status != null and status != ''">
+			<![CDATA[  
+			   and h.Status = #{status}
+            ]]>
+		</if>
+		<if test="uploadFlag != null and uploadFlag != ''">
+			<![CDATA[  
+			   and Decode(h.Url, Null, '未上传', '已上传') = #{uploadFlag}
+            ]]>
+		</if>
+		<if test="logFlag != null and logFlag != ''">
+			<![CDATA[  
+			   and h.Log_Flag = #{logFlag}
+            ]]>
+		</if>
+  		order by h.Version_No, h.Version_Date, h.Role_Name, h.Status
+	</select>
+	
+	<select id="getOrganizeInfo" resultType="HashMap" parameterType="HashMap">
+		select coa.Organization_ID FCSTID, 
+			coa.Organization_Name FCSTNAME
+		from Com_Organizations coa 
+		order by Organization_Name
+	</select>
+	
+	<select id="getFactoryInfo" resultType="HashMap" parameterType="HashMap">
+		select 
+			cf.factory_code FCSTID, 
+			cf.factory_name FCSTNAME
+		from  com_factorys cf
+		where cf.ENABLED_FLAG = 'Y'
+		order by 2 desc
+	</select>
+	
+	<select id="getDemandNameInfo" resultType="HashMap" parameterType="HashMap">
+		select 
+			distinct
+			msd.Schedule_Designator FCSTID, 
+			Msd.Description FCSTNAME
+		from mrp.mrp_schedule_designators msd
+		where msd.description is not null
+		<if test="map.scheduleTypeValues != null and map.scheduleTypeValues  != ''">
+			<![CDATA[  
+              and msd.schedule_type in (${map.scheduleTypeValues})
+            ]]>
+		</if>
+		<if test="map.organized != null and map.organized  != ''">
+			<![CDATA[  
+              and msd.organization_id = #{map.organized}
+            ]]>
+		</if>
+		<if test="map.demandCode != null and map.demandCode  != ''">
+			<![CDATA[  
+              and msd.demand_class = #{map.demandCode}
+            ]]>
+		</if>
+		order by 2 desc
+	</select>
+	
+	<select id="getDemandTypeInfo" resultType="HashMap" parameterType="HashMap">
+		select 
+			lv.FLEX_VALUE_MEANING FCSTID, 
+			Lv.DESCRIPTION FCSTNAME
+		from Apps.Fnd_Flex_Values_Vl Lv
+		where lv.FLEX_VALUE_SET_ID=1019250
+		order by 2 desc
+	</select>
+	
+	<select id="getDemandCodeInfo" resultType="HashMap" parameterType="HashMap">
+		select 
+			distinct
+			ds.demand_class FCSTID, 
+			ds.demand_class FCSTNAME
+		from Mrp.Mrp_Schedule_Designators ds
+		where ds.demand_class is not null
+		order by 2 desc
+	</select>
+	
+	<select id="getUserTypeInfo" resultType="HashMap" parameterType="HashMap">
+		select 
+			lv.FLEX_VALUE_MEANING FCSTID, 
+			Lv.DESCRIPTION FCSTNAME
+		from Apps.Fnd_Flex_Values_Vl Lv
+		where lv.FLEX_VALUE_SET_ID=1019970
+		order by 2 desc
+	</select>
+	
+	<select id="getDateTypeInfo" resultType="HashMap" parameterType="HashMap">
+		select 
+			cv.lookup_code FCSTID, 
+			cv.meaning FCSTNAME
+		from  com_lookup_values cv
+		where type_id = 9
+		order by 2 desc
+	</select>
+	
+	<select id="getDemandDataZ" resultType="HashMap" parameterType="HashMap">
+		select 
+			dv.Organization_Code,
+			dv.Schedule_Type,
+			dv.Schedule_Designator,
+			dv.Demand_Type,
+			dv.Used_Type,
+			dv.Item_No,
+			dv.Item_Conf,
+			dv.factory,
+			dv.data_type,
+			to_char(dv.Schedule_Date, 'yyyy/mm/dd') Schedule_Date,
+			to_char(dv.Schedule_Quantity) Schedule_Quantity,
+			to_char(dv.Creation_Date, 'yyyy/mm/dd') Creation_Date,
+			to_char(dv.Last_Update_Date, 'yyyy/mm/dd') Last_Update_Date,
+			to_char(sum(nvl(dv.Wip_Qty, 0))) wip_qty,
+            to_char(sum(nvl(dv.Onhand_Qty, 0))) onhand_qty
+		from com_demand_data_v dv
+		where 1 = 1
+		<if test="organization != null and organization != ''">
+			<![CDATA[  
+			   and dv.Organization_Id = #{organization}
+            ]]>
+		</if>
+		<if test="factory != null and factory != ''">
+			<![CDATA[  
+			   and dv.factory = #{factory}
+            ]]>
+		</if>
+		<if test="scheduleTypeItems != null and scheduleTypeItems != ''">
+			<![CDATA[  
+			   and dv.Schedule_Type_code in(${scheduleTypeItems})
+            ]]>
+		</if>
+		<if test="demandName != null and demandName != ''">
+			<![CDATA[  
+			   and dv.Schedule_Designator in (${demandName})
+            ]]>
+		</if>
+		<if test="demandType != null and demandType != ''">
+			<![CDATA[  
+			   and dv.Demand_Type_Code = #{demandType}
+            ]]>
+		</if>
+		<if test="demandCode != null and demandCode != ''">
+			<![CDATA[  
+			   and dv.Demand_Class = #{demandCode}
+            ]]>
+		</if>
+		<if test="useType != null and useType != ''">
+			<![CDATA[  
+			   and dv.Used_Type_Code = #{useType}
+            ]]>
+		</if>
+		<if test="dataType != null and dataType != ''">
+			<![CDATA[  
+			   and dv.data_type = #{dataType}
+            ]]>
+		</if>
+		<if test="startDate != null and startDate != ''">
+			<![CDATA[  
+			 	and dv.Schedule_Date >= to_date(to_char(#{startDate}), 'yyyy/mm/dd')
+            ]]>
+		</if>
+		<if test="endDate != null and endDate != ''">
+			<![CDATA[  
+			 	and dv.Schedule_Date <= to_date(to_char(#{endDate}), 'yyyy/mm/dd')
+            ]]>
+		</if>
+		group by dv.Organization_Code, dv.Schedule_Type,dv.Schedule_Designator, dv.Demand_Type, dv.Used_Type,
+                        dv.Item_No,  dv.Item_Conf,  dv.factory, dv.data_type, dv.Schedule_Date, dv.Schedule_Quantity, dv.Creation_Date, dv.Last_Update_Date
+		order by dv.Last_Update_Date desc, dv.Creation_Date desc
+	</select>
+	
+	<select id="getDemandDataH" resultType="HashMap" parameterType="HashMap">
+		select 
+			Organization_Code,
+			Schedule_Type,
+			Schedule_Designator,
+			Demand_Type,
+			Used_Type,
+			Item_No,
+			Item_Conf,
+			factory,
+			data_type,
+			Schedule_Date,
+			to_char(sum(Schedule_Quantity)) Schedule_Quantity
+		from (
+		select 
+			dv.Organization_Code,
+			dv.Schedule_Type,
+			dv.Schedule_Designator,
+			dv.Demand_Type,
+			dv.Used_Type,
+			dv.Item_No,
+			dv.Item_Conf,
+			dv.factory,
+			dv.data_type,
+			to_char(dv.Schedule_Date, 'yyyy/mm/dd') Schedule_Date,
+			nvl(dv.Schedule_Quantity, 0) Schedule_Quantity
+		from com_demand_data_v  dv
+		where 1 = 1
+		<if test="organization != null and organization != ''">
+			<![CDATA[  
+			   and dv.Organization_id = #{organization}
+            ]]>
+		</if>
+		<if test="factory != null and factory != ''">
+			<![CDATA[  
+			   and dv.factory = #{factory}
+            ]]>
+		</if>
+		<if test="scheduleTypeItems != null and scheduleTypeItems != ''">
+			<![CDATA[  
+			   and dv.Schedule_Type_code in(${scheduleTypeItems})
+            ]]>
+		</if>
+		<if test="demandName != null and demandName != ''">
+			<![CDATA[  
+			   and dv.Schedule_Designator in (${demandName})
+            ]]>
+		</if>
+		<if test="demandType != null and demandType != ''">
+			<![CDATA[  
+			   and dv.Demand_Type_Code = #{demandType}
+            ]]>
+		</if>
+		<if test="demandCode != null and demandCode != ''">
+			<![CDATA[  
+			   and dv.Demand_Class = #{demandCode}
+            ]]>
+		</if>
+		<if test="useType != null and useType != ''">
+			<![CDATA[  
+			   and dv.Used_Type_Code = #{useType}
+            ]]>
+		</if>
+		<if test="dataType != null and dataType != ''">
+			<![CDATA[  
+			   and dv.data_type = #{dataType}
+            ]]>
+		</if>)
+		group by Organization_Code, 
+			     Schedule_Type, 
+			     Schedule_Designator, 
+			     Demand_Type, 
+			     Used_Type, 
+			     Item_No, 
+			     Item_Conf, 
+			     factory, 
+			     data_type, 
+			     Schedule_Date
+	</select>
+	
+	<select id="querySubMitStatusInfo" resultType="HashMap" parameterType="HashMap">
+		Select h.Version_No,
+     	   to_char(h.Version_Date, 'yyyy/mm/dd') Version_Date,
+	       h.Role_Name,
+	       h.Role_Name_Des,
+	       h.Status,
+	       Decode(h.Url, Null, '未上传', '已上传') Upload_Flag,
+	       to_char((Select Count(1)
+	          From Mps_Details d, Mps_Lines l
+	         Where d.Qty > 0
+	           And l.Line_Id = d.Line_Id
+	           And l.Header_Id = d.Header_Id
+	           And l.Enable_Flag = 'Y'
+	           And l.Data_Type_Code = 'MPS'
+	           And l.Header_Id = h.Header_Id)) Cnt,
+	       to_char((Select Sum(d.Qty)
+	          From Mps_Details d, Mps_Lines l
+	         Where d.Qty > 0
+	           And d.Mps_Type = 'MPS'
+	           And l.Line_Id = d.Line_Id
+	           And l.Header_Id = d.Header_Id
+	           And l.Enable_Flag = 'Y'
+	           And l.Data_Type_Code = 'MPS'
+	           And l.Header_Id = h.Header_Id)) Mps_Qty,
+	       to_char((Select Sum(d.Qty)
+	          From Mps_Details d, Mps_Lines l
+	         Where d.Qty > 0
+	           And d.Mps_Type = 'PRE-MPS'
+	           And l.Line_Id = d.Line_Id
+	           And l.Header_Id = d.Header_Id
+	           And l.Enable_Flag = 'Y'
+	           And l.Data_Type_Code = 'MPS'
+	           And l.Header_Id = h.Header_Id)) Pre_Mps_Qty,
+	       h.Remark,
+	       h.Log_Flag,
+	       to_char(h.status_date, 'yyyy/mm/dd hh24:mi:ss') status_date
+  		From Mps_Headers_v h
+  		where 1 = 1
+  		<if test="map.versionNo != null and map.versionNo != ''">
+			<![CDATA[  
+              and h.Version_No = #{map.versionNo}
+            ]]>
+		</if>
+  		<if test="map.startDate != null and map.startDate != ''">
+			<![CDATA[  
+			 	and h.Version_Date >= to_date(to_char(#{map.startDate}), 'yyyy/mm/dd')
+            ]]>
+		</if>
+		<if test="map.endDate != null and map.endDate != ''">
+			<![CDATA[  
+			 	and h.Version_Date <= to_date(to_char(#{map.endDate}), 'yyyy/mm/dd')
+            ]]>
+		</if>
+		<if test="map.roleName != null and map.roleName != ''">
+			<![CDATA[  
+			   and h.Role_Name = #{map.roleName}
+            ]]>
+		</if>
+		<if test="map.roleDesc != null and map.roleDesc != ''">
+			<![CDATA[  
+			   and h.Role_Name_Des like #{map.roleDesc}
+            ]]>
+		</if>
+		<if test="map.status != null and map.status != ''">
+			<![CDATA[  
+			   and h.Status = #{map.status}
+            ]]>
+		</if>
+		<if test="map.uploadFlag != null and map.uploadFlag != ''">
+			<![CDATA[  
+			   and Decode(h.Url, Null, '未上传', '已上传') = #{map.uploadFlag}
+            ]]>
+		</if>
+		<if test="map.logFlag != null and map.logFlag != ''">
+			<![CDATA[  
+			   and h.Log_Flag = #{map.logFlag}
+            ]]>
+		</if>
+  		order by h.Version_No, h.Version_Date, h.Role_Name, h.Status
+	</select>
+	
+	<select id="getSubMitStatusCount" parameterType="HashMap" resultType="java.lang.Integer">
+		select count(1) 
+		from (
+		Select h.Version_No,
+     	   to_char(h.Version_Date, 'yyyy/mm/dd') Version_Date,
+	       h.Role_Name,
+	       h.Role_Name_Des,
+	       h.Status,
+	       Decode(h.Url, Null, '未上传', '已上传') Upload_Flag,
+	       to_char((Select Count(1)
+	          From Mps_Details d, Mps_Lines l
+	         Where d.Qty > 0
+	           And l.Line_Id = d.Line_Id
+	           And l.Header_Id = d.Header_Id
+	           And l.Enable_Flag = 'Y'
+	           And l.Data_Type_Code = 'MPS'
+	           And l.Header_Id = h.Header_Id)) Cnt,
+	       to_char((Select Sum(d.Qty)
+	          From Mps_Details d, Mps_Lines l
+	         Where d.Qty > 0
+	           And d.Mps_Type = 'MPS'
+	           And l.Line_Id = d.Line_Id
+	           And l.Header_Id = d.Header_Id
+	           And l.Enable_Flag = 'Y'
+	           And l.Data_Type_Code = 'MPS'
+	           And l.Header_Id = h.Header_Id)) Mps_Qty,
+	       to_char((Select Sum(d.Qty)
+	          From Mps_Details d, Mps_Lines l
+	         Where d.Qty > 0
+	           And d.Mps_Type = 'PRE-MPS'
+	           And l.Line_Id = d.Line_Id
+	           And l.Header_Id = d.Header_Id
+	           And l.Enable_Flag = 'Y'
+	           And l.Data_Type_Code = 'MPS'
+	           And l.Header_Id = h.Header_Id)) Pre_Mps_Qty,
+	       h.Remark,
+	       h.Log_Flag
+  		From Mps_Headers_v h
+  		where 1 = 1
+  			<if test="map.versionNo != null and map.versionNo != ''">
+			<![CDATA[  
+              and h.Version_No = #{map.versionNo}
+            ]]>
+		</if>
+  		<if test="map.startDate != null and map.startDate != ''">
+			<![CDATA[  
+			 	and h.Version_Date >= to_date(to_char(#{map.startDate}), 'yyyy/mm/dd')
+            ]]>
+		</if>
+		<if test="map.endDate != null and map.endDate != ''">
+			<![CDATA[  
+			 	and h.Version_Date <= to_date(to_char(#{map.endDate}), 'yyyy/mm/dd')
+            ]]>
+		</if>
+		<if test="map.roleName != null and map.roleName != ''">
+			<![CDATA[  
+			   and h.Role_Name = #{map.roleName}
+            ]]>
+		</if>
+		<if test="map.roleDesc != null and map.roleDesc != ''">
+			<![CDATA[  
+			   and h.Role_Name_Des like #{map.roleDesc}
+            ]]>
+		</if>
+		<if test="map.status != null and map.status != ''">
+			<![CDATA[  
+			   and h.Status = #{map.status}
+            ]]>
+		</if>
+		<if test="map.uploadFlag != null and map.uploadFlag != ''">
+			<![CDATA[  
+			   and Decode(h.Url, Null, '未上传', '已上传') = #{map.uploadFlag}
+            ]]>
+		</if>
+		<if test="map.logFlag != null and map.logFlag != ''">
+			<![CDATA[  
+			   and h.Log_Flag = #{map.logFlag}
+            ]]>
+		</if>
+		)
+	</select>
+	
+	<select id="queryRequireDataInfo" resultType="HashMap" parameterType="HashMap">
+		select 
+			dv.Organization_Code,
+			dv.Schedule_Type,
+			dv.Schedule_Designator,
+			dv.Demand_Type,
+			dv.Used_Type,
+			dv.Item_No,
+			dv.Item_Conf,
+			dv.factory,
+			dv.data_type,
+			to_char(dv.Schedule_Date, 'yyyy/mm/dd') Schedule_Date,
+			to_char(dv.Schedule_Quantity) Schedule_Quantity,
+			to_char(dv.Creation_Date, 'yyyy/mm/dd') Creation_Date,
+			to_char(dv.Last_Update_Date, 'yyyy/mm/dd') Last_Update_Date,
+			sum(nvl(dv.Wip_Qty, 0)) wip_qty,
+            sum(nvl(dv.Onhand_Qty, 0)) onhand_qty
+		from com_demand_data_v dv
+		where 1 = 1
+		<if test="map.organization != null and map.organization != ''">
+			<![CDATA[  
+			   and dv.Organization_Id = #{map.organization}
+            ]]>
+		</if>
+		<if test="map.factory != null and map.factory != ''">
+			<![CDATA[  
+			   and dv.factory = #{map.factory}
+            ]]>
+		</if>
+		<if test="map.scheduleTypeItems != null and map.scheduleTypeItems != ''">
+			<![CDATA[  
+			   and dv.Schedule_Type_code in(${map.scheduleTypeItems})
+            ]]>
+		</if>
+		<if test="map.demandName != null and map.demandName != ''">
+			<![CDATA[  
+			   and dv.Schedule_Designator in (${map.demandName})
+            ]]>
+		</if>
+		<if test="map.demandType != null and map.demandType != ''">
+			<![CDATA[  
+			   and dv.Demand_Type_Code = #{map.demandType}
+            ]]>
+		</if>
+		<if test="map.demandCode != null and map.demandCode != ''">
+			<![CDATA[  
+			   and dv.Demand_Class = #{map.demandCode}
+            ]]>
+		</if>
+		<if test="map.useType != null and map.useType != ''">
+			<![CDATA[  
+			   and dv.Used_Type_Code = #{map.useType}
+            ]]>
+		</if>
+		<if test="map.dataType != null and map.dataType != ''">
+			<![CDATA[  
+			   and dv.data_type = #{map.dataType}
+            ]]>
+		</if>
+		<if test="map.startDate != null and map.startDate != ''">
+			<![CDATA[  
+			 	and dv.Schedule_Date >= to_date(to_char(#{map.startDate}), 'yyyy/mm/dd')
+            ]]>
+		</if>
+		<if test="map.endDate != null and map.endDate != ''">
+			<![CDATA[  
+			 	and dv.Schedule_Date <= to_date(to_char(#{map.endDate}), 'yyyy/mm/dd')
+            ]]>
+		</if>
+		group by dv.Organization_Code, dv.Schedule_Type,dv.Schedule_Designator, dv.Demand_Type, dv.Used_Type,
+                        dv.Item_No,  dv.Item_Conf,  dv.factory, dv.data_type, dv.Schedule_Date, dv.Schedule_Quantity, dv.Creation_Date, dv.Last_Update_Date
+		order by dv.Last_Update_Date desc, dv.Creation_Date desc
+	</select>
+	
+	<select id="getRequireDataCount" parameterType="HashMap" resultType="java.lang.Integer">
+	select count(1) 
+	from (
+			select 
+			dv.Organization_Code,
+			dv.Schedule_Type,
+			dv.Schedule_Designator,
+			dv.Demand_Type,
+			dv.Used_Type,
+			dv.Item_No,
+			dv.Item_Conf,
+			dv.factory,
+			dv.data_type,
+			to_char(dv.Schedule_Date, 'yyyy/mm/dd') Schedule_Date,
+			to_char(dv.Schedule_Quantity) Schedule_Quantity,
+			to_char(dv.Creation_Date, 'yyyy/mm/dd') Creation_Date,
+			to_char(dv.Last_Update_Date, 'yyyy/mm/dd') Last_Update_Date
+		from com_demand_data_v dv
+		where 1 = 1
+		<if test="map.organization != null and map.organization != ''">
+			<![CDATA[  
+			   and dv.Organization_Id = #{map.organization}
+            ]]>
+		</if>
+		<if test="map.factory != null and map.factory != ''">
+			<![CDATA[  
+			   and dv.factory = #{map.factory}
+            ]]>
+		</if>
+		<if test="map.scheduleTypeItems != null and map.scheduleTypeItems != ''">
+			<![CDATA[  
+			   and dv.Schedule_Type_code in(${map.scheduleTypeItems})
+            ]]>
+		</if>
+		<if test="map.demandName != null and map.demandName != ''">
+			<![CDATA[  
+			   and dv.Schedule_Designator in (${map.demandName})
+            ]]>
+		</if>
+		<if test="map.demandType != null and map.demandType != ''">
+			<![CDATA[  
+			   and dv.Demand_Type_Code = #{map.demandType}
+            ]]>
+		</if>
+		<if test="map.demandCode != null and map.demandCode != ''">
+			<![CDATA[  
+			   and dv.Demand_Class = #{map.demandCode}
+            ]]>
+		</if>
+		<if test="map.useType != null and map.useType != ''">
+			<![CDATA[  
+			   and dv.Used_Type_Code = #{map.useType}
+            ]]>
+		</if>
+		<if test="map.dataType != null and map.dataType != ''">
+			<![CDATA[  
+			   and dv.data_type = #{map.dataType}
+            ]]>
+		</if>
+		<if test="map.startDate != null and map.startDate != ''">
+			<![CDATA[  
+			 	and dv.Schedule_Date >= to_date(to_char(#{map.startDate}), 'yyyy/mm/dd')
+            ]]>
+		</if>
+		<if test="map.endDate != null and map.endDate != ''">
+			<![CDATA[  
+			 	and dv.Schedule_Date <= to_date(to_char(#{map.endDate}), 'yyyy/mm/dd')
+            ]]>
+		</if>
+		group by dv.Organization_Code, dv.Schedule_Type,dv.Schedule_Designator, dv.Demand_Type, dv.Used_Type,
+                        dv.Item_No,  dv.Item_Conf,  dv.factory, dv.data_type, dv.Schedule_Date, dv.Schedule_Quantity, dv.Creation_Date, dv.Last_Update_Date
+		
+	)
+	</select>
+	
+	
+	<select id="queryHistoryAction" parameterType="HashMap" resultMap="historyActionResult">
+         select 
+               Header_Id,
+		       Action_Code,
+		       Action as Action_Des,
+		       Action_By,
+		       User_Name,
+		       Remark,
+		       to_char(Action_Date,(select fcst_global_pkg.Get_Fmt_Time@FCST.HUAQIN.COM from dual) ) Action_Date_f,
+		       to_char(Creation_Date,(select fcst_global_pkg.Get_Fmt_Time@FCST.HUAQIN.COM from dual) ) Creation_Date_f,
+		       Created_By,
+		       to_char(Last_Update_Date,(select fcst_global_pkg.Get_Fmt_Time@FCST.HUAQIN.COM from dual)) Last_Update_Date_f,
+		       Last_Updated_By
+		   from
+		       Mps_Schedule_Actions_v
+		       where 1=1
+		       <if test="map.headerId != null and map.headerId != ''">
+					<![CDATA[  
+		            and  Header_Id = #{map.headerId}
+		            ]]>
+		        </if>   
+		    order by Action_Date desc
+    </select>
+    
+    <select id="getHistoryActionCount" parameterType="HashMap" resultType="Integer">
+        select 
+            count(1)
+        from 
+            Mps_Schedule_Actions_v
+        where 
+            1=1
+           <if test="map.headerId != null and map.headerId != ''">
+				<![CDATA[  
+	           and  Header_Id = #{map.headerId}
+	            ]]>
+	       </if>  
+    </select>
+    
+    <select id="queryScheduleMsgInfo" parameterType="HashMap" resultType="HashMap">
+         Select 
+			count(mv.header_id) QTY,
+			mv.Msg_Code MSGCODE,
+			mv.Msg MSG,
+			mv.Msg_Level MSGLEVEL,
+			mv.Msg_Level_Desc MSGLEVELDESC,
+			min(hv.Version_No) VERSIONNO,
+			min(hv.Ver_No) VERNO,
+			min(mv.Header_Id) HEADERID
+		From Mps_Line_Msg_v mv
+		inner join mps_headers_v hv on hv.Header_Id = mv.Header_Id
+		where 1 = 1
+		<if test="map.headerId != null and map.headerId != ''">
+			<![CDATA[  
+            and mv.Header_Id = #{map.headerId}
+            ]]>
+        </if>   
+		group by mv.Msg_Code, mv.Msg, mv.Msg_Level, mv.Msg_Level_Desc
+		order by Msg_Level desc
+    </select>
+    
+    <select id="getScheduleMsgInfoCount" parameterType="HashMap" resultType="Integer">
+        select 
+            count(1)
+        from 
+            Mps_Line_Msg_v mv
+        where 
+            1=1
+       	<if test="map.headerId != null and map.headerId != ''">
+			<![CDATA[  
+           and  mv.Header_Id = #{map.headerId}
+            ]]>
+       	</if>  
+    </select>
+</mapper>

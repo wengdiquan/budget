@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:jee="http://www.springframework.org/schema/jee"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="
+           http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context.xsd
+           http://www.springframework.org/schema/mvc
+           http://www.springframework.org/schema/mvc/spring-mvc.xsd
+           http://www.springframework.org/schema/jee
+           http://www.springframework.org/schema/jee/spring-jee.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd
+           http://www.springframework.org/schema/tx
+           http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+	<!-- 加载配置文件 -->
+	<bean id="propertyConfigurer"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>classpath:jdbc.properties</value>
+			</list>
+		</property>
+	</bean>
+
+	<!-- 配置数据源 -->
+	<bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource"
+		init-method="init" destroy-method="close">
+		<!-- 基本属性 driver、url、user、password -->
+		<property name="driverClassName" value="${driverClassName}" />
+		<property name="url" value="${url}" /><!-- 192.168.21.16:1521:prod -->
+		<property name="username" value="${username}" />
+		<property name="password" value="${password}" />
+
+		<!-- 配置初始化大小、最小、最大 -->
+		<property name="initialSize" value="${initialSize}" />
+		<property name="minIdle" value="${minIdle}" />
+		<property name="maxActive" value="${maxActive}" />
+
+		<!-- 配置获取连接等待超时的时间 -->
+		<property name="maxWait" value="${maxWait}" />
+
+		<!-- 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒 -->
+		<property name="timeBetweenEvictionRunsMillis" value="60000" />
+
+		<!-- 配置一个连接在池中最小生存的时间，单位是毫秒 -->
+		<property name="minEvictableIdleTimeMillis" value="${minEvictableIdleTimeMillis}" />
+
+		<!-- 打开PSCache，并且指定每个连接上PSCache的大小 -->
+		<property name="poolPreparedStatements" value="${poolPreparedStatements}" />
+		<property name="maxPoolPreparedStatementPerConnectionSize"
+			value="${maxPoolPreparedStatementPerConnectionSize}" />
+
+		<!-- 配置监控统计拦截的filters -->
+		<property name="filters" value="stat" />
+	</bean>
+
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean"
+		p:dataSource-ref="dataSource"
+		p:mapperLocations="classpath:com/bjsj/budget/dao/mapper/*Mapper.xml"
+		p:configLocation="classpath:mybatis-config.xml"/>
+
+	<!-- 事务管理 -->
+	<bean id="transactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+	<!-- 出错事务回滚 -->
+	<tx:advice id="TxAdvice" transaction-manager="transactionManager">
+		<tx:attributes>
+			<tx:method name="del*" propagation="REQUIRED" read-only="false"
+				rollback-for="Exception" />
+			<tx:method name="add*" propagation="REQUIRED" read-only="false"
+				rollback-for="Exception" />
+			<tx:method name="insert*" propagation="REQUIRED" read-only="false"
+				rollback-for="Exception" />
+			<tx:method name="create*" propagation="REQUIRED" read-only="false"
+				rollback-for="Exception" />
+			<tx:method name="save*" propagation="REQUIRED" read-only="false"
+				rollback-for="Exception" />
+			<tx:method name="update*" propagation="REQUIRED" read-only="false"
+				rollback-for="Exception" />
+			<tx:method name="import*" propagation="REQUIRED" read-only="false"
+				rollback-for="Exception" />
+			<tx:method name="do*" propagation="REQUIRED" read-only="false"
+				rollback-for="Exception" />
+
+			<tx:method name="find*" propagation="SUPPORTS" />
+			<tx:method name="get*" propagation="SUPPORTS" />
+			<tx:method name="check*" propagation="SUPPORTS" />
+			<tx:method name="select*" propagation="SUPPORTS" />
+			<tx:method name="query*" propagation="SUPPORTS" />
+		</tx:attributes>
+	</tx:advice>
+
+	<!-- 事务拦截 -->
+	<aop:config>
+		<aop:pointcut id="pc"
+			expression="execution(* com.bjsj.budget.service.*.*(..))" />
+		<aop:advisor pointcut-ref="pc" advice-ref="TxAdvice" />
+	</aop:config>
+
+	<!-- druid拦截器 -->
+	<bean id="druid-stat-interceptor"
+		class="com.alibaba.druid.support.spring.stat.DruidStatInterceptor">
+	</bean>
+
+	<bean id="druid-stat-pointcut" class="org.springframework.aop.support.JdkRegexpMethodPointcut"
+		scope="prototype">
+		<property name="patterns">
+			<list>
+				<value>com.bjsj.budget.service.*</value>
+				<value>com.bjsj.budget.dao.*</value>
+			</list>
+		</property>
+	</bean>
+
+	<aop:config>
+		<aop:advisor advice-ref="druid-stat-interceptor"
+			pointcut-ref="druid-stat-pointcut" />
+	</aop:config>
+
+	<!-- 配置视图 -->
+	<context:component-scan base-package="com.bjsj.budget" />
+	<bean
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<!-- <property name="prefix" value="/WEB-INF/views/" /> -->
+		<property name="prefix" value="/pages/*/" />
+		<property name="suffix" value=".jsp" />
+	</bean>
+
+	<!-- 配置通用Dao -->
+    <bean id="baseDao" class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		 <property name="basePackage" value="com.bjsj.budget.dao" />
+		 <property name="markerInterface" value="com.bjsj.budget.dao.BaseDao" /> 
+	</bean>  
+	
+	<!-- 文件上传 -->
+	<bean id="multipartResolver"
+		class="org.springframework.web.multipart.commons.CommonsMultipartResolver"
+		p:defaultEncoding="utf-8" />
+</beans>
+    
