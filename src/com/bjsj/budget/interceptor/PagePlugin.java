@@ -61,7 +61,7 @@ public class PagePlugin implements Interceptor {
                 } else {
                     Connection connection = (Connection) ivk.getArgs()[0];
                     String sql = boundSql.getSql();
-                    String countSql = "select count(0) from (" + sql + ") ";
+                    String countSql = "select count(0) from (" + sql + ") pt";
                     PreparedStatement countStmt = connection
                             .prepareStatement(countSql);
                     BoundSql countBS = new BoundSql(

@@ -377,7 +377,7 @@ globalObject.openTab = function(tabId, tabTitle, tab, config) {
 			layout : 'fit',
 			autoScroll : true,
 			border : false,
-			items : typeof (tab) == 'string' ? Ext.create('Cscec.app.' + tab, config) : tab
+			items : typeof (tab) == 'string' ? Ext.create('Budget.app.' + tab, config) : tab
 		});
 		mainTab.add(_tab);
 		mainTab.setLoading(false);
@@ -394,7 +394,7 @@ globalObject.openWindow = function(winTitle, win, winWidth, config) {
 		id : win,
 		resizable : false,
 		width : winWidth || 300,
-		items : typeof (win) == 'string' ? Ext.create('Cscec.app.' + win, config) : win
+		items : typeof (win) == 'string' ? Ext.create('Budget.app.' + win, config) : win
 	});
 }
 

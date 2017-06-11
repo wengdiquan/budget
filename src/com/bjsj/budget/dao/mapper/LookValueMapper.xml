@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bjsj.budget.dao.LookValueDao">
+	<resultMap id="BaseResultMap" type="com.bjsj.budget.model.LookValue">
+		<id column="lookvalue_id" jdbcType="INTEGER" property="lookvalueId" />
+		<result column="lookvalue_code" jdbcType="VARCHAR" property="lookvalueCode" />
+		<result column="lookvalue_name" jdbcType="VARCHAR" property="lookvalueName" />
+		<result column="remark" jdbcType="VARCHAR" property="remark" />
+		<result column="seq" jdbcType="DOUBLE" property="seq" />
+		<result column="enable_flag" jdbcType="INTEGER" property="enableFlag" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		t.lookvalue_id, t.lookvalue_code, t.lookvalue_name, t.remark, t.seq,
+		t.enable_flag, t.looktype_id
+	</sql>
+		
+	<select id="queryLookTypeInfo" parameterType="Map" resultType="HashMap">
+	    select 
+	    	tt.looktype_id,
+	    	tt.looktype_code,
+	    	tt.looktype_name
+	    from tm_looktype tt
+	    where tt.enable_flag = 1
+	    <if test="map.listCode != null">
+			and tt.list_code = #{map.listCode,jdbcType=VARCHAR}   
+	    </if>	
+	    order by looktype_id 
+	</select>
+	
+	<select id="getLookTypeInfoCount" parameterType="Map" resultType="Integer">
+		 select 
+	    	count(1)
+	    from tm_looktype tt
+	    where tt.enable_flag = 1
+	    <if test="map.listCode != null">
+			and tt.list_code = #{map.listCode,jdbcType=VARCHAR}   
+	    </if>	
+	</select>
+	
+	
+	<select id="queryLookValueInfo" parameterType="Map" resultMap="BaseResultMap">
+	    select 
+	    	<include refid="Base_Column_List" />
+	    from tm_lookvalue t
+	    inner join tm_looktype tt on t.looktype_id = tt.looktype_id 
+	    where tt.enable_flag = 1
+	    	and tt.list_code = #{map.listCode,jdbcType=VARCHAR}
+	    <if test="map.lookTypeId != null">
+			and t.looktype_id = #{map.lookTypeId,jdbcType=INTEGER}   
+	    </if>	
+	   	<if test="map.lookvalueCode != null">
+			and t.lookvalue_code like uppper('%' || #{map.lookvalueCode,jdbcType=VARCHAR} ||'%')      
+	    </if>
+	    <if test="map.lookvalueName != null">
+			and t.lookvalue_name like '%' || #{map.lookvalueName,jdbcType=VARCHAR} ||'%'       
+	    </if>
+	    order by seq, lookvalue_id 
+	</select>
+	
+	<select id="getLookValueInfoCount" parameterType="Map" resultType="Integer">
+		select 
+	    	count(1)
+	    from tm_lookvalue t
+	    inner join tm_looktype tt on t.looktype_id = tt.looktype_id 
+	    where tt.enable_flag = 1
+	    	and tt.list_code = #{map.listCode,jdbcType=VARCHAR}
+	    <if test="map.lookTypeId != null">
+			and t.looktype_id = #{map.lookTypeId,jdbcType=INTEGER}   
+	    </if>	
+	   	<if test="map.lookvalueCode != null">
+			and t.lookvalue_code like uppper('%' || #{map.lookvalueCode,jdbcType=VARCHAR} ||'%')      
+	    </if>
+	    <if test="map.lookvalueName != null">
+			and t.lookvalue_name like '%' || #{map.lookvalueName,jdbcType=VARCHAR} ||'%'       
+	    </if>
+	</select>
+	
+	<select id="getLookValueCountAdd" parameterType="LookValue" resultType="Integer">
+		select 
+	    	count(1)
+	    from tm_lookvalue t
+	    where t.lookvalue_name = #{lookvalueName,jdbcType=VARCHAR}
+	    or t.lookvalue_code =  #{lookvalueCode,jdbcType=VARCHAR}
+	</select>
+	
+	<select id="selectByPrimaryKey" parameterType="java.lang.Integer"
+		resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from tm_lookvalue t
+		where lookvalue_id = #{lookvalueId,jdbcType=INTEGER}
+	</select>
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+		delete from
+		tm_lookvalue
+		where lookvalue_id = #{lookvalueId,jdbcType=INTEGER}
+	</delete>
+	<insert id="insert" parameterType="com.bjsj.budget.model.LookValue">
+		insert into tm_lookvalue
+		(lookvalue_id, lookvalue_code, lookvalue_name,
+		remark, seq, enable_flag, looktype_id
+		)
+		values (#{lookvalueId,jdbcType=INTEGER},
+		#{lookvalueCode,jdbcType=VARCHAR},
+		#{lookvalueName,jdbcType=VARCHAR},
+		#{remark,jdbcType=VARCHAR}, #{seq,jdbcType=DOUBLE},
+		#{enableFlag,jdbcType=INTEGER},#{lookTypeId,jdbcType=INTEGER}
+		)
+	</insert>
+	<insert id="insertSelective" parameterType="com.bjsj.budget.model.LookValue">
+		insert into tm_lookvalue
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="lookvalueId != null">
+				lookvalue_id,
+			</if>
+			<if test="lookvalueCode != null">
+				lookvalue_code,
+			</if>
+			<if test="lookvalueName != null">
+				lookvalue_name,
+			</if>
+			<if test="remark != null">
+				remark,
+			</if>
+			<if test="seq != null">
+				seq,
+			</if>
+			<if test="enableFlag != null">
+				enable_flag,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="lookvalueId != null">
+				#{lookvalueId,jdbcType=INTEGER},
+			</if>
+			<if test="lookvalueCode != null">
+				#{lookvalueCode,jdbcType=VARCHAR},
+			</if>
+			<if test="lookvalueName != null">
+				#{lookvalueName,jdbcType=VARCHAR},
+			</if>
+			<if test="remark != null">
+				#{remark,jdbcType=VARCHAR},
+			</if>
+			<if test="seq != null">
+				#{seq,jdbcType=DOUBLE},
+			</if>
+			<if test="enableFlag != null">
+				#{enableFlag,jdbcType=INTEGER},
+			</if>
+		</trim>
+	</insert>
+	<update id="updateByPrimaryKey" parameterType="com.bjsj.budget.model.LookValue">
+		update
+		tm_lookvalue
+		set lookvalue_code = #{lookvalueCode,jdbcType=VARCHAR},
+		lookvalue_name = #{lookvalueName,jdbcType=VARCHAR},
+		remark =
+		#{remark,jdbcType=VARCHAR},
+		seq = #{seq,jdbcType=DOUBLE},
+		enable_flag =
+		#{enableFlag,jdbcType=INTEGER}
+		where lookvalue_id =
+		#{lookvalueId,jdbcType=INTEGER}
+	</update>
+</mapper>

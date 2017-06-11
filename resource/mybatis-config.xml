@@ -9,6 +9,7 @@
 	<typeAliases>
 		<typeAlias type="java.util.HashMap" alias="HashMap" />
 		<typeAlias type="java.util.Date" alias="Date" />
+		<typeAlias type="com.bjsj.budget.model.LookValue" alias="LookValue" />
 	</typeAliases>
 	<plugins>
 		<plugin interceptor="com.bjsj.budget.interceptor.PagePlugin">

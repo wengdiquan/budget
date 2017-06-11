@@ -76,7 +76,7 @@ Ext.onReady(function() {
 		}
 	});
 
-	Ext.define('Cscec.app.util.UserWindow', {
+	Ext.define('Budget.app.util.UserWindow', {
 		extend : 'Ext.ux.custom.GlobalGridPanel',
 		region : 'center',
 		initComponent : function() {

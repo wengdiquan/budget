@@ -9,7 +9,7 @@
 		<title>概预算管理系统</title>
 		<link rel="stylesheet" type="text/css" href="${contextPath}/static/ext/examples/portal/portal.css" />
 		<link rel="stylesheet" type="text/css" href="${contextPath}/static/ext/examples/shared/example.css" />
-		<link rel="stylesheet" type="text/css" href="${contextPath}/static/css/cscec-style.css"  />
+		<link rel="stylesheet" type="text/css" href="${contextPath}/static/css/budget-style.css"  />
 	    <script type="text/javascript" src="${contextPath}/static/ext/examples/shared/include-ext.js"></script>
 	    <script type="text/javascript" src="${contextPath}/static/ext/locale/ext-lang-zh_CN.js"></script>
 	    <script type="text/javascript" src="${contextPath}/static/ext/examples/shared/options-toolbar.js"></script>
@@ -21,7 +21,7 @@
 	    	var appName = '概预算管理系统';
 	        Ext.Loader.setPath('Ext.app', '${contextPath}/static/ext/examples/portal/classes');
 	        Ext.Loader.setPath('Ext.ux', '${contextPath}/static/ext/examples/ux');
-	        Ext.Loader.setPath('Cscec.app', '${contextPath}/static/ext/examples/portal');
+	        Ext.Loader.setPath('Budget.app', '${contextPath}/static/ext/examples/portal');
 	    </script>
 	    <script type="text/javascript" src="${contextPath}/static/ext/examples/portal/portal.js"></script>
 	    <script type="text/javascript">
@@ -40,7 +40,21 @@
 	    </script>
 	    
 	    <!-- 公共类 -->
-	    <script type="text/javascript" src="${contextPath}/static/ext/examples/portal/util/UserWindow.js"></script>
+	    <style type="text/css">
+	    	 .enableFlag_N { 
+				background-color: #DDDDDD;
+			}
+			.error_rp{
+				background-color: #FF7256;
+			}
+			.success_rp{
+				background-color: #C1FFC1;
+			}
+			.info_rp{
+				background-color: #EEE685;
+			}
+	    </style>
+	    
 	    
 	</head>
 	<body>
