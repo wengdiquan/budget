@@ -20,7 +20,21 @@ public class ProjectServiceImpl implements ProjectService {
 	
 	@Override
 	public void updateProject(Project project) throws Exception {
-		projectDao.updateByPrimaryKey(project);
+		
+		
+		/***
+		 * 先删除单位工程信息 TODO
+		 */
+		
+		
+		Map<String, String> queryMap = new HashMap<String, String>();
+		queryMap.put("parentId", project.getProjectId() + "");
+		
+		List<Project> childProjectList = getLowerProjectTreeList(queryMap);
+		for(Project p : childProjectList){
+			projectDao.deleteByPrimaryKey(p.getProjectId());
+		}
+		projectDao.deleteByPrimaryKey(project.getProjectId());
 	}
 
 	@Override

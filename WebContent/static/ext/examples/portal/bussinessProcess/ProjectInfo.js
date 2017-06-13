@@ -68,9 +68,7 @@ Ext.onReady(function() {
 										if (response.responseText != '') {
 											var res = Ext.JSON.decode(response.responseText);
 											if (res.success) {
-											
 												var store = Ext.getCmp('projectinfo-projecttreeid').getStore();
-												
 												//如果是项目的话
 												if(window.eventSource == "PJ"){
 												}
@@ -144,7 +142,7 @@ Ext.onReady(function() {
 		plain : true,
 		border : true,
 		region : 'west',
-		width : '16%',
+		width : '20%',
 		animate : true,//动画效果
 		initComponent : function() {
 			var me = this;
@@ -167,9 +165,9 @@ Ext.onReady(function() {
 				rootVisible : false,
 				store:store,
 				tbar:[{
-						width : 120,
+						width : 80,
 						xtype : 'button',
-						text : '新建',
+						text : '新增',
 						iconCls : 'icon-add',
 						menu : [/*{
 							text : '新增项目',
@@ -184,6 +182,55 @@ Ext.onReady(function() {
 							handler : me.addBitProjectFun,
 							iconCls : 'icon-wood'
 						} ]
+					},
+					{
+						width : 80,
+						xtype : 'button',
+						text : '移除',
+						iconCls : 'icon-delete',
+						handler:function(){
+							
+							 var records = Ext.getCmp('projectinfo-projecttreeid').getSelectionModel().getSelection()
+							 if(records.length != 1){
+								 globalObject.infoTip('请选择一项进行移除');
+								 return;
+							 }
+							 
+							 if(records[0].data.depth == 1){
+								 globalObject.infoTip('不能移除项目');
+								 return;
+							 }
+							 
+							 globalObject.confirmTip("删除该节点会同时删除已经填写的单位工程，确认删除吗?", 
+								 function(btn){
+									 if("yes" == btn){
+										 Ext.getCmp('projectinfo-projecttreeid').getEl().mask('数据处理中，请稍候...');
+										 Ext.Ajax.request({
+											 url : appBaseUri + '/project/saveOrUpdateProject',
+											 params : {
+												 "cmd":"edit",
+												 "projectId":records[0].data.id
+											 },
+											 method : "POST",
+											 success : function(response) {
+												 if (response.responseText != '') {
+													 var res = Ext.JSON.decode(response.responseText);
+													 if (res.success) {
+														 records[0].remove();
+													 } else {
+														 globalObject.errTip(res.msg);
+													 }
+												 }
+											 },
+											 failure : function(response) {
+												 globalObject.errTip('操作失败！');
+											 }
+										 });
+										 
+										 Ext.getCmp('projectinfo-projecttreeid').getEl().unmask();
+									 }
+							 	});
+						}
 					}
 				]
 			});
@@ -243,12 +290,17 @@ Ext.onReady(function() {
 				var store = Ext.getCmp('projectinfo-projecttreeid').getStore();
 				Ext.apply(store.proxy.extraParams, {"source":"click"});
 				
+				var costValueStore = Ext.getCmp("costmoneymanage-costvaluegrid").getStore();
 				if(record.data.depth == 1){
 					Ext.getCmp('projectinfo-projecttreeid').project = record.data.id;
+					Ext.apply(store.proxy.extraParams, {"source": "pj"});
+					costValueStore.reload();
 				}
 				
 				if(record.data.depth == 2){
 					Ext.getCmp('projectinfo-projecttreeid').sproject = record.data.id;
+					Ext.apply(store.proxy.extraParams, {"source": "spj"});
+					costValueStore.reload();
 				}
 				
 				/*
@@ -265,12 +317,19 @@ Ext.onReady(function() {
 			'cellclick':function(_this, td, cellIndex, record, tr, rowIndex, e, eOpts){
 				var store = Ext.getCmp('projectinfo-projecttreeid').getStore();
 				Ext.apply(store.proxy.extraParams, {"source":"click"});
+				
+
+				var costValueStore = Ext.getCmp("costmoneymanage-costvaluegrid").getStore();
 				if(record.data.depth == 1){
 					Ext.getCmp('projectinfo-projecttreeid').project = record.data.id;
+					Ext.apply(store.proxy.extraParams, {"source": "spj"});
+					costValueStore.reload();
 				}
 				
 				if(record.data.depth == 2){
 					Ext.getCmp('projectinfo-projecttreeid').sproject = record.data.id;
+					Ext.apply(store.proxy.extraParams, {"source": "spj"});
+					costValueStore.reload();
 				}
 				/*
 				if (!record.data.leaf) {
@@ -289,7 +348,6 @@ Ext.onReady(function() {
 	// 项目汇总
 	Ext.define('Budget.app.bussinessProcess.ProjectInfo.projectSummeryGrid', {
 		extend : 'Ext.grid.Panel',
-		id : 'costmoneymanage-costvaluegrid',
 		plain : true,
 		region : 'center',
 		initComponent : function() {
@@ -310,7 +368,7 @@ Ext.onReady(function() {
 				pageSize : globalPageSize,
 				proxy : {
 					type : 'ajax',
-					url : appBaseUri + '/lookvalue/queryLookValueInfo',
+					url : appBaseUri + '',
 					extraParams : {"lookTypeId": Ext.getCmp('projectinfo-projecttreeid').lookTypeId},
 					reader : {
 						type : 'json',
@@ -321,14 +379,30 @@ Ext.onReady(function() {
 				}
 			});
 			Ext.apply(this, {
+				id : 'costmoneymanage-costvaluegrid',
 				store : costValueStore,
 				title:"汇总信息",
 				selModel : Ext.create('Ext.selection.CheckboxModel'),
-				columns : [],
-				bbar : Ext.create('Ext.PagingToolbar', {
-					store : costValueStore,
-					displayInfo : true
-				}),
+				columns : [{
+						text:'序号', width:40,xtype:'rownumberer'
+					},
+					{
+						text:'名称', width:120, 	dataIndex : 'name',
+					},
+					{
+						text:'项目造价(元)', width:120, 	dataIndex : 'money', align:"right"
+					},{
+						text:'占造价百分比(%)', width:120, 	dataIndex : 'money', align:"right"
+					},
+					{
+						text:"其中",
+			            columns:[
+			                {text: "运输费", width: 80, dataIndex: 'title', sortable: false},
+			                {text: "材料费", width: 80, dataIndex: 'author', sortable: false},
+			                {text: "安装费", width: 80, dataIndex: 'hits', sortable: false},
+			                {text: "措施费", width: 80, dataIndex: 'hits', sortable: false}]
+					}
+				],
 				viewConfig:{
 					loadingText : '正在查询数据，请耐心稍候...',
 					stripeRows:false,
