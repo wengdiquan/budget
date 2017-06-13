@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bjsj.budget.dao.ProjectDao">
+	<resultMap id="BaseResultMap" type="com.bjsj.budget.model.Project">
+		<id column="t_project_id" property="projectId" jdbcType="INTEGER" />
+		<result column="t_project_name" property="projectName"
+			jdbcType="VARCHAR" />
+		<result column="t_level" property="level" jdbcType="INTEGER" />
+		<result column="t_parent_id" property="parentId" jdbcType="INTEGER" />
+		<result column="t_enable_flag" property="enableFlag" jdbcType="INTEGER" />
+		<result column="t_remark" property="remark" jdbcType="VARCHAR" />
+		<result column="t_isleaf" property="isLeaf" jdbcType="INTEGER" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		t.project_id as t_project_id, t.project_name as
+		t_project_name, t.level as
+		t_level,
+		t.parent_id as t_parent_id,
+		t.enable_flag as t_enable_flag, t.remark as t_remark, t.isleaf as t_isleaf
+	</sql>
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap"
+		parameterType="java.lang.Integer">
+		select
+		<include refid="Base_Column_List" />
+		from tb_project t
+		where t.project_id = #{projectId,jdbcType=INTEGER}
+	</select>
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+		delete from
+		tb_project
+		where project_id = #{projectId,jdbcType=INTEGER}
+	</delete>
+	<insert id="insert" parameterType="com.bjsj.budget.model.Project" useGeneratedKeys="true" keyProperty="projectId">
+		insert into tb_project
+		(project_name, level,
+		parent_id, enable_flag, remark, isleaf
+		)
+		values (
+		#{projectName,jdbcType=VARCHAR},
+		#{level,jdbcType=INTEGER},
+		#{parentId,jdbcType=INTEGER}, #{enableFlag,jdbcType=INTEGER},
+		#{remark,jdbcType=VARCHAR}, #{isLeaf,jdbcType=INTEGER}
+		)
+	</insert>
+	<update id="updateByPrimaryKey" parameterType="com.bjsj.budget.model.Project">
+		update tb_project
+		set project_name = #{projectName,jdbcType=VARCHAR},
+		level = #{level,jdbcType=INTEGER},
+		parent_id = #{parentId,jdbcType=INTEGER},
+		enable_flag = #{enableFlag,jdbcType=INTEGER},
+		remark = #{remark,jdbcType=VARCHAR}
+		where project_id = #{projectId,jdbcType=INTEGER}
+	</update>
+	
+	
+	<select id="getCountProjectByMap" parameterType="Map" resultType="Integer">
+		select
+			count(1)
+		from tb_project t
+		where t.enable_flag = 1
+		<if test='isChild == "Y"'>
+			<![CDATA[  
+              and t.parent_id = #{parentId,jdbcType=INTEGER}
+              and t.level = #{level,jdbcType=INTEGER}
+              and t.project_name = #{projectName,jdbcType=VARCHAR}
+            ]]>
+		</if>    
+	</select>
+	
+	<select id="selectByMap" resultMap="BaseResultMap"
+		parameterType="HashMap">
+		select
+		<include refid="Base_Column_List" />
+		from tb_project t 
+		where t.project_id = #{projectId,jdbcType=INTEGER}
+	</select>
+	
+	<select id="getLowerProjectTreeList" resultMap="BaseResultMap" parameterType="HashMap">
+	    select
+		<include refid="Base_Column_List" />
+		from tb_project t 
+		where t.parent_id = #{parentId,jdbcType=INTEGER}    
+	</select>
+	
+</mapper>

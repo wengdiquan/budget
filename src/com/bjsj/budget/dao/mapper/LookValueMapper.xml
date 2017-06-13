@@ -37,7 +37,6 @@
 	    </if>	
 	</select>
 	
-	
 	<select id="queryLookValueInfo" parameterType="Map" resultMap="BaseResultMap">
 	    select 
 	    	<include refid="Base_Column_List" />
@@ -45,13 +44,13 @@
 	    inner join tm_looktype tt on t.looktype_id = tt.looktype_id 
 	    where tt.enable_flag = 1
 	    	and tt.list_code = #{map.listCode,jdbcType=VARCHAR}
-	    <if test="map.lookTypeId != null">
+	    <if test="map.lookTypeId != null and map.lookTypeId != ''">
 			and t.looktype_id = #{map.lookTypeId,jdbcType=INTEGER}   
 	    </if>	
-	   	<if test="map.lookvalueCode != null">
+	   	<if test="map.lookvalueCode != null and map.lookvalueCode != ''">
 			and t.lookvalue_code like uppper('%' || #{map.lookvalueCode,jdbcType=VARCHAR} ||'%')      
 	    </if>
-	    <if test="map.lookvalueName != null">
+	    <if test="map.lookvalueName != null and map.lookvalueName != ''">
 			and t.lookvalue_name like '%' || #{map.lookvalueName,jdbcType=VARCHAR} ||'%'       
 	    </if>
 	    order by seq, lookvalue_id 
@@ -64,13 +63,13 @@
 	    inner join tm_looktype tt on t.looktype_id = tt.looktype_id 
 	    where tt.enable_flag = 1
 	    	and tt.list_code = #{map.listCode,jdbcType=VARCHAR}
-	    <if test="map.lookTypeId != null">
+	   	<if test="map.lookTypeId != null and map.lookTypeId != ''">
 			and t.looktype_id = #{map.lookTypeId,jdbcType=INTEGER}   
 	    </if>	
-	   	<if test="map.lookvalueCode != null">
+	   	<if test="map.lookvalueCode != null and map.lookvalueCode != ''">
 			and t.lookvalue_code like uppper('%' || #{map.lookvalueCode,jdbcType=VARCHAR} ||'%')      
 	    </if>
-	    <if test="map.lookvalueName != null">
+	    <if test="map.lookvalueName != null and map.lookvalueName != ''">
 			and t.lookvalue_name like '%' || #{map.lookvalueName,jdbcType=VARCHAR} ||'%'       
 	    </if>
 	</select>
@@ -153,11 +152,9 @@
 	<update id="updateByPrimaryKey" parameterType="com.bjsj.budget.model.LookValue">
 		update
 		tm_lookvalue
-		set lookvalue_code = #{lookvalueCode,jdbcType=VARCHAR},
-		lookvalue_name = #{lookvalueName,jdbcType=VARCHAR},
+		set 
 		remark =
 		#{remark,jdbcType=VARCHAR},
-		seq = #{seq,jdbcType=DOUBLE},
 		enable_flag =
 		#{enableFlag,jdbcType=INTEGER}
 		where lookvalue_id =

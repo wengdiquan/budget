@@ -313,7 +313,7 @@ Ext.onReady(function() {
 			items : [ Ext.create('Ext.ux.StatusBar', {
 				border : false,
 				text : '',
-				style : 'background:#3892D3;',
+				style : 'background:#5d8b49;',
 				defaults : {
 					style : 'color:#fff;'
 				},
