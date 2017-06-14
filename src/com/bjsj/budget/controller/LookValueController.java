@@ -1,5 +1,7 @@
 package com.bjsj.budget.controller;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -18,6 +20,9 @@ import com.bjsj.budget.service.LookValueService;
 import com.bjsj.budget.util.ListView;
 import com.bjsj.budget.util.TransforUtil;
 
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+
 @Controller
 @RequestMapping(value="/lookvalue")
 public class LookValueController {
@@ -34,21 +39,37 @@ public class LookValueController {
 	 */
 	@RequestMapping(value = "/queryLookTypeInfo")
 	@ResponseBody
-	public ListView queryLookTypeInfo(HttpServletRequest request,
+	public List<JSONObject> queryLookTypeInfo(HttpServletRequest request,
 			HttpServletResponse response){
 		//查询条件
 		Map<String, String> queryMap = TransforUtil.transRMapToMap(request.getParameterMap());
 		
 		PageInfo pageInfo = new PageInfo();
-		pageInfo.setCurrentResult(Integer.parseInt(request.getParameter("start")));
-		pageInfo.setShowCount(Integer.parseInt(request.getParameter("limit")));
+		pageInfo.setCurrentResult(0);
+		pageInfo.setShowCount(100);
 		
 		PageObject pageObj = lookValueService.queryLookTypeInfo(queryMap, pageInfo);
 		
-		ListView typeList = new ListView();
-		typeList.setData(pageObj.getRows());
-		typeList.setTotalRecord(pageObj.getRecords());
-		return typeList;
+		JSONObject jsonRoot = new JSONObject();
+		jsonRoot.element("id", "0");
+		jsonRoot.element("text", "费用代码");
+		jsonRoot.element("leaf", false);
+		jsonRoot.element("expanded", true);
+		
+		JSONArray sjsonArray = new JSONArray();
+		for(Object obj: pageObj.getRows()){
+			JSONObject json = new JSONObject();
+			Map map = (Map)obj;
+			json.element("id", map.get("looktype_id"));
+			json.element("text", map.get("looktype_name"));
+			json.element("leaf", true);
+			json.element("expanded", false);
+			sjsonArray.add(json);
+		}
+		List<JSONObject> resultList = new ArrayList<JSONObject>();
+		jsonRoot.element("children", sjsonArray);
+		resultList.add(jsonRoot);
+		return resultList;
 	}
 	
 	
@@ -96,7 +117,7 @@ public class LookValueController {
 			
 			
 		}catch (Exception ex) {
-			return "{success:false,msg:" + ex.getMessage() + "}";
+			return "{success:false,msg:'" + ex.getMessage() + "'}";
 		}
 		return "{success:true}";
 	}

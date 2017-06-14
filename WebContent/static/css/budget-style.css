@@ -81,3 +81,20 @@
 .icon-export {
 	background-image: url(/budget/static/ext/examples/shared/icons/fam/page_copy.png) !important;
 }
+
+.icon-buliding {
+	background-image: url(/budget/static/ext/examples/shared/icons/fam/book.png) !important;
+}
+
+
+.icon-room {
+	background-image: url(/budget/static/ext/examples/shared/icons/fam/pictures.png) !important;
+}
+
+
+.icon-wood {
+	background-image: url(/budget/static/ext/examples/shared/icons/fam/plugin.gif) !important;
+}
+
+
+

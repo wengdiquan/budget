@@ -5,8 +5,8 @@
 		<Console name="Console" target="SYSTEM_OUT">
 			<PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
 		</Console>
-		<RollingFile name="LogFile" fileName="../logs/demand/demand.log"
-			filePattern="../logs/demand/demand_%d{yyyy-MM-dd}_%i.log">
+		<RollingFile name="LogFile" fileName="../logs/budget/budget.log"
+			filePattern="../logs/budget/budget_%d{yyyy-MM-dd}_%i.log">
 			<PatternLayout pattern="%d %p %c{1.} [%t] %m%n" />
 			<Policies>
 				<TimeBasedTriggeringPolicy modulate="true"

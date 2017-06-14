@@ -97,9 +97,7 @@ Ext.onReady(function() {
 			App.baseDataManage.CostMoneyManage.InfoWindow.superclass.constructor.call(this, config);
 		}
 	});
-
-
-
+	
 	// 费用代码维护
 	Ext.define('Budget.app.baseDataManage.CostMoneyManage', {
 		extend : 'Ext.panel.Panel',
@@ -116,58 +114,38 @@ Ext.onReady(function() {
 	
 	//费用大类
 	Ext.define('Budget.app.baseDataManage.CostMoneyManage.CostTypeGrid', {
-		extend : 'Ext.grid.Panel',
+		extend : 'Ext.tree.Panel',
 		id : 'costmoneymanage-costtypegrid',
 		region : 'west',
 		width : '18%',
+		border : true,
+		title:"大类名称",
+		animate : true,//动画效果
 		initComponent : function() {
 			var me = this;
-			Ext.define('CostTypeList', {
-				extend : 'Ext.data.Model',
-				idProperty : 'looktype_id',
-				fields : [ {
-					name : 'looktype_id',
-					type : 'int'
-				}, 'looktype_code', 'looktype_name' ]
-			});
-			var costTypeStore = Ext.create('Ext.data.Store', {
-				model : 'CostTypeList',
+			var costTypeStore = Ext.create('Ext.data.TreeStore', {
 				autoLoad : true,
-				remoteSort : true,
-				pageSize : globalPageSize,
 				proxy : {
 					type : 'ajax',
 					url : appBaseUri + '/lookvalue/queryLookTypeInfo',
 					extraParams : {listCode:"COST_CODE"},
 					reader : {
 						type : 'json',
-						root : 'data',
-						totalProperty : 'totalRecord',
-						successProperty : "success"
+						root : 'children'
 					}
 				}
 			});
-			var costTypeColumns = [ {
-				text : "looktype_id",
-				dataIndex : 'looktype_id',
-				hidden : true
-			}, {
-				text : "looktype_code",
-				dataIndex : 'looktype_code',
-				hidden : true
-			}, {
-				text : "费用大类",
-				dataIndex : 'looktype_name',
-				sortable : false,
-				width : '85%'
-			}];
 			Ext.apply(this, {
+				rootVisible : false,
 				store : costTypeStore,
-				selModel : Ext.create('Ext.selection.CheckboxModel'),
-				columns : costTypeColumns,
 				listeners : {
 					'itemclick' : function(item, record) {
-						me.lookTypeId = record.get('looktype_id');
+						if(record.get('id') == 0){
+							return;
+						}
+						
+						me.lookTypeId = record.get('id');
+						
 						Ext.getCmp('costmoneymanage-costvaluegrid').getStore().load({
 							params : {
 								'lookTypeId' : me.lookTypeId
@@ -199,7 +177,7 @@ Ext.onReady(function() {
 			
 			var costValueStore = Ext.create('Ext.data.Store', {
 				model : 'CostValueList',
-				autoLoad : false,
+				autoLoad : true,
 				remoteSort : true,
 				pageSize : globalPageSize,
 				proxy : {
@@ -219,6 +197,9 @@ Ext.onReady(function() {
 				dataIndex : 'lookvalueId',
 				hidden : true
 			},{
+				text:'', width:25,xtype:'rownumberer'
+			}
+			,{
 				text : "费用名称",
 				dataIndex : 'lookvalueName',
 				sortable : false,
@@ -315,7 +296,9 @@ Ext.onReady(function() {
 			form.findField('lookTypeId').setValue(looktypeId);
 			form.findField('cmd').setValue('edit');
 			form.findField('lookvalueName').setReadOnly(true);
+			form.findField('lookvalueName').setDisabled(true);
 			form.findField('lookvalueCode').setReadOnly(true);
+			form.findField('lookvalueCode').setDisabled(true);
 			form.loadRecord(gridRecord);
 			win.show();
 		}
