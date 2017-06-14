@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bjsj.budget.dao.YCADao">
+
+	<resultMap id="YCAInfoMap" type="com.bjsj.budget.model.YCAModel">
+	</resultMap>
+	
+	<sql id="Base_Column_List">
+		t.id as ID,
+		t.looktype_id as looktype_id,
+		t.code as code,
+		t.name as name,
+		t.unit as unit
+	</sql>
+	
+    <select id="queryYCAInfo" parameterType="HashMap" resultMap="YCAInfoMap">
+        select
+		<include refid="Base_Column_List" />,lt.looktype_name as category
+		from tm_yca_detail t 
+		<!-- inner join tm_lookvalue lv on lv.lookvalue_id = t.lookvalue_id -->
+		inner join tm_looktype lt on lt.looktype_id = t.looktype_id and lt.looktype_id = #{map.lookTypeId,jdbcType=INTEGER} 
+    </select>
+    <select id="getYCAInfoCount" parameterType="HashMap" resultType="Integer">
+		select 
+	    	count(1)
+	    from tm_yca_detail t 
+		<!-- inner join tm_lookvalue lv on lv.lookvalue_id = t.lookvalue_id -->
+		inner join tm_looktype lt on lt.looktype_id = t.looktype_id and lt.looktype_id = #{map.lookTypeId,jdbcType=INTEGER}
+	</select>
+    <insert id="insertYCA" parameterType="com.bjsj.budget.model.YCAModel">
+		insert into tm_yca_detail
+			(id, lookvalue_id, code, name, unit)
+		values (#{id,jdbcType=INTEGER},
+			#{lookvalue_id,jdbcType=VARCHAR},
+			#{code,jdbcType=VARCHAR},
+			#{name,jdbcType=VARCHAR},
+			#{unit,jdbcType=INTEGER}
+			)
+	</insert>
+	<select id="getYCACount" parameterType="com.bjsj.budget.model.YCAModel" resultType="Integer">
+		select 
+	    	count(1)
+	    from tm_yca_detail t
+	    where t.code = #{code,jdbcType=VARCHAR}
+	</select>
+	<update id="updateByPrimaryKey" parameterType="com.bjsj.budget.model.YCAModel">
+		update
+		tm_yca_detail
+		set name = #{name,jdbcType=VARCHAR},
+		unit = #{unit,jdbcType=VARCHAR}
+		where id = #{id,jdbcType=INTEGER}
+	</update>
+</mapper>
