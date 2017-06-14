@@ -111,58 +111,38 @@ Ext.onReady(function() {
 	
 	//费用大类
 	Ext.define('Budget.app.baseDataManage.YCAManage.CostTypeGrid', {
-		extend : 'Ext.grid.Panel',
+		extend : 'Ext.tree.Panel',
 		id : 'ycamanage-costtypegrid',
 		region : 'west',
 		width : '18%',
+		border : true,
+		title:"大类名称",
+		animate : true,//动画效果
 		initComponent : function() {
 			var me = this;
-			Ext.define('CostTypeList', {
-				extend : 'Ext.data.Model',
-				idProperty : 'looktype_id',
-				fields : [ {
-					name : 'looktype_id',
-					type : 'int'
-				}, 'looktype_code', 'looktype_name' ]
-			});
-			var costTypeStore = Ext.create('Ext.data.Store', {
-				model : 'CostTypeList',
+			var costTypeStore = Ext.create('Ext.data.TreeStore', {
 				autoLoad : true,
-				remoteSort : true,
-				pageSize : globalPageSize,
 				proxy : {
 					type : 'ajax',
 					url : appBaseUri + '/lookvalue/queryLookTypeInfo',
 					extraParams : {listCode:"COST_CODE"},
 					reader : {
 						type : 'json',
-						root : 'data',
-						totalProperty : 'totalRecord',
-						successProperty : "success"
+						root : 'children'
 					}
 				}
 			});
-			var costTypeColumns = [ {
-				text : "looktype_id",
-				dataIndex : 'looktype_id',
-				hidden : true
-			}, {
-				text : "looktype_code",
-				dataIndex : 'looktype_code',
-				hidden : true
-			}, {
-				text : "费用大类",
-				dataIndex : 'looktype_name',
-				sortable : false,
-				width : '85%'
-			}];
 			Ext.apply(this, {
+				rootVisible : false,
 				store : costTypeStore,
-				selModel : Ext.create('Ext.selection.CheckboxModel'),
-				columns : costTypeColumns,
 				listeners : {
 					'itemclick' : function(item, record) {
-						me.lookTypeId = record.get('looktype_id');
+						if(record.get('id') == 0){
+							return;
+						}
+						
+						me.lookTypeId = record.get('id');
+						
 						Ext.getCmp('ycamanage-costvaluegrid').getStore().load({
 							params : {
 								'lookTypeId' : me.lookTypeId
@@ -173,9 +153,8 @@ Ext.onReady(function() {
 			});
 			this.callParent(arguments);
 		}
-		
 	});
-	
+
 	// 详细值
 	Ext.define('Budget.app.baseDataManage.YCAManage.CostValueGrid', {
 		extend : 'Ext.grid.Panel',
@@ -281,7 +260,7 @@ Ext.onReady(function() {
 				hidden : true
 			})
 			var form = win.down('form').getForm();
-			form.findField('looktypeId').setValue(looktypeId);
+			form.findField('looktype_id').setValue(looktypeId);
 			win.show();
 		},
 		editCodeCodeFun : function() {

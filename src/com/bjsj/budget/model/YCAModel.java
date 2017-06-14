@@ -1,7 +1,7 @@
 package com.bjsj.budget.model;
 
 public class YCAModel {
-	private Integer looktype_Id;
+	private Integer looktype_id;
 	private Integer lookvalue_id;
 	private String looktypeName;
 	private Integer id;
@@ -10,11 +10,11 @@ public class YCAModel {
 	private String name;
 	private String unit;
 
-	public Integer getLooktype_Id() {
-		return looktype_Id;
+	public Integer getLooktype_id() {
+		return looktype_id;
 	}
-	public void setLooktype_Id(Integer looktype_Id) {
-		this.looktype_Id = looktype_Id;
+	public void setLooktype_id(Integer looktype_id) {
+		this.looktype_id = looktype_id;
 	}
 	public String getLooktypeName() {
 		return looktypeName;

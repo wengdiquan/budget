@@ -29,9 +29,9 @@
 	</select>
     <insert id="insertYCA" parameterType="com.bjsj.budget.model.YCAModel">
 		insert into tm_yca_detail
-			(id, lookvalue_id, code, name, unit)
+			(id, looktype_id, code, name, unit)
 		values (#{id,jdbcType=INTEGER},
-			#{lookvalue_id,jdbcType=VARCHAR},
+			#{looktype_id,jdbcType=VARCHAR},
 			#{code,jdbcType=VARCHAR},
 			#{name,jdbcType=VARCHAR},
 			#{unit,jdbcType=INTEGER}
