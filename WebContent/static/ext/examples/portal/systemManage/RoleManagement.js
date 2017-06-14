@@ -2,16 +2,16 @@
 Ext.onReady(function() {
 	Ext.tip.QuickTipManager.init();
 	
-	Ext.define('Cscec.app.systemManage.RoleManagement', {
+	Ext.define('Budget.app.systemManage.RoleManagement', {
 		extend : 'Ext.panel.Panel',
 		initComponent : function() {
 			var me = this;
 			Ext.apply(this, {
 				layout : 'border',
-				items : [ Ext.create('Cscec.app.systemManage.RoleManagement.roleGrid', {
+				items : [ Ext.create('Budget.app.systemManage.RoleManagement.roleGrid', {
 					cButtons : me.cButtons,
 					cName : me.cName
-				}), Ext.create('Cscec.app.util.UserWindow',{
+				}), Ext.create('Budget.app.util.UserWindow',{
 					title:"关联用户",
 					id:"userwindowidforrole",
 					needAutoLoad:false
@@ -126,7 +126,7 @@ Ext.onReady(function() {
 		}
 	});
 	
-	Ext.define('Cscec.app.systemManage.RoleManagement.roleGrid', {
+	Ext.define('Budget.app.systemManage.RoleManagement.roleGrid', {
 		extend : 'Ext.ux.custom.GlobalGridPanel',
 		region : 'north',
 		height : '40%',
@@ -191,7 +191,7 @@ Ext.onReady(function() {
 	});
 	
 	//角色人员信息
-	Ext.define('Cscec.app.systemManage.RoleManagement.userGrid', {
+	Ext.define('Budget.app.systemManage.RoleManagement.userGrid', {
 		extend : 'Ext.ux.custom.GlobalGridPanel',
 		region : 'south',
 		height : '60%',

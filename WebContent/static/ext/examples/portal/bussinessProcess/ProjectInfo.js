@@ -263,7 +263,6 @@ Ext.onReady(function() {
 				globalObject.infoTip('请先选择项目');
 				return;
 			}
-			
 			var win = new App.bussinessProcess.ProjectInfo.Project({title:"新建单项工程", hidden:true, eventSource:'SPJ'});
 			var form = win.down('form').getForm();
 			form.findField('level').setValue("2");
@@ -302,17 +301,6 @@ Ext.onReady(function() {
 					Ext.apply(store.proxy.extraParams, {"source": "spj"});
 					costValueStore.reload();
 				}
-				
-				/*
-				if (!record.data.leaf) {
-					var store = Ext.getCmp('projectinfo-projecttreeid').getStore();
-					var new_params = {
-						level:record.data.depth,
-						parentId:record.data.id,
-						type:"click"
-					};
-					Ext.apply(store.proxy.extraParams, new_params);
-				}*/
 			},
 			'cellclick':function(_this, td, cellIndex, record, tr, rowIndex, e, eOpts){
 				var store = Ext.getCmp('projectinfo-projecttreeid').getStore();
@@ -331,18 +319,20 @@ Ext.onReady(function() {
 					Ext.apply(store.proxy.extraParams, {"source": "spj"});
 					costValueStore.reload();
 				}
-				/*
-				if (!record.data.leaf) {
-					var store = Ext.getCmp('projectinfo-projecttreeid').getStore();
-					var new_params = {
-						level:record.data.depth,
-						parentId:record.data.id,
-						type:"click"
-					};
-					Ext.apply(store.proxy.extraParams, new_params);
-				}*/
+			},
+			'itemdblclick' : function(_this, record, td, cellIndex, tr, rowIndex, e, eOpts){
+				var store = Ext.getCmp('projectinfo-projecttreeid').getStore();
+				if(record.data.leaf){
+					var pnode = store.getNodeById(record.data.parentId);
+					var rnode = store.getNodeById(pnode.data.parentId);
+					
+					var bitWin = Ext.create("Budget.app.bussinessProcess.ProjectBitWin",{
+						title : '单位工程:' + rnode.data.text + "->" + pnode.data.text + "->" + record.data.text
+					});
+					
+					bitWin.show();
+				}
 			}
-			
 		}
 	});
 	// 项目汇总
