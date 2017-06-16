@@ -25,7 +25,7 @@ Ext.onReady(function() {
 						value : 'new'
 					}, {
 						xtype : 'hiddenfield',
-						name : 'looktype_id'
+						name : 'lookvalue_id'
 					},{
 						xtype : 'hiddenfield',
 						name : 'id'
@@ -124,7 +124,7 @@ Ext.onReady(function() {
 				autoLoad : true,
 				proxy : {
 					type : 'ajax',
-					url : appBaseUri + '/lookvalue/queryLookTypeInfo',
+					url : appBaseUri + '/yca/queryTreeList',
 					extraParams : {listCode:"COST_CODE"},
 					reader : {
 						type : 'json',
@@ -137,15 +137,15 @@ Ext.onReady(function() {
 				store : costTypeStore,
 				listeners : {
 					'itemclick' : function(item, record) {
-						if(record.get('id') == 0){
+						if(record.data.id == 0){
 							return;
 						}
 						
-						me.lookTypeId = record.get('id');
+						me.lookValueId = record.data.id;
 						
 						Ext.getCmp('ycamanage-costvaluegrid').getStore().load({
 							params : {
-								'lookTypeId' : me.lookTypeId
+								'lookValueId' : me.lookValueId
 							}
 						});
 					}
@@ -180,7 +180,7 @@ Ext.onReady(function() {
 				proxy : {
 					type : 'ajax',
 					url : appBaseUri + '/yca/queryYCAInfo',
-					extraParams : {"lookTypeId": Ext.getCmp('ycamanage-costtypegrid').lookTypeId},
+					extraParams : {"lookValueId": Ext.getCmp('ycamanage-costtypegrid').lookValueId},
 					reader : {
 						type : 'json',
 						root : 'data',
@@ -251,23 +251,23 @@ Ext.onReady(function() {
 		},
 		newCodeCodeFun: function(){
 			var me = this;
-			var looktypeId = Ext.getCmp('ycamanage-costtypegrid').lookTypeId;
-			if (!looktypeId) {
-				globalObject.infoTip('请先选择费用大类！');
+			var lookValueId = Ext.getCmp('ycamanage-costtypegrid').lookValueId;
+			if (!lookValueId) {
+				globalObject.infoTip('请先选择费用小类！');
 				return;
 			};
 			var win = new App.baseDataManage.YCAManage.InfoWindow({
 				hidden : true
-			})
+			});
 			var form = win.down('form').getForm();
-			form.findField('looktype_id').setValue(looktypeId);
+			form.findField('lookvalue_id').setValue(lookValueId);
 			win.show();
 		},
 		editCodeCodeFun : function() {
 			var me = this;
-			var looktypeId = Ext.getCmp('ycamanage-costtypegrid').lookTypeId;
-			if (!looktypeId) {
-				globalObject.infoTip('请先选择费用大类！');
+			var lookValueId = Ext.getCmp('ycamanage-costtypegrid').lookValueId;
+			if (!lookValueId) {
+				globalObject.infoTip('请先选择费用小类！');
 				return;
 			};
 			

@@ -1,6 +1,11 @@
 package com.bjsj.budget.service;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import com.bjsj.budget.model.LookValue;
+import com.bjsj.budget.model.Project;
 import com.bjsj.budget.model.YCAModel;
 import com.bjsj.budget.page.PageInfo;
 import com.bjsj.budget.page.PageObject;
@@ -25,4 +30,9 @@ public interface YCAService {
 	 * @throws Exception
 	 */
 	public void updateValue(YCAModel record) throws Exception;
+	
+	
+	public List<LookValue> getLookValueList(Map<String, String> queryMap);
+	
+	public List<HashMap> getLookTypeList(Map<String, String> queryMap);
 }

@@ -1,5 +1,6 @@
 package com.bjsj.budget.service.impl;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -40,4 +41,13 @@ public class YCAServiceImpl implements YCAService{
 		yCADao.updateByPrimaryKey(record);
 	}
 
+	@Override
+	public List<LookValue> getLookValueList(Map<String, String> queryMap) {
+		return yCADao.getLookValueList(queryMap);
+	}
+
+	@Override
+	public List<HashMap> getLookTypeList(Map<String, String> queryMap) {
+		return yCADao.getLookTypeList(queryMap);
+	}
 }

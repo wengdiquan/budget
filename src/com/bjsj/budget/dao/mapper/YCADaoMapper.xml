@@ -4,10 +4,17 @@
 
 	<resultMap id="YCAInfoMap" type="com.bjsj.budget.model.YCAModel">
 	</resultMap>
-	
+	<resultMap id="BaseResultMap" type="com.bjsj.budget.model.LookValue">
+		<id column="lookvalue_id" jdbcType="INTEGER" property="lookvalueId" />
+		<result column="lookvalue_code" jdbcType="VARCHAR" property="lookvalueCode" />
+		<result column="lookvalue_name" jdbcType="VARCHAR" property="lookvalueName" />
+		<result column="remark" jdbcType="VARCHAR" property="remark" />
+		<result column="seq" jdbcType="DOUBLE" property="seq" />
+		<result column="enable_flag" jdbcType="INTEGER" property="enableFlag" />
+	</resultMap>
 	<sql id="Base_Column_List">
 		t.id as ID,
-		t.looktype_id as looktype_id,
+		t.lookvalue_id as lookvalue_id,
 		t.code as code,
 		t.name as name,
 		t.unit as unit
@@ -15,23 +22,23 @@
 	
     <select id="queryYCAInfo" parameterType="HashMap" resultMap="YCAInfoMap">
         select
-		<include refid="Base_Column_List" />,lt.looktype_name as category
+		<include refid="Base_Column_List" />
 		from tm_yca_detail t 
-		<!-- inner join tm_lookvalue lv on lv.lookvalue_id = t.lookvalue_id -->
-		inner join tm_looktype lt on lt.looktype_id = t.looktype_id and lt.looktype_id = #{map.lookTypeId,jdbcType=INTEGER} 
+		inner join tm_lookvalue lv on lv.lookvalue_id = t.lookvalue_id
+		where t.lookvalue_id = #{map.lookValueId,jdbcType=INTEGER}
     </select>
     <select id="getYCAInfoCount" parameterType="HashMap" resultType="Integer">
 		select 
 	    	count(1)
 	    from tm_yca_detail t 
-		<!-- inner join tm_lookvalue lv on lv.lookvalue_id = t.lookvalue_id -->
-		inner join tm_looktype lt on lt.looktype_id = t.looktype_id and lt.looktype_id = #{map.lookTypeId,jdbcType=INTEGER}
+		inner join tm_lookvalue lv on lv.lookvalue_id = t.lookvalue_id 
+		where t.lookvalue_id = #{map.lookValueId,jdbcType=INTEGER}
 	</select>
     <insert id="insertYCA" parameterType="com.bjsj.budget.model.YCAModel">
 		insert into tm_yca_detail
-			(id, looktype_id, code, name, unit)
+			(id, lookvalue_id, code, name, unit)
 		values (#{id,jdbcType=INTEGER},
-			#{looktype_id,jdbcType=VARCHAR},
+			#{lookvalue_id,jdbcType=VARCHAR},
 			#{code,jdbcType=VARCHAR},
 			#{name,jdbcType=VARCHAR},
 			#{unit,jdbcType=INTEGER}
@@ -50,4 +57,29 @@
 		unit = #{unit,jdbcType=VARCHAR}
 		where id = #{id,jdbcType=INTEGER}
 	</update>
+	<sql id="Base_Column_ListLook">
+		t.lookvalue_id, t.lookvalue_code, t.lookvalue_name, t.remark, t.seq,
+		t.enable_flag, t.looktype_id
+	</sql>
+    <select id="getLookValueList" parameterType="HashMap" resultMap="BaseResultMap">
+	    select 
+	    	<include refid="Base_Column_ListLook" />
+	    from tm_lookvalue t
+	    where 1 = 1  
+	     <if test="map.lookTypeId != null and map.lookTypeId != ''">
+			and t.looktype_id = #{map.lookTypeId,jdbcType=INTEGER}   
+	    </if>	
+	   	<if test="map.lookvalue_id != null and map.lookvalue_id != ''">
+			and t.lookvalue_id = #{map.lookvalue_id,jdbcType=INTEGER}    
+	    </if>
+	</select>
+	<select id="getLookTypeList" parameterType="Map" resultType="HashMap">
+	    select 
+	    	tt.looktype_id,
+	    	tt.looktype_code,
+	    	tt.looktype_name
+	    from tm_looktype tt
+	    where tt.enable_flag = 1
+	    order by looktype_id 
+	</select>
 </mapper>
