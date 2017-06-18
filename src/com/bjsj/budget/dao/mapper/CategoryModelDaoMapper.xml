@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bjsj.budget.dao.CategoryModelDao">
+
+	<resultMap id="CMInfoMap" type="com.bjsj.budget.model.CategoryModelModel">
+	</resultMap>
+	<resultMap id="CMYCAInfoMap" type="com.bjsj.budget.model.CategoryModelYCAModel">
+	</resultMap>
+	
+	<sql id="Base_Column_List">
+		t.id as id,
+		t.code as code,
+		t.name as name,
+		t.unit as unit,
+		t.price as price,
+		t.transportfee as transportFee,
+		t.materialfee as materialFee,
+		t.installationfee as installationFee,
+		t.sumprice as sumPrice,
+		t.dtgcl as dtgcl,
+		t.parentid as parentId,
+		t.leaf as leaf
+	</sql>
+	
+    <select id="getCategoryModelList" parameterType="HashMap" resultMap="CMInfoMap">
+        select
+		<include refid="Base_Column_List" />
+		from tm_unitproject_base t 
+		where 1 = 1
+		 <if test="map.leaf != null and map.leaf != ''">
+			and t.leaf = #{map.leaf,jdbcType=INTEGER}   
+	     </if>	
+	     <if test="map.parentId != null and map.parentId != ''">
+			and t.parentId = #{map.parentId,jdbcType=INTEGER}   
+	     </if>	
+    </select>
+    
+    <select id="queryDetailCategoryModel" parameterType="HashMap" resultMap="CMInfoMap">
+        select
+		<include refid="Base_Column_List" />
+		from tm_unitproject_base t 
+		where 1 = 1
+		     <if test="map.parentId != null and map.parentId != ''">
+				and t.parentId = #{map.parentId,jdbcType=INTEGER}   
+		     </if>	
+    </select>
+    
+    <select id="getDetailCategoryModelCount" parameterType="HashMap" resultType="Integer">
+		select 
+	    	count(1)
+	    from tm_unitproject_base t 
+		where 1 =1 
+		     <if test="map.parentId != null and map.parentId != ''">
+				and t.parentId = #{map.parentId,jdbcType=INTEGER}   
+		     </if>	
+	</select>
+	
+	<sql id="Base_Column_List_YCA">
+		t.id as id,
+		t.unitProject_Id as unitProject_Id,
+		t.code as code,
+		t.name as name,
+		t.unit as unit,
+		t.content as content,
+		t.amount as amount,
+		t.noPrice as noPrice,
+		t.price as price,
+		t.rate as rate,
+		t.sumprice as sumPrice,
+		t.sumnoprice as sumNoPrice
+	</sql>
+	
+	<select id="queryDetailYCA" parameterType="HashMap" resultMap="CMYCAInfoMap">
+        select
+		<include refid="Base_Column_List_YCA" />
+		from tm_unitproject_detail_base t 
+		where 1 = 1
+		     <if test="map.unitProject_Id != null and map.unitProject_Id != ''">
+				and t.unitproject_id = #{map.unitProject_Id,jdbcType=INTEGER}   
+		     </if>	
+    </select>
+    
+    <select id="getDetailYCACount" parameterType="HashMap" resultType="Integer">
+		select 
+	    	count(1)
+	   from tm_unitproject_detail_base t 
+		where 1 = 1
+		     <if test="map.unitProject_Id != null and map.unitProject_Id != ''">
+				and t.unitproject_id = #{map.unitProject_Id,jdbcType=INTEGER}   
+		     </if>
+	</select>
+	
+	
+   <!--  <insert id="insertYCA" parameterType="com.bjsj.budget.model.YCAModel">
+		insert into tm_yca_detail
+			(id, lookvalue_id, code, name, unit)
+		values (#{id,jdbcType=INTEGER},
+			#{lookvalue_id,jdbcType=VARCHAR},
+			#{code,jdbcType=VARCHAR},
+			#{name,jdbcType=VARCHAR},
+			#{unit,jdbcType=INTEGER}
+			)
+	</insert>
+	<select id="getYCACount" parameterType="com.bjsj.budget.model.YCAModel" resultType="Integer">
+		select 
+	    	count(1)
+	    from tm_yca_detail t
+	    where t.code = #{code,jdbcType=VARCHAR}
+	</select>
+	<update id="updateByPrimaryKey" parameterType="com.bjsj.budget.model.YCAModel">
+		update
+		tm_yca_detail
+		set name = #{name,jdbcType=VARCHAR},
+		unit = #{unit,jdbcType=VARCHAR}
+		where id = #{id,jdbcType=INTEGER}
+	</update>
+	<sql id="Base_Column_ListLook">
+		t.lookvalue_id, t.lookvalue_code, t.lookvalue_name, t.remark, t.seq,
+		t.enable_flag, t.looktype_id
+	</sql>
+    <select id="getLookValueList" parameterType="HashMap" resultMap="BaseResultMap">
+	    select 
+	    	<include refid="Base_Column_ListLook" />
+	    from tm_lookvalue t
+	    where 1 = 1  
+	     <if test="map.lookTypeId != null and map.lookTypeId != ''">
+			and t.looktype_id = #{map.lookTypeId,jdbcType=INTEGER}   
+	    </if>	
+	   	<if test="map.lookvalue_id != null and map.lookvalue_id != ''">
+			and t.lookvalue_id = #{map.lookvalue_id,jdbcType=INTEGER}    
+	    </if>
+	</select>
+	<select id="getLookTypeList" parameterType="Map" resultType="HashMap">
+	    select 
+	    	tt.looktype_id,
+	    	tt.looktype_code,
+	    	tt.looktype_name
+	    from tm_looktype tt
+	    where tt.enable_flag = 1
+	    order by looktype_id 
+	</select> -->
+</mapper>

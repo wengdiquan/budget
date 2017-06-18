@@ -12,28 +12,32 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import com.bjsj.budget.model.CategoryModelModel;
 import com.bjsj.budget.model.LookValue;
 import com.bjsj.budget.model.YCAModel;
 import com.bjsj.budget.page.PageInfo;
 import com.bjsj.budget.page.PageObject;
+import com.bjsj.budget.service.CategoryModelService;
 import com.bjsj.budget.service.YCAService;
 import com.bjsj.budget.util.ListView;
 import com.bjsj.budget.util.TransforUtil;
 @Controller
-@RequestMapping(value="/yca")
-public class YCAController {
+@RequestMapping(value="/categorymodel")
+public class CategoryModelController {
 	@Autowired
 	private YCAService yCAService;
+	@Autowired
+	private CategoryModelService categoryModelService;
 	
 	/**
-	 * 查询 yca
+	 * 查询 查询右侧 上部分 序里的数据
 	 * @param request
 	 * @param response
 	 * @return
 	 */
-	@RequestMapping(value = "/queryYCAInfo")
+	@RequestMapping(value = "/queryDetailCategoryModel")
 	@ResponseBody
-	public ListView queryYCAInfo(HttpServletRequest request,
+	public ListView queryDetailCategoryModel(HttpServletRequest request,
 			HttpServletResponse response){
 		//查询条件
 		Map<String, String> queryMap = TransforUtil.transRMapToMap(request.getParameterMap());
@@ -42,7 +46,32 @@ public class YCAController {
 		pageInfo.setCurrentResult(Integer.parseInt(request.getParameter("start")));
 		pageInfo.setShowCount(Integer.parseInt(request.getParameter("limit")));
 		
-		PageObject pageObj = yCAService.queryYCAInfo(queryMap, pageInfo);
+		PageObject pageObj = categoryModelService.queryDetailCategoryModel(queryMap, pageInfo);
+		
+		ListView typeList = new ListView();
+		typeList.setData(pageObj.getRows());
+		typeList.setTotalRecord(pageObj.getRecords());
+		return typeList;
+	}
+	
+	/**
+	 * 查询右侧下方部分 运材安数据
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	@RequestMapping(value = "/queryDetailYCA")
+	@ResponseBody
+	public ListView queryDetailYCA(HttpServletRequest request,
+			HttpServletResponse response){
+		//查询条件
+		Map<String, String> queryMap = TransforUtil.transRMapToMap(request.getParameterMap());
+		
+		PageInfo pageInfo = new PageInfo();
+		pageInfo.setCurrentResult(Integer.parseInt(request.getParameter("start")));
+		pageInfo.setShowCount(Integer.parseInt(request.getParameter("limit")));
+		
+		PageObject pageObj = categoryModelService.queryDetailYCA(queryMap, pageInfo);
 		
 		ListView typeList = new ListView();
 		typeList.setData(pageObj.getRows());
@@ -80,37 +109,39 @@ public class YCAController {
 		return "{success:true}";
 	}
 	/**
-	 * 查询 字典类型
+	 * 查询 左侧树状  模块
 	 * @param request
 	 * @param response
 	 * @return
 	 */
-	@RequestMapping(value = "/queryTreeList")
+	@RequestMapping(value = "/getCategoryModelList")
 	@ResponseBody
-	public List<JSONObject> queryLookTypeInfo(HttpServletRequest request,
+	public List<JSONObject> getCategoryModelList(HttpServletRequest request,
 			HttpServletResponse response){
 		//查询条件
 		Map<String, String> queryMap = TransforUtil.transRMapToMap(request.getParameterMap());
 		
-		List<HashMap> typeList = yCAService.getLookTypeList(queryMap);
+		queryMap.put("leaf", "0");
+		List<CategoryModelModel> CMList = categoryModelService.getCategoryModelList(queryMap);
 		
 		List<JSONObject> resultList = new ArrayList<JSONObject>();
-		for(int i = 0; i < typeList.size(); i++){
+		Map<String, String> queryMap1 = new HashMap();
+		for(int i = 0; i < CMList.size(); i++){
 			JSONObject jsonRoot = new JSONObject();
-			Map map = typeList.get(i);
-			jsonRoot.element("id", map.get("looktype_id"));
-			jsonRoot.element("text", map.get("looktype_name"));
+			CategoryModelModel map = CMList.get(i);
+			jsonRoot.element("id", map.getId());
+			jsonRoot.element("text", map.getName());
 			jsonRoot.element("leaf", false);
 			jsonRoot.element("expanded", true);
 			
-			queryMap.put("lookTypeId", map.get("looktype_id").toString());
-			List<LookValue> valueList = yCAService.getLookValueList(queryMap);
+			queryMap1.put("parentId", map.getId().toString());
+			List<CategoryModelModel> CMMChild = categoryModelService.getCategoryModelList(queryMap1);
 			
 			JSONArray sjsonArray = new JSONArray();
-			for(LookValue lookValue : valueList){
+			for(CategoryModelModel child : CMMChild){
 				JSONObject json = new JSONObject();
-				json.element("id", lookValue.getLookvalueId());
-				json.element("text", lookValue.getLookvalueName());
+				json.element("id", child.getId());
+				json.element("text", child.getName());
 				json.element("leaf", true);
 				json.element("expanded", false);
 				sjsonArray.add(json);
