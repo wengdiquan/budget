@@ -4,20 +4,20 @@ Ext.onReady(function() {
 	
 	Ext.define('Budget.app.bussinessProcess.ProjectBitWin', {
 		extend : 'Ext.window.Window',
-		constructor : function(config) {
-			config = config || {};
-			Ext.apply(config, {
-				width : "99%",
-				height : "95%",
+		initComponent : function() {
+          	var me = this;
+  			Ext.apply(this, {
+  				width : "99%",
+				height : "99%",
 				bodyPadding : '5 5',
 				modal : true,
 				layout : 'fit',
 				items : [Ext.create("Budget.app.bussinessProcess.ProjectBitWin.TabPanel", {
-				
+						bitProjectId: me.bitProjectId
 					})
 				]
-			});
-			Budget.app.bussinessProcess.ProjectBitWin.superclass.constructor.call(this, config);
+  			});
+  			this.callParent(arguments);
 		}
 	});
 	
@@ -31,7 +31,7 @@ Ext.onReady(function() {
                     title: '分部分项',  
                     items:[
                     	Ext.create("Budget.app.bussinessProcess.ProjectBitPanel", {
-                    		
+                    		bitProjectId:me.bitProjectId
                     	})
                     ],
                     itemId: 'bitproject'  

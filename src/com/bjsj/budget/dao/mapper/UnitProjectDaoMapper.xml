@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bjsj.budget.dao.UnitProjectDao">
+	<resultMap id="BaseResultMap" type="com.bjsj.budget.model.UnitProject">
+		<id column="t_id" property="id" jdbcType="INTEGER" />
+		<id column="t_sumprice" property="sumprice" jdbcType="DOUBLE" />
+		<result column="t_code" property="code" jdbcType="VARCHAR" />
+		<result column="t_name" property="name" jdbcType="VARCHAR" />
+		<result column="t_unit" property="unit" jdbcType="VARCHAR" />
+		<result column="t_amount" property="amount" jdbcType="DOUBLE" />
+		<result column="t_dtgcl" property="dtgcl" jdbcType="DOUBLE" />
+		<result column="t_price" property="price" jdbcType="DOUBLE" />
+		<result column="t_remark" property="remark" jdbcType="VARCHAR" />
+		<result column="t_parentid" property="parentid" jdbcType="INTEGER" />
+		<result column="t_leaf" property="leaf" jdbcType="INTEGER" />
+		<result column="t_bit_project_id" property="bitProjectId"
+			jdbcType="INTEGER" />
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		t.id as t_id, t.sumprice as t_sumprice, t.code as t_code, t.name as
+		t_name, t.unit as t_unit,
+		t.amount as t_amount, t.dtgcl as t_dtgcl, t.price as t_price, t.remark as
+		t_remark,
+		t.parentid as t_parentid, t.leaf as t_leaf, t.bit_project_id as t_bit_project_id
+	</sql>
+	<insert id="insert" parameterType="com.bjsj.budget.model.UnitProject">
+		insert into tm_unitproject (id, sumprice, code,
+		name, unit, amount,
+		dtgcl, price, remark,
+		parentid, leaf, bit_project_id
+		)
+		values (#{id,jdbcType=INTEGER}, #{sumprice,jdbcType=DOUBLE},
+		#{code,jdbcType=VARCHAR},
+		#{name,jdbcType=VARCHAR}, #{unit,jdbcType=VARCHAR}, #{amount,jdbcType=DOUBLE},
+		#{dtgcl,jdbcType=DOUBLE}, #{price,jdbcType=DOUBLE},
+		#{remark,jdbcType=VARCHAR},
+		#{parentid,jdbcType=INTEGER}, #{leaf,jdbcType=INTEGER}, #{bitProjectId,jdbcType=INTEGER}
+		)
+	</insert>
+	<update id="updateByPrimaryKey" parameterType="com.bjsj.budget.model.UnitProject">
+		update tm_unitproject
+		set code = #{code,jdbcType=VARCHAR},
+		name = #{name,jdbcType=VARCHAR},
+		unit = #{unit,jdbcType=VARCHAR},
+		amount = #{amount,jdbcType=DOUBLE},
+		dtgcl = #{dtgcl,jdbcType=DOUBLE},
+		price = #{price,jdbcType=DOUBLE},
+		remark = #{remark,jdbcType=VARCHAR},
+		parentid = #{parentid,jdbcType=INTEGER},
+		leaf = #{leaf,jdbcType=INTEGER},
+		bit_project_id = #{bitProjectId,jdbcType=INTEGER}
+		where id = #{id,jdbcType=INTEGER}
+		and sumprice = #{sumprice,jdbcType=DOUBLE}
+	</update>
+</mapper>

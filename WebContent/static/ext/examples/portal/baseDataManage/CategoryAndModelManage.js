@@ -30,11 +30,19 @@ Ext.onReady(function() {
 					},{
 						xtype : 'hiddenfield',
 						name : 'id'
-					},{
-						xtype: 'treecombox', 
-						name : 'xiaohan',
-						fieldLabel: '编号分类'
-					},{
+					},
+					Ext.create("Ext.ux.comboboxtree", {  
+				        name : 'xiaohan',
+				        hiddenName : 'hiddenName',  
+				        storeUrl :  appBaseUri + '/static/ext/examples/portal/util/tree2.json',  
+				        cascade : 'child',//级联方式:1.child子级联;2.parent,父级联,3,both全部级联  
+				        checkModel:'single',//当json数据为不带checked的数据时只配置为single,带checked配置为double为单选,不配置为多选  
+				        fieldLabel : '编号分类',  
+				        rootId : '1',  
+				        rootText : 'DRP',  
+				        treeNodeParameter : '',  
+				    })
+					,{
 						xtype : 'textfield',
 						name : 'code',
 						allowBlank : false,

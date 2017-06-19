@@ -327,7 +327,8 @@ Ext.onReady(function() {
 					var rnode = store.getNodeById(pnode.data.parentId);
 					
 					var bitWin = Ext.create("Budget.app.bussinessProcess.ProjectBitWin",{
-						title : '单位工程:' + rnode.data.text + "->" + pnode.data.text + "->" + record.data.text
+						title : '单位工程:' + rnode.data.text + "->" + pnode.data.text + "->" + record.data.text,
+						bitProjectId: record.data.id
 					});
 					
 					bitWin.show();

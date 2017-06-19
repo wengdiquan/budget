@@ -16,3 +16,4 @@ public interface AuthorityDao extends BaseDao {
 	 */
 	List<Authority> getMenuInfo(@Param("map")Map<String, Object> queryMap);
 }
+
