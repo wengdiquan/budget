@@ -8,4 +8,9 @@ public class Constant {
 	//新增项目时，将项目ID放入Session中
 	public static final String PRODUCT_ID = "PRODUCT_ID";
 	
+	
+	public static final String YSFLAG = "1";//运输费
+	public static final String CLFLAG = "2";//材料费
+	public static final String AZFLAG = "3";//安装费
+	public static final String CSFLAG = "4";//措施费
 }

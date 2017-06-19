@@ -1,5 +1,6 @@
 package com.bjsj.budget.controller;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import com.bjsj.budget.model.CategoryModelModel;
+import com.bjsj.budget.model.CategoryModelYCAModel;
 import com.bjsj.budget.model.LookValue;
 import com.bjsj.budget.model.YCAModel;
 import com.bjsj.budget.page.PageInfo;
@@ -20,6 +22,7 @@ import com.bjsj.budget.page.PageObject;
 import com.bjsj.budget.service.CategoryModelService;
 import com.bjsj.budget.service.YCAService;
 import com.bjsj.budget.util.ListView;
+import com.bjsj.budget.util.NumberUtils;
 import com.bjsj.budget.util.TransforUtil;
 @Controller
 @RequestMapping(value="/categorymodel")
@@ -83,27 +86,16 @@ public class CategoryModelController {
 	@ResponseBody
 	public String saveOrUpdateValue (HttpServletRequest request,
 			HttpServletResponse response){
-		YCAModel record = new YCAModel();
-		
 		try
 		{
-			TransforUtil.transFromMapToBean(request.getParameterMap(), record);
-			
 			if("edit".equals(request.getParameter("cmd"))){
-				yCAService.updateValue(record);
+				categoryModelService.updateValue(request.getParameterMap());
 			}else{
-				Map<String, String> queryMap = TransforUtil.transRMapToMap(request.getParameterMap());
-				List<LookValue> lookValue = yCAService.getLookValueList(queryMap);
-				if(lookValue.size() > 0){
-					LookValue tt = lookValue.get(0);
-					String code = record.getCode();
-					record.setCode(tt.getLookvalueCode() + "-" + code);
-					yCAService.insertValue(record);
-				}
+				categoryModelService.insertValue(request.getParameterMap());
 			}
 			
-			
 		}catch (Exception ex) {
+			ex.printStackTrace();
 			return "{success:false,msg:" + ex.getMessage() + "}";
 		}
 		return "{success:true}";

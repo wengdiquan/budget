@@ -1,4 +1,3 @@
-// 用户管理
 Ext.onReady(function() {
 	Ext.tip.QuickTipManager.init();
 	Ext.define('App.baseDataManage.YCAManage.InfoWindow', {

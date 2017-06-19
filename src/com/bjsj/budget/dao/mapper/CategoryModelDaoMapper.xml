@@ -90,53 +90,63 @@
 		     </if>
 	</select>
 	
+ 	<select id="selectByPrimaryKey" parameterType="HashMap" resultMap="CMYCAInfoMap">
+		select 
+	    	<include refid="Base_Column_List_YCA" />
+	    from tm_unitproject_detail_base t 
+	    where t.id = #{map.id,jdbcType=INTEGER}   
+	</select> 
 	
-   <!--  <insert id="insertYCA" parameterType="com.bjsj.budget.model.YCAModel">
-		insert into tm_yca_detail
-			(id, lookvalue_id, code, name, unit)
+	<select id="selectCMByPrimaryKey" parameterType="HashMap" resultMap="CMInfoMap">
+		select 
+	    	<include refid="Base_Column_List" />
+	    from tm_unitproject_base t 
+	    where t.id = #{map.id,jdbcType=INTEGER}   
+	</select>
+	
+	
+     <insert id="insertCMYCA" parameterType="com.bjsj.budget.model.CategoryModelYCAModel">
+		insert into tm_unitproject_detail_base
+			(id, unitProject_Id, code, name, unit, content, amount, noprice, price, rate, sumprice, sumnoprice)
 		values (#{id,jdbcType=INTEGER},
-			#{lookvalue_id,jdbcType=VARCHAR},
+			#{unitProject_Id,jdbcType=INTEGER},
 			#{code,jdbcType=VARCHAR},
 			#{name,jdbcType=VARCHAR},
-			#{unit,jdbcType=INTEGER}
+			#{unit,jdbcType=VARCHAR},
+			#{content,jdbcType=INTEGER},
+			#{amount,jdbcType=DOUBLE},
+			#{noPrice,jdbcType=DOUBLE},
+			#{price,jdbcType=DOUBLE},
+			#{rate,jdbcType=DOUBLE},
+			#{sumPrice,jdbcType=DOUBLE},
+			#{sumNoPrice,jdbcType=DOUBLE}
 			)
 	</insert>
-	<select id="getYCACount" parameterType="com.bjsj.budget.model.YCAModel" resultType="Integer">
-		select 
-	    	count(1)
-	    from tm_yca_detail t
-	    where t.code = #{code,jdbcType=VARCHAR}
-	</select>
-	<update id="updateByPrimaryKey" parameterType="com.bjsj.budget.model.YCAModel">
+	
+	<update id="updateByPrimaryKey" parameterType="com.bjsj.budget.model.CategoryModelYCAModel">
 		update
-		tm_yca_detail
-		set name = #{name,jdbcType=VARCHAR},
-		unit = #{unit,jdbcType=VARCHAR}
+		tm_unitproject_detail_base
+		set content = #{content,jdbcType=INTEGER},
+		amount = #{amount,jdbcType=DOUBLE},
+		noPrice = #{noPrice,jdbcType=DOUBLE},
+		price = #{price,jdbcType=DOUBLE},
+		rate = #{rate,jdbcType=DOUBLE},
+		sumPrice = #{sumPrice,jdbcType=DOUBLE},
+		sumNoPrice = #{sumNoPrice,jdbcType=DOUBLE}
 		where id = #{id,jdbcType=INTEGER}
-	</update>
-	<sql id="Base_Column_ListLook">
-		t.lookvalue_id, t.lookvalue_code, t.lookvalue_name, t.remark, t.seq,
-		t.enable_flag, t.looktype_id
-	</sql>
-    <select id="getLookValueList" parameterType="HashMap" resultMap="BaseResultMap">
-	    select 
-	    	<include refid="Base_Column_ListLook" />
-	    from tm_lookvalue t
-	    where 1 = 1  
-	     <if test="map.lookTypeId != null and map.lookTypeId != ''">
-			and t.looktype_id = #{map.lookTypeId,jdbcType=INTEGER}   
-	    </if>	
-	   	<if test="map.lookvalue_id != null and map.lookvalue_id != ''">
-			and t.lookvalue_id = #{map.lookvalue_id,jdbcType=INTEGER}    
-	    </if>
-	</select>
-	<select id="getLookTypeList" parameterType="Map" resultType="HashMap">
-	    select 
-	    	tt.looktype_id,
-	    	tt.looktype_code,
-	    	tt.looktype_name
-	    from tm_looktype tt
-	    where tt.enable_flag = 1
-	    order by looktype_id 
-	</select> -->
+	</update> 
+	
+	<update id="updateCMByPrimaryKey" parameterType="com.bjsj.budget.model.CategoryModelModel">
+		update
+		tm_unitproject_base
+		set content = #{content,jdbcType=INTEGER},
+		amount = #{amount,jdbcType=DOUBLE},
+		noPrice = #{noPrice,jdbcType=DOUBLE},
+		price = #{price,jdbcType=DOUBLE},
+		rate = #{rate,jdbcType=DOUBLE},
+		sumPrice = #{sumPrice,jdbcType=DOUBLE},
+		sumNoPrice = #{sumNoPrice,jdbcType=DOUBLE}
+		where id = #{id,jdbcType=INTEGER}
+	</update> 
+	
 </mapper>

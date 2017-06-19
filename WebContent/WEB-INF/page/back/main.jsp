@@ -14,6 +14,7 @@
 	    <script type="text/javascript" src="${contextPath}/static/ext/locale/ext-lang-zh_CN.js"></script>
 	    <script type="text/javascript" src="${contextPath}/static/ext/examples/shared/options-toolbar.js"></script>
 	    <script type="text/javascript" src="${contextPath}/static/ext/examples/shared/examples.js"></script>
+	   
 	    <script type="text/javascript">
 	  		var userName = '${SESSION_SYS_USER.userName}';
 	  		var userID = '${SESSION_SYS_USER.userId}';
@@ -24,6 +25,7 @@
 	        Ext.Loader.setPath('Budget.app', '${contextPath}/static/ext/examples/portal');
 	    </script>
 	    <script type="text/javascript" src="${contextPath}/static/ext/examples/portal/portal.js"></script>
+	    <script type="text/javascript" src="${contextPath}/static/ext/examples/portal/util/ComboBoxTree.js"></script> 
 	    <script type="text/javascript">
 	        Ext.require([
 	            'Ext.layout.container.*',
@@ -31,6 +33,8 @@
 	            'Ext.fx.target.Element',
 	            'Ext.fx.target.Component',
 	            'Ext.window.Window',
+	           // 'Ext.tree.TreeLoader',
+	           // 'Ext.tree.AsyncTreeNode',
 	            'Ext.app.Portlet',
 	            'Ext.app.PortalColumn',
 	            'Ext.app.PortalPanel',

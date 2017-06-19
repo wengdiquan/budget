@@ -14,6 +14,7 @@ public class CategoryModelYCAModel {
 	private Double rate;
 	private Double sumPrice;
 	private Double sumNoPrice;
+	private String flag;//运材安
 	public Integer getId() {
 		return id;
 	}
@@ -87,6 +88,12 @@ public class CategoryModelYCAModel {
 	}
 	public void setSumNoPrice(Double sumNoPrice) {
 		this.sumNoPrice = sumNoPrice;
+	}
+	public String getFlag() {
+		return flag;
+	}
+	public void setFlag(String flag) {
+		this.flag = flag;
 	}
 	
 }

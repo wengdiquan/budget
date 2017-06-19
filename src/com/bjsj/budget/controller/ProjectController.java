@@ -221,4 +221,73 @@ public class ProjectController {
 		}
 		return "{success:true, data:'" + project.getProjectId() +"'}";
 	}
+	
+	/**
+	 * 请求别的系统，获取项目信息
+	 * @return
+	 */
+	@RequestMapping("/getProjectSum")
+	@ResponseBody
+	public List<JSONObject> getProjectSum(HttpServletRequest request, HttpServletResponse response){
+		Map<String, String> queryMap = TransforUtil.transRMapToMap(request.getParameterMap());
+		
+		List<JSONObject> resultList = new ArrayList<JSONObject>();
+		if("init".equals(queryMap.get("source"))){
+			List<Project> otherProjectList = new ArrayList<Project>();
+			Project p1 = new Project();
+			p1.setProjectId(1);
+			p1.setProjectName("项目1");
+			
+			Project p2 = new Project();
+			p2.setProjectId(2);
+			p2.setProjectName("项目2");
+			
+			otherProjectList.add(p1);
+			otherProjectList.add(p2);
+			
+			for(Project pproject: otherProjectList){
+				JSONObject jsonp = new JSONObject();
+				jsonp.element("id", pproject.getProjectId());
+				jsonp.element("text", pproject.getProjectName());
+				jsonp.element("leaf", false);
+				jsonp.element("iconCls", "icon-buliding");
+				jsonp.element("expanded", true);
+				jsonp.element("level", pproject.getLevel());
+				
+				queryMap.put("parentId", pproject.getProjectId() + "");
+				List<Project> sprojectList = projectService.getLowerProjectTreeList(queryMap);
+				JSONArray sjsonArray = new JSONArray();
+				for(Project sproject: sprojectList){
+					JSONObject jsonS = new JSONObject();
+					jsonS.element("id", sproject.getProjectId());
+					jsonS.element("text", sproject.getProjectName());
+					jsonS.element("leaf", false);
+					jsonS.element("iconCls", "icon-room");
+					jsonS.element("expanded", true);
+					jsonS.element("level", sproject.getLevel());
+					
+					queryMap.put("parentId", sproject.getProjectId() + "");
+					List<Project> bprojectList = projectService.getLowerProjectTreeList(queryMap);
+					JSONArray bjsonArray = new JSONArray();
+					for(Project bproject: bprojectList){
+						JSONObject jsonB = new JSONObject();
+						jsonB.element("id", bproject.getProjectId());
+						jsonB.element("text", bproject.getProjectName());
+						jsonB.element("leaf", true);
+						jsonB.element("iconCls", "icon-wood");
+						jsonB.element("expanded", false);
+						jsonB.element("level", bproject.getLevel());
+						bjsonArray.add(jsonB);
+					}
+					jsonS.element("children", bjsonArray);
+					sjsonArray.add(jsonS);
+				}
+				jsonp.element("children", sjsonArray);
+				
+				resultList.add(jsonp);
+			}
+		}
+		
+		return resultList;
+	}
 }
