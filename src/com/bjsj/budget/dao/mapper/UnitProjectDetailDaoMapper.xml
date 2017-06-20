@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bjsj.budget.dao.UnitProjectDetailDao">
+	<resultMap id="BaseResultMap" type="com.bjsj.budget.model.UnitProjectDetail">
+		<id column="t_id" property="id" jdbcType="INTEGER" />
+		<result column="t_unitproject_id" property="unitprojectId"
+			jdbcType="INTEGER" />
+		<result column="t_code" property="code" jdbcType="VARCHAR" />
+		<result column="t_type" property="type" jdbcType="VARCHAR" />
+		<result column="t_name" property="name" jdbcType="VARCHAR" />
+		<result column="t_type_info" property="typeInfo" jdbcType="VARCHAR" />
+		<result column="t_unit" property="unit" jdbcType="VARCHAR" />
+		<result column="t_content" property="content" jdbcType="DOUBLE" />
+		<result column="t_single_price" property="singlePrice"
+			jdbcType="DOUBLE" />
+		<result column="t_Market_price" property="marketPrice"
+			jdbcType="DOUBLE" />
+		<result column="t_amount" property="amount" jdbcType="DOUBLE" />
+		<result column="t_orig_count" property="origCount" jdbcType="DOUBLE" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		t.id as t_id, t.unitproject_id as t_unitproject_id, t.code as t_code,
+		t.type as t_type,
+		t.name as t_name, t.type_info as t_type_info, t.unit as t_unit, t.content as
+		t_content,
+		t.single_price as t_single_price, t.Market_price as t_Market_price, t.amount as
+		t_amount,
+		t.orig_count as t_orig_count
+	</sql>
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap"
+		parameterType="java.lang.Integer">
+		select
+		<include refid="Base_Column_List" />
+		from tm_unitproject_detail t
+		where t.id = #{id,jdbcType=INTEGER}
+	</select>
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+		delete from tm_unitproject_detail
+		where id = #{id,jdbcType=INTEGER}
+	</delete>
+	<insert id="insert" parameterType="com.bjsj.budget.model.UnitProjectDetail">
+		insert into tm_unitproject_detail (id, unitproject_id, code,
+		type, name, type_info,
+		unit, content, single_price,
+		Market_price, amount, orig_count
+		)
+		values (#{id,jdbcType=INTEGER}, #{unitprojectId,jdbcType=INTEGER},
+		#{code,jdbcType=VARCHAR},
+		#{type,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{typeInfo,jdbcType=VARCHAR},
+		#{unit,jdbcType=VARCHAR}, #{content,jdbcType=DOUBLE},
+		#{singlePrice,jdbcType=DOUBLE},
+		#{marketPrice,jdbcType=DOUBLE}, #{amount,jdbcType=DOUBLE}, #{origCount,jdbcType=DOUBLE}
+		)
+	</insert>
+	<update id="updateByPrimaryKey" parameterType="com.bjsj.budget.model.UnitProjectDetail">
+		update tm_unitproject_detail
+		set unitproject_id = #{unitprojectId,jdbcType=INTEGER},
+		code = #{code,jdbcType=VARCHAR},
+		type = #{type,jdbcType=VARCHAR},
+		name = #{name,jdbcType=VARCHAR},
+		type_info = #{typeInfo,jdbcType=VARCHAR},
+		unit = #{unit,jdbcType=VARCHAR},
+		content = #{content,jdbcType=DOUBLE},
+		single_price = #{singlePrice,jdbcType=DOUBLE},
+		Market_price = #{marketPrice,jdbcType=DOUBLE},
+		amount = #{amount,jdbcType=DOUBLE},
+		orig_count = #{origCount,jdbcType=DOUBLE}
+		where id = #{id,jdbcType=INTEGER}
+	</update>
+</mapper>
