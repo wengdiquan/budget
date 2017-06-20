@@ -19,11 +19,15 @@ public interface CategoryModelDao extends BaseDao{
 		
 		
 		
+		int insertCMYCASpecial(CategoryModelYCAModel record);
 		int insertCMYCA(CategoryModelYCAModel record);
+		int insertCM(CategoryModelModel record);
 		//int getYCACount(YCAModel record);
 		int updateByPrimaryKey(CategoryModelYCAModel record);
 		
 		int updateCMByPrimaryKey(CategoryModelModel record);
+		
+		
 		
 		CategoryModelYCAModel selectByPrimaryKey(@Param("map") Map<String, String> queryMap);
 		

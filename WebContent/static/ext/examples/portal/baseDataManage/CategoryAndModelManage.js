@@ -8,8 +8,8 @@ Ext.onReady(function() {
 			config = config || {};
 			Ext.apply(config, {
 				title : '运材安新增',
-				width : 360,
-				height : 300,
+				width : 420,
+				height : 350,
 				bodyPadding : '10 5',
 				modal : true,
 				layout : 'fit',
@@ -24,7 +24,7 @@ Ext.onReady(function() {
 						name : "cmd",
 						xtype : "hidden",
 						value : 'new'
-					}, {
+					},{
 						xtype : 'hiddenfield',
 						name : 'unitProject_Id'
 					},{
@@ -32,8 +32,22 @@ Ext.onReady(function() {
 						name : 'id'
 					},{
 						xtype: 'treecombox', 
-						name : 'xiaohan',
-						fieldLabel: '编号分类'
+						name : 'lookValueId',
+						itemId: 'myActionColumn',
+						fieldLabel: '编号分类<font color="red">*</font>',
+						displayField: 'text', 
+					    store: Ext.create('Ext.data.TreeStore', {   
+					        fields: ['text','id','parentId'],  
+					        root: {  
+					            text: '所有分类',  
+					            id: -1,  
+					            expanded: true  
+					        },  
+					        proxy: {   
+					            type: 'ajax',   
+					            url: appBaseUri + '/yca/queryTreeList'
+					        }  
+					    })
 					},{
 						xtype : 'textfield',
 						name : 'code',
@@ -50,23 +64,27 @@ Ext.onReady(function() {
 						fieldLabel:'单位<font color="red">*</font>',
 						allowBlank : false
 					},{
-						xtype : 'textfield',
+						xtype : 'numberfield',
 						name : 'content',
+						allowDecimals: false,
 						fieldLabel:'含量<font color="red">*</font>',
 						allowBlank : false
 					},{
-						xtype : 'textfield',
+						xtype : 'numberfield',
 						name : 'amount',
+						decimalPrecision: 5,
 						fieldLabel:'数量<font color="red">*</font>',
 						allowBlank : false
 					},{
-						xtype : 'textfield',
+						xtype : 'numberfield',
 						name : 'price',
+						decimalPrecision: 5,
 						fieldLabel:'含税单价<font color="red">*</font>',
 						allowBlank : false
 					},{
-						xtype : 'textfield',
+						xtype : 'numberfield',
 						name : 'rate',
+						decimalPrecision: 5,
 						fieldLabel:'税率<font color="red">*</font>',
 						allowBlank : false
 					}],
@@ -91,6 +109,7 @@ Ext.onReady(function() {
 											if (res.success) {
 												globalObject.msgTip('操作成功！');
 												Ext.getCmp('categoryandmodelmanage-cmdetailgrid').getStore().reload();
+												Ext.getCmp('categoryandmodelmanage-YCAGrid').getStore().reload();
 											} else {
 												globalObject.errTip(res.msg);
 											}
@@ -116,6 +135,100 @@ Ext.onReady(function() {
 				} ]
 			});
 			App.baseDataManage.CategoryAndModelManage.InfoWindow.superclass.constructor.call(this, config);
+		}
+	});
+	
+	Ext.define('App.baseDataManage.CategoryAndModelManage.InfoWindowCM', {
+		extend : 'Ext.window.Window',
+		constructor : function(config) {
+			config = config || {};
+			Ext.apply(config, {
+				title : '子目新增',
+				width : 420,
+				height : 350,
+				bodyPadding : '10 5',
+				modal : true,
+				layout : 'fit',
+				items : [ {
+					xtype : 'form',
+					fieldDefaults : {
+						labelAlign : 'left',
+						labelWidth : 90,
+						anchor : '100%'
+					},
+					items : [{
+						name : "cmd",
+						xtype : "hidden",
+						value : 'editCM'
+					},{
+						xtype : 'hiddenfield',
+						name : 'parentId'
+					},{
+						xtype : 'hiddenfield',
+						name : 'id'
+					},{
+						xtype : 'textfield',
+						name : 'code',
+						allowBlank : false,
+						fieldLabel:'子目编码<font color="red">*</font>'
+					},{
+						xtype : 'textfield',
+						name : 'name',
+						fieldLabel:'子目名称<font color="red">*</font>',
+						allowBlank : false
+					},{
+						xtype : 'textfield',
+						name : 'unit',
+						fieldLabel:'计量单位<font color="red">*</font>',
+						allowBlank : false
+					}],
+					buttons : [ '->', {
+						id : 'infowindow-save',
+						text : '保存',
+						iconCls : 'icon-save',
+						width : 80,
+						handler : function(btn, eventObj) {
+							var window = btn.up('window');
+							var form = window.down('form').getForm();
+							if (form.isValid()) {
+								window.getEl().mask('数据保存中，请稍候...');
+								var vals = form.getValues();
+								Ext.Ajax.request({
+									url : appBaseUri + '/categorymodel/saveOrUpdateValue',
+									params : vals,
+									method : "POST",
+									success : function(response) {
+										if (response.responseText != '') {
+											var res = Ext.JSON.decode(response.responseText);
+											if (res.success) {
+												globalObject.msgTip('操作成功！');
+												Ext.getCmp('categoryandmodelmanage-cmdetailgrid').getStore().reload();
+												Ext.getCmp('categoryandmodelmanage-YCAGrid').getStore().reload();
+											} else {
+												globalObject.errTip(res.msg);
+											}
+										}
+									},
+									failure : function(response) {
+										globalObject.errTip('操作失败！');
+									}
+								});
+								window.getEl().unmask();
+								window.close();
+							}
+						}
+					}, {
+						id : 'infowindow-cancel',
+						text : '取消',
+						iconCls : 'icon-cancel',
+						width : 80,
+						handler : function() {
+							this.up('window').close();
+						}
+					},'->']
+				} ]
+			});
+			App.baseDataManage.CategoryAndModelManage.InfoWindowCM.superclass.constructor.call(this, config);
 		}
 	});
 
@@ -312,43 +425,16 @@ Ext.onReady(function() {
 		},
 		newCodeCodeFun: function(){
 			var me = this;
-			var lookValueId = Ext.getCmp('categoryandmodelmanage-cmgrid').lookValueId;
-			if (!lookValueId) {
-				globalObject.infoTip('请先选择费用小类！');
+			var parentId = Ext.getCmp('categoryandmodelmanage-cmgrid').parentId;
+			if (!parentId) {
+				globalObject.infoTip('请先选模块名称！');
 				return;
 			};
-			var win = new App.baseDataManage.CategoryAndModelManage.InfoWindow({
+			var win = new App.baseDataManage.CategoryAndModelManage.InfoWindowCM({
 				hidden : true
 			});
 			var form = win.down('form').getForm();
-			form.findField('lookvalue_id').setValue(lookValueId);
-			win.show();
-		},
-		editCodeCodeFun : function() {
-			var me = this;
-			var lookValueId = Ext.getCmp('categoryandmodelmanage-cmgrid').lookValueId;
-			if (!lookValueId) {
-				globalObject.infoTip('请先选择费用小类！');
-				return;
-			};
-			
-			var grid = Ext.getCmp("categoryandmodelmanage-cmdetailgrid");
-			var records = grid.getSelectionModel().getSelection();
-			if(records.length != 1){
-				globalObject.infoTip('请先选择需要修改的记录！');
-				return;
-			}
-			
-			var gridRecord = grid.getStore().findRecord('id', records[0].get('id'));
-			
-			var win = new App.baseDataManage.CategoryAndModelManage.InfoWindow({
-				hidden : true
-			});
-			
-			var form = win.down('form').getForm();
-			form.findField('cmd').setValue('edit');
-			form.findField('code').setReadOnly(true);
-			form.loadRecord(gridRecord);
+			form.findField('parentId').setValue(parentId);
 			win.show();
 		}
 	});
@@ -370,7 +456,7 @@ Ext.onReady(function() {
 				fields : [ {
 					name : 'looktype_id',
 					type : 'int'
-				}, 'code', 'name', 'unit', 'content','amount','noPrice','price','rate','sumNoPrice','sumPrice']
+				}, 'code', 'name', 'unit', 'content','amount','noPrice','price','rate','sumNoPrice','sumPrice','lookValueId']
 			});
 			
 			var YCAGridStore = Ext.create('Ext.data.Store', {
@@ -443,6 +529,10 @@ Ext.onReady(function() {
 			},{
 				text : "id",
 				dataIndex : 'id',
+				hidden : true
+			},{
+				text : "lookValueId",
+				dataIndex : 'lookValueId',
 				hidden : true
 			}];
 			Ext.apply(this, {
@@ -521,6 +611,9 @@ Ext.onReady(function() {
 			form.findField('code').setReadOnly(true);
 			form.findField('name').setReadOnly(true);
 			form.findField('unit').setReadOnly(true);
+			form.findField('lookValueId').setValue(gridRecord.data.lookValueId);
+			
+			win.down('#myActionColumn').hide();
 			
 			form.loadRecord(gridRecord);
 			win.show();

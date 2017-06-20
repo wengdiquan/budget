@@ -8,8 +8,10 @@ import org.springframework.stereotype.Service;
 
 import com.bjsj.budget.constant.Constant;
 import com.bjsj.budget.dao.CategoryModelDao;
+import com.bjsj.budget.dao.LookValueDao;
 import com.bjsj.budget.model.CategoryModelModel;
 import com.bjsj.budget.model.CategoryModelYCAModel;
+import com.bjsj.budget.model.LookValue;
 import com.bjsj.budget.page.PageInfo;
 import com.bjsj.budget.page.PageObject;
 import com.bjsj.budget.service.CategoryModelService;
@@ -19,7 +21,8 @@ import com.bjsj.budget.util.TransforUtil;
 public class CategoryModelServiceImpl implements CategoryModelService{
 	@Autowired
 	private CategoryModelDao categoryModelDao;
-	
+	@Autowired
+	private LookValueDao lookValueDao;
 	@Override
 	public List<CategoryModelModel> getCategoryModelList(
 			Map<String, String> queryMap) {
@@ -49,9 +52,7 @@ public class CategoryModelServiceImpl implements CategoryModelService{
 	@Override
 	public void insertValue(Map<String, String[]> map) throws Exception {
 		CategoryModelYCAModel record = new CategoryModelYCAModel();
-		CategoryModelModel cm = new CategoryModelModel();
 		TransforUtil.transFromMapToBean(map, record);
-		TransforUtil.transFromMapToBean(map, cm);
 		
 		Double db = record.getPrice()/(1+record.getRate()/100);
 		record.setNoPrice(NumberUtils.degree(db));
@@ -63,16 +64,19 @@ public class CategoryModelServiceImpl implements CategoryModelService{
 		categoryModelDao.insertCMYCA(record);
 		
 		Map queryMap = new HashMap();
-		queryMap.put("id", record.getId());
+		queryMap.put("id", record.getUnitProject_Id());
 		CategoryModelModel cmVO = categoryModelDao.selectCMByPrimaryKey(queryMap);
-		if(Constant.YSFLAG.equals(record.getFlag())){
-			cm.setTransportFee(cmVO.getTransportFee() + record.getSumNoPrice());
-		}else if(Constant.CLFLAG.equals(record.getFlag())){
-			cm.setMaterialFee(cmVO.getMaterialFee() + record.getSumNoPrice());
-		}else if(Constant.AZFLAG.equals(record.getFlag())){
-			cm.setInstallationFee(cmVO.getInstallationFee() + record.getSumNoPrice());
+		
+		LookValue lvVO = lookValueDao.selectByPrimaryKey(record.getLookValueId());
+		
+		if(Constant.YSFLAG == lvVO.getLookTypeId()){
+			cmVO.setTransportFee(cmVO.getTransportFee() + record.getSumNoPrice());
+		}else if(Constant.CLFLAG == lvVO.getLookTypeId()){
+			cmVO.setMaterialFee(cmVO.getMaterialFee() + record.getSumNoPrice());
+		}else if(Constant.AZFLAG == lvVO.getLookTypeId()){
+			cmVO.setInstallationFee(cmVO.getInstallationFee() + record.getSumNoPrice());
 		}
-		categoryModelDao.updateCMByPrimaryKey(cm);
+		categoryModelDao.updateCMByPrimaryKey(cmVO);
 		
 	}
 
@@ -80,16 +84,12 @@ public class CategoryModelServiceImpl implements CategoryModelService{
 	public void updateValue(Map<String, String[]> map) throws Exception {
 		
 		CategoryModelYCAModel record = new CategoryModelYCAModel();
-		CategoryModelModel cm = new CategoryModelModel();
 		
 		TransforUtil.transFromMapToBean(map, record);
-		TransforUtil.transFromMapToBean(map, cm);
 		
 		Map queryMap = new HashMap();
 		queryMap.put("id", record.getId());
 		CategoryModelYCAModel tmVO = categoryModelDao.selectByPrimaryKey(queryMap);
-		double oldP = tmVO.getPrice();
-		double newP = record.getPrice();
 		
 		Double db = record.getPrice()/(1+record.getRate()/100);
 		record.setNoPrice(NumberUtils.degree(db));
@@ -100,33 +100,33 @@ public class CategoryModelServiceImpl implements CategoryModelService{
 		
 		categoryModelDao.updateByPrimaryKey(record);
 		
-		queryMap.put("id", record.getId());
+		queryMap.put("id", record.getUnitProject_Id());
 		CategoryModelModel cmVO = categoryModelDao.selectCMByPrimaryKey(queryMap);
 		
+		LookValue lvVO = lookValueDao.selectByPrimaryKey(record.getLookValueId());
+		
 		if(tmVO.getPrice() != record.getPrice()){
-			String tmp = record.getCode();
-			record.setCode(tmp + "@");
 			record.setId(null);
-			categoryModelDao.insertCMYCA(record);
-			
-			if(Constant.YSFLAG.equals(record.getFlag())){
-				cm.setTransportFee(cmVO.getTransportFee() + record.getSumNoPrice());
-			}else if(Constant.CLFLAG.equals(record.getFlag())){
-				cm.setMaterialFee(cmVO.getMaterialFee() + record.getSumNoPrice());
-			}else if(Constant.AZFLAG.equals(record.getFlag())){
-				cm.setInstallationFee(cmVO.getInstallationFee() + record.getSumNoPrice());
+			categoryModelDao.insertCMYCASpecial(record);
+			//汇总应该包括 新增和改动两部分
+			if(Constant.YSFLAG == lvVO.getLookTypeId()){
+				cmVO.setTransportFee(cmVO.getTransportFee() + record.getSumNoPrice() + (record.getSumNoPrice()-tmVO.getSumNoPrice()));
+			}else if(Constant.CLFLAG == lvVO.getLookTypeId()){
+				cmVO.setMaterialFee(cmVO.getMaterialFee() + record.getSumNoPrice() + (record.getSumNoPrice()-tmVO.getSumNoPrice()));
+			}else if(Constant.AZFLAG == lvVO.getLookTypeId()){
+				cmVO.setInstallationFee(cmVO.getInstallationFee() + record.getSumNoPrice() + (record.getSumNoPrice()-tmVO.getSumNoPrice()));
 			}
-			categoryModelDao.updateCMByPrimaryKey(cm);
+			categoryModelDao.updateCMByPrimaryKey(cmVO);
 		}else{
 			
-			if(Constant.YSFLAG.equals(record.getFlag())){
-				cm.setTransportFee(cmVO.getTransportFee() + (newP-oldP));
-			}else if(Constant.CLFLAG.equals(record.getFlag())){
-				cm.setMaterialFee(cmVO.getMaterialFee() + (newP-oldP));
-			}else if(Constant.AZFLAG.equals(record.getFlag())){
-				cm.setInstallationFee(cmVO.getInstallationFee() + (newP-oldP));
+			if(Constant.YSFLAG == lvVO.getLookTypeId()){
+				cmVO.setTransportFee(cmVO.getTransportFee() + (record.getSumNoPrice()-tmVO.getSumNoPrice()));
+			}else if(Constant.CLFLAG == lvVO.getLookTypeId()){
+				cmVO.setMaterialFee(cmVO.getMaterialFee() + (record.getSumNoPrice()-tmVO.getSumNoPrice()));
+			}else if(Constant.AZFLAG == lvVO.getLookTypeId()){
+				cmVO.setInstallationFee(cmVO.getInstallationFee() + (record.getSumNoPrice()-tmVO.getSumNoPrice()));
 			}
-			categoryModelDao.updateCMByPrimaryKey(cm);
+			categoryModelDao.updateCMByPrimaryKey(cmVO);
 		}
 		
 	}
@@ -139,5 +139,13 @@ public class CategoryModelServiceImpl implements CategoryModelService{
 	@Override
 	public void updateValueCM(CategoryModelModel record) throws Exception {
 		categoryModelDao.updateCMByPrimaryKey(record);
+	}
+
+	@Override
+	public void insertCM(Map<String, String[]> map) throws Exception {
+		CategoryModelModel record = new CategoryModelModel();
+		TransforUtil.transFromMapToBean(map, record);
+		
+		categoryModelDao.insertCM(record);
 	}
 }

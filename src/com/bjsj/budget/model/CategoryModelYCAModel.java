@@ -14,7 +14,7 @@ public class CategoryModelYCAModel {
 	private Double rate;
 	private Double sumPrice;
 	private Double sumNoPrice;
-	private String flag;//运材安
+	private Integer lookValueId;//
 	public Integer getId() {
 		return id;
 	}
@@ -89,11 +89,12 @@ public class CategoryModelYCAModel {
 	public void setSumNoPrice(Double sumNoPrice) {
 		this.sumNoPrice = sumNoPrice;
 	}
-	public String getFlag() {
-		return flag;
+	public Integer getLookValueId() {
+		return lookValueId;
 	}
-	public void setFlag(String flag) {
-		this.flag = flag;
+	public void setLookValueId(Integer lookValueId) {
+		this.lookValueId = lookValueId;
 	}
+
 	
 }

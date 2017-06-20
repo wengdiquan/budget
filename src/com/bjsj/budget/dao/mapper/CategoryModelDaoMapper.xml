@@ -12,12 +12,10 @@
 		t.code as code,
 		t.name as name,
 		t.unit as unit,
-		t.price as price,
+		(t.transportfee + t.materialfee + t.installationfee) as price,
 		t.transportfee as transportFee,
 		t.materialfee as materialFee,
 		t.installationfee as installationFee,
-		t.sumprice as sumPrice,
-		t.dtgcl as dtgcl,
 		t.parentid as parentId,
 		t.leaf as leaf
 	</sql>
@@ -67,7 +65,8 @@
 		t.price as price,
 		t.rate as rate,
 		t.sumprice as sumPrice,
-		t.sumnoprice as sumNoPrice
+		t.sumnoprice as sumNoPrice,
+		t.lookvalueid as lookValueId
 	</sql>
 	
 	<select id="queryDetailYCA" parameterType="HashMap" resultMap="CMYCAInfoMap">
@@ -104,10 +103,22 @@
 	    where t.id = #{map.id,jdbcType=INTEGER}   
 	</select>
 	
+	<insert id="insertCM" parameterType="com.bjsj.budget.model.CategoryModelModel">
+		insert into tm_unitproject_base
+			(id, code, name, unit, parentid, leaf, transportfee, materialfee, installationfee)
+		values (#{id,jdbcType=INTEGER},
+			#{code,jdbcType=VARCHAR},
+			#{name,jdbcType=VARCHAR},
+			#{unit,jdbcType=VARCHAR},
+			#{parentId,jdbcType=INTEGER},
+			1,0,0,0
+			)
+	 </insert>
+	
 	
      <insert id="insertCMYCA" parameterType="com.bjsj.budget.model.CategoryModelYCAModel">
 		insert into tm_unitproject_detail_base
-			(id, unitProject_Id, code, name, unit, content, amount, noprice, price, rate, sumprice, sumnoprice)
+			(id, unitProject_Id, code, name, unit, content, amount, noprice, price, rate, sumprice, sumnoprice, lookvalueid)
 		values (#{id,jdbcType=INTEGER},
 			#{unitProject_Id,jdbcType=INTEGER},
 			#{code,jdbcType=VARCHAR},
@@ -119,7 +130,27 @@
 			#{price,jdbcType=DOUBLE},
 			#{rate,jdbcType=DOUBLE},
 			#{sumPrice,jdbcType=DOUBLE},
-			#{sumNoPrice,jdbcType=DOUBLE}
+			#{sumNoPrice,jdbcType=DOUBLE},
+			#{lookValueId,jdbcType=INTEGER}
+			)
+	</insert>
+	
+	 <insert id="insertCMYCASpecial" parameterType="com.bjsj.budget.model.CategoryModelYCAModel">
+		insert into tm_unitproject_detail_base
+			(id, unitProject_Id, code, name, unit, content, amount, noprice, price, rate, sumprice, sumnoprice, lookvalueid)
+		values (#{id,jdbcType=INTEGER},
+			#{unitProject_Id,jdbcType=INTEGER},
+			CONCAT(#{code,jdbcType=VARCHAR}, '@', nextval(#{code,jdbcType=VARCHAR})),
+			#{name,jdbcType=VARCHAR},
+			#{unit,jdbcType=VARCHAR},
+			#{content,jdbcType=INTEGER},
+			#{amount,jdbcType=DOUBLE},
+			#{noPrice,jdbcType=DOUBLE},
+			#{price,jdbcType=DOUBLE},
+			#{rate,jdbcType=DOUBLE},
+			#{sumPrice,jdbcType=DOUBLE},
+			#{sumNoPrice,jdbcType=DOUBLE},
+			#{lookValueId,jdbcType=INTEGER}
 			)
 	</insert>
 	
@@ -139,13 +170,10 @@
 	<update id="updateCMByPrimaryKey" parameterType="com.bjsj.budget.model.CategoryModelModel">
 		update
 		tm_unitproject_base
-		set content = #{content,jdbcType=INTEGER},
-		amount = #{amount,jdbcType=DOUBLE},
-		noPrice = #{noPrice,jdbcType=DOUBLE},
-		price = #{price,jdbcType=DOUBLE},
-		rate = #{rate,jdbcType=DOUBLE},
-		sumPrice = #{sumPrice,jdbcType=DOUBLE},
-		sumNoPrice = #{sumNoPrice,jdbcType=DOUBLE}
+		set 
+		transportFee = #{transportFee,jdbcType=DOUBLE},
+		materialFee = #{materialFee,jdbcType=DOUBLE},
+		installationFee = #{installationFee,jdbcType=DOUBLE}
 		where id = #{id,jdbcType=INTEGER}
 	</update> 
 	

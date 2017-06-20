@@ -9,8 +9,6 @@ public class CategoryModelModel {
 	private Double transportFee;
 	private Double materialFee;
 	private Double installationFee;
-	private Double sumPrice;
-	private Double dtgcl;
 	private Integer parentId;
 	private Integer leaf;
 	public Integer getId() {
@@ -61,23 +59,11 @@ public class CategoryModelModel {
 	public void setInstallationFee(Double installationFee) {
 		this.installationFee = installationFee;
 	}
-	public Double getDtgcl() {
-		return dtgcl;
-	}
-	public void setDtgcl(Double dtgcl) {
-		this.dtgcl = dtgcl;
-	}
 	public Integer getLeaf() {
 		return leaf;
 	}
 	public void setLeaf(Integer leaf) {
 		this.leaf = leaf;
-	}
-	public Double getSumPrice() {
-		return sumPrice;
-	}
-	public void setSumPrice(Double sumPrice) {
-		this.sumPrice = sumPrice;
 	}
 	public Integer getParentId() {
 		return parentId;

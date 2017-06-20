@@ -1,6 +1,5 @@
 package com.bjsj.budget.controller;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -14,15 +13,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import com.bjsj.budget.model.CategoryModelModel;
-import com.bjsj.budget.model.CategoryModelYCAModel;
-import com.bjsj.budget.model.LookValue;
-import com.bjsj.budget.model.YCAModel;
 import com.bjsj.budget.page.PageInfo;
 import com.bjsj.budget.page.PageObject;
 import com.bjsj.budget.service.CategoryModelService;
 import com.bjsj.budget.service.YCAService;
 import com.bjsj.budget.util.ListView;
-import com.bjsj.budget.util.NumberUtils;
 import com.bjsj.budget.util.TransforUtil;
 @Controller
 @RequestMapping(value="/categorymodel")
@@ -90,6 +85,8 @@ public class CategoryModelController {
 		{
 			if("edit".equals(request.getParameter("cmd"))){
 				categoryModelService.updateValue(request.getParameterMap());
+			}else if("editCM".equals(request.getParameter("cmd"))){
+				categoryModelService.insertCM(request.getParameterMap());
 			}else{
 				categoryModelService.insertValue(request.getParameterMap());
 			}

@@ -8,6 +8,7 @@
 		<result column="remark" jdbcType="VARCHAR" property="remark" />
 		<result column="seq" jdbcType="DOUBLE" property="seq" />
 		<result column="enable_flag" jdbcType="INTEGER" property="enableFlag" />
+		<result column="looktype_id" jdbcType="INTEGER" property="lookTypeId" />
 	</resultMap>
 	<sql id="Base_Column_List">
 		t.lookvalue_id, t.lookvalue_code, t.lookvalue_name, t.remark, t.seq,
