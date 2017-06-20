@@ -48,7 +48,7 @@ Ext.onReady(function() {
 				fields : [ {
 					name : 'id',
 					type : 'long'
-				}, 'code', 'unit', 'type', {
+				}, 'code', 'unit', 'type', 'name', {
 					name : 'amount',
 					type : 'double'
 				}, {
@@ -190,6 +190,46 @@ Ext.onReady(function() {
 		},
 		deleteItemFun:function(){
 			
+			
+			globalObject.confirmTip("删除该子目会同时删除下面板的运材安费用明细，确认删除吗?", 
+					 function(btn){
+						 if("yes" == btn){
+							 
+							 var records = Ext.getCmp('projectbitpanel-bititemgrid').getSelectionModel().getSelection();	 
+							 
+							 if(records.length == 0){
+								 globalObject.infoTip("请选择至少一条子目进行删除.");
+								 return;
+							 }
+							 
+							 Ext.getCmp('projectbitpanel-bititemgrid').getStore().remove(records);
+							 
+							/* Ext.getCmp('projectinfo-projecttreeid').getEl().mask('数据处理中，请稍候...');
+							 Ext.Ajax.request({
+								 url : appBaseUri + '/project/saveOrUpdateProject',
+								 params : {
+									 "cmd":"edit",
+									 "projectId":records[0].data.id
+								 },
+								 method : "POST",
+								 success : function(response) {
+									 if (response.responseText != '') {
+										 var res = Ext.JSON.decode(response.responseText);
+										 if (res.success) {
+											 records[0].remove();
+										 } else {
+											 globalObject.errTip(res.msg);
+										 }
+									 }
+								 },
+								 failure : function(response) {
+									 globalObject.errTip('操作失败！');
+								 }
+							 });
+							 
+							 Ext.getCmp('projectinfo-projecttreeid').getEl().unmask();*/
+						 }
+				 	});
 		}
 	});
 	
