@@ -113,7 +113,7 @@ Ext.onReady(function() {
 		extend : 'Ext.tree.Panel',
 		id : 'ycamanage-costtypegrid',
 		region : 'west',
-		width : '18%',
+		width : '35%',
 		border : true,
 		title:"大类名称",
 		animate : true,//动画效果

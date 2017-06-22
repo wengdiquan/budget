@@ -307,7 +307,7 @@ Ext.onReady(function() {
 				Ext.apply(store.proxy.extraParams, {"source":"click"});
 				
 
-				var costValueStore = Ext.getCmp("costmoneymanage-costvaluegrid").getStore();
+				var costValueStore = Ext.getCmp("projectinfo-projectsummerygrid").getStore();
 				if(record.data.depth == 1){
 					Ext.getCmp('projectinfo-projecttreeid').project = record.data.id;
 					Ext.apply(store.proxy.extraParams, {"source": "spj"});
@@ -370,7 +370,7 @@ Ext.onReady(function() {
 				}
 			});
 			Ext.apply(this, {
-				id : 'costmoneymanage-costvaluegrid',
+				id : 'projectinfo-projectsummerygrid',
 				store : costValueStore,
 				title:"汇总信息",
 				selModel : Ext.create('Ext.selection.CheckboxModel'),
@@ -407,49 +407,6 @@ Ext.onReady(function() {
 			});
 			
 			this.callParent(arguments);
-		},
-		newCodeCodeFun: function(){
-			var me = this;
-			var looktypeId = Ext.getCmp('costmoneymanage-costtypegrid').lookTypeId;
-			if (!looktypeId) {
-				globalObject.infoTip('请先选择费用大类！');
-				return;
-			};
-			var win = new App.baseDataManage.CostMoneyManage.InfoWindow({
-				hidden : true
-			})
-			var form = win.down('form').getForm();
-			form.findField('lookTypeId').setValue(looktypeId);
-			win.show();
-		},
-		editCodeCodeFun : function() {
-			var me = this;
-			var looktypeId = Ext.getCmp('costmoneymanage-costtypegrid').lookTypeId;
-			if (!looktypeId) {
-				globalObject.infoTip('请先选择费用大类！');
-				return;
-			};
-			
-			var grid = Ext.getCmp("costmoneymanage-costvaluegrid");
-			var records = grid.getSelectionModel().getSelection()
-			if(records.length != 1){
-				globalObject.infoTip('请先需要修改的费用信息！');
-				return;
-			}
-			
-			var gridRecord = grid.getStore().findRecord('lookvalueId', records[0].get('lookvalueId'));
-			
-			var win = new App.baseDataManage.CostMoneyManage.InfoWindow({
-				hidden : true
-			});
-			
-			var form = win.down('form').getForm();
-			form.findField('lookTypeId').setValue(looktypeId);
-			form.findField('cmd').setValue('edit');
-			form.findField('lookvalueName').setReadOnly(true);
-			form.findField('lookvalueCode').setReadOnly(true);
-			form.loadRecord(gridRecord);
-			win.show();
 		}
 	});
 });
