@@ -1,6 +1,7 @@
 package com.bjsj.budget.controller;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -12,7 +13,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.bjsj.budget.model.CategoryModelModel;
 import com.bjsj.budget.model.Project;
+import com.bjsj.budget.model.ReportModel;
 import com.bjsj.budget.service.ProjectService;
 import com.bjsj.budget.util.TransforUtil;
 
@@ -289,5 +292,25 @@ public class ProjectController {
 		}
 		
 		return resultList;
+	}
+	
+	/**
+	 * 查询 汇总数据
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	@RequestMapping(value = "/getSumList")
+	@ResponseBody
+	public List getSumList(HttpServletRequest request,
+			HttpServletResponse response){
+		//查询条件
+		Map<String, String> queryMap = TransforUtil.transRMapToMap(request.getParameterMap());
+		List<ReportModel> CMList = new ArrayList();
+		if(queryMap.get("projectId") != null && queryMap.get("projectId") != ""){
+			CMList = projectService.getSumList(queryMap);
+		}
+		
+		return CMList;
 	}
 }

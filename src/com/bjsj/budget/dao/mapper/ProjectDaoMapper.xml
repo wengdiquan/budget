@@ -11,6 +11,9 @@
 		<result column="t_remark" property="remark" jdbcType="VARCHAR" />
 		<result column="t_isleaf" property="isLeaf" jdbcType="INTEGER" />
 	</resultMap>
+	<resultMap id="ReportResultMap" type="com.bjsj.budget.model.ReportModel">
+	
+	</resultMap>
 	<sql id="Base_Column_List">
 		t.project_id as t_project_id, t.project_name as
 		t_project_name, t.level as
@@ -81,5 +84,17 @@
 		from tb_project t 
 		where t.parent_id = #{parentId,jdbcType=INTEGER}    
 	</select>
+	
+	 <select id="getSumList" statementType="CALLABLE" parameterType="java.util.HashMap" resultMap="ReportResultMap">
+       <![CDATA[
+           {call budget.pro_get_dxproject(#{map.projectId,mode=IN,jdbcType=INTEGER})}    
+       ]]>
+    </select>
+    
+    <select id="getSumListUnit" statementType="CALLABLE" parameterType="java.util.HashMap" resultMap="ReportResultMap">
+       <![CDATA[
+           {call budget.pro_get_unitproject(#{map.projectId,mode=IN,jdbcType=INTEGER})}    
+       ]]>
+    </select>
 	
 </mapper>

@@ -5,11 +5,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.bjsj.budget.dao.ProjectDao;
 import com.bjsj.budget.model.Project;
+import com.bjsj.budget.model.ReportModel;
 import com.bjsj.budget.service.ProjectService;
 
 @Service("projectServiceImpl")
@@ -67,5 +69,15 @@ public class ProjectServiceImpl implements ProjectService {
 	@Override
 	public List<Project> getLowerProjectTreeList(Map<String, String> queryMap) {
 		return projectDao.getLowerProjectTreeList(queryMap);
+	}
+
+	@Override
+	public List<ReportModel> getSumList(@Param("map") Map<String, String> queryMap) {
+		if("1".endsWith(queryMap.get("pro"))){
+			return projectDao.getSumList(queryMap);
+		}else{
+			return projectDao.getSumListUnit(queryMap);
+		}
+		
 	}
 }

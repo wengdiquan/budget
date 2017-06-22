@@ -290,31 +290,18 @@ Ext.onReady(function() {
 				Ext.apply(store.proxy.extraParams, {"source":"click"});
 				
 				var costValueStore = Ext.getCmp("costmoneymanage-costvaluegrid").getStore();
+				
+				Ext.apply(costValueStore.proxy.extraParams, {"projectId":record.data.id});
 				if(record.data.depth == 1){
+					Ext.apply(costValueStore.proxy.extraParams, {"pro":"1"});
+					
 					Ext.getCmp('projectinfo-projecttreeid').project = record.data.id;
 					Ext.apply(store.proxy.extraParams, {"source": "pj"});
 					costValueStore.reload();
 				}
 				
 				if(record.data.depth == 2){
-					Ext.getCmp('projectinfo-projecttreeid').sproject = record.data.id;
-					Ext.apply(store.proxy.extraParams, {"source": "spj"});
-					costValueStore.reload();
-				}
-			},
-			'cellclick':function(_this, td, cellIndex, record, tr, rowIndex, e, eOpts){
-				var store = Ext.getCmp('projectinfo-projecttreeid').getStore();
-				Ext.apply(store.proxy.extraParams, {"source":"click"});
-				
-
-				var costValueStore = Ext.getCmp("costmoneymanage-costvaluegrid").getStore();
-				if(record.data.depth == 1){
-					Ext.getCmp('projectinfo-projecttreeid').project = record.data.id;
-					Ext.apply(store.proxy.extraParams, {"source": "spj"});
-					costValueStore.reload();
-				}
-				
-				if(record.data.depth == 2){
+					Ext.apply(costValueStore.proxy.extraParams, {"pro":"2"});
 					Ext.getCmp('projectinfo-projecttreeid').sproject = record.data.id;
 					Ext.apply(store.proxy.extraParams, {"source": "spj"});
 					costValueStore.reload();
@@ -345,11 +332,11 @@ Ext.onReady(function() {
 			var me = this;
 			Ext.define('CostValueList', {
 				extend : 'Ext.data.Model',
-				idProperty : 'lookvalue_id',
+				idProperty : 'project_id',
 				fields : [ {
-					name : 'lookvalueId',
+					name : 'project_id',
 					type : 'int'
-				}, 'lookvalueName', 'lookvalueCode', 'remark', 'enableFlag' ]
+				}, 'project_name', 'projectTotal', 'projectPercent', 'transportFee','materialFee','installationFee','csFee' ]
 			});
 			
 			var costValueStore = Ext.create('Ext.data.Store', {
@@ -359,8 +346,8 @@ Ext.onReady(function() {
 				pageSize : globalPageSize,
 				proxy : {
 					type : 'ajax',
-					url : appBaseUri + '',
-					extraParams : {"lookTypeId": Ext.getCmp('projectinfo-projecttreeid').lookTypeId},
+					url : appBaseUri + '/project/getSumList',
+					extraParams : {"xx":""},
 					reader : {
 						type : 'json',
 						root : 'data',
@@ -378,20 +365,20 @@ Ext.onReady(function() {
 						text:'序号', width:40,xtype:'rownumberer'
 					},
 					{
-						text:'名称', width:120, 	dataIndex : 'name',
+						text:'名称', width:120, 	dataIndex : 'project_name',
 					},
 					{
-						text:'项目造价(元)', width:120, 	dataIndex : 'money', align:"right"
+						text:'项目造价(元)', width:120, 	dataIndex : 'projectTotal', align:"right"
 					},{
-						text:'占造价百分比(%)', width:120, 	dataIndex : 'money', align:"right"
+						text:'占造价百分比(%)', width:120, 	dataIndex : 'projectPercent', align:"right"
 					},
 					{
 						text:"其中",
 			            columns:[
-			                {text: "运输费", width: 80, dataIndex: 'title', sortable: false},
-			                {text: "材料费", width: 80, dataIndex: 'author', sortable: false},
-			                {text: "安装费", width: 80, dataIndex: 'hits', sortable: false},
-			                {text: "措施费", width: 80, dataIndex: 'hits', sortable: false}]
+			                {text: "运输费", width: 80, dataIndex: 'transportFee', sortable: false},
+			                {text: "材料费", width: 80, dataIndex: 'materialFee', sortable: false},
+			                {text: "安装费", width: 80, dataIndex: 'installationFee', sortable: false},
+			                {text: "措施费", width: 80, dataIndex: 'csFee', sortable: false}]
 					}
 				],
 				viewConfig:{
