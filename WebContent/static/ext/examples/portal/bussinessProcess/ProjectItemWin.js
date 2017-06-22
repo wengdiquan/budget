@@ -14,7 +14,7 @@ Ext.onReady(function() {
 				bodyPadding : '5 5',
 				modal : true,
 				layout : 'fit',
-				items : [Ext.create("Budget.app.bussinessProcess.ProjectBitWin.TabPanel", {
+				items : [Ext.create("Budget.app.bussinessProcess.ProjectItemWin.TabPanel", {
 						bitProjectId: me.bitProjectId,
 						bitItemGrid: me.bitItemGrid
 					})
@@ -24,7 +24,7 @@ Ext.onReady(function() {
 		}
 	});
 	
-	Ext.define('Budget.app.bussinessProcess.ProjectBitWin.TabPanel', {
+	Ext.define('Budget.app.bussinessProcess.ProjectItemWin.TabPanel', {
 		extend : 'Ext.tab.Panel',
         initComponent : function() {
           	var me = this;
@@ -34,19 +34,23 @@ Ext.onReady(function() {
                     title: '定额',  
                     layout : 'border',
                     items:[
-                    	 Ext.create('Budget.app.bussinessProcess.ProjectBitWin.TabPanel.CMGrid',{
+                    	 Ext.create('Budget.app.bussinessProcess.ProjectItemWin.TabPanel.CMGrid',{
                     		 bitItemGrid:me.bitItemGrid
                     	 }),
-                    	 Ext.create('Budget.app.bussinessProcess.ProjectBitWin.TabPanel.CMDetailGrid', {
+                    	 Ext.create('Budget.app.bussinessProcess.ProjectItemWin.TabPanel.CMDetailGrid', {
                     		 bitItemGrid:me.bitItemGrid
                     	 })
                     ],
                     itemId: 'dinge'  
                 },{  
-                    title: '运材安',  
+                    title: '运材安', 
+                    layout : 'border',
                     items:[
-                    	Ext.create("Budget.app.bussinessProcess.ProjectYCATotalPanel", {
-                    		
+                    	Ext.create('Budget.app.bussinessProcess.ProjectItemWin.TabPanel.CostTypeTree',{
+                    		 bitItemGrid:me.bitItemGrid
+                    	}),
+                    	Ext.create('Budget.app.bussinessProcess.ProjectItemWin.TabPanel.CostValueGrid',{
+                    		 bitItemGrid:me.bitItemGrid
                     	})
                     ],
                     itemId: 'yca'
@@ -58,7 +62,7 @@ Ext.onReady(function() {
 	});
 	
 	//模块名称tree
-	Ext.define('Budget.app.bussinessProcess.ProjectBitWin.TabPanel.CMGrid', {
+	Ext.define('Budget.app.bussinessProcess.ProjectItemWin.TabPanel.CMGrid', {
 		extend : 'Ext.tree.Panel',
 		id:"projectbitwin-tabpanel-cmgrid",
 		region : 'west',
@@ -102,7 +106,7 @@ Ext.onReady(function() {
 		}
 	});
 	
-	Ext.define('Budget.app.bussinessProcess.ProjectBitWin.TabPanel.CMDetailGrid', {
+	Ext.define('Budget.app.bussinessProcess.ProjectItemWin.TabPanel.CMDetailGrid', {
 		extend : 'Ext.grid.Panel',
 		plain : true,
 		region : 'center',
@@ -187,7 +191,7 @@ Ext.onReady(function() {
 			Ext.apply(this, {
 				store : costValueStore,
 				listeners : {
-					'itemclick' : function(item, record) {
+					'itemdblclick' : function(item, record) {
 						if(record.data.id == 0){
 							return;
 						}
@@ -242,4 +246,163 @@ Ext.onReady(function() {
 			this.callParent(arguments);
 		}
 	});
+	
+	Ext.define('Budget.app.bussinessProcess.ProjectItemWin.TabPanel.CostTypeTree', {
+		extend : 'Ext.tree.Panel',
+		id : 'projectbitwin-tabpanel-costtypetree',
+		region : 'west',
+		width : '18%',
+		border : true,
+		animate : true,//动画效果
+		initComponent : function() {
+			var me = this;
+			var costTypeStore = Ext.create('Ext.data.TreeStore', {
+				autoLoad : true,
+				proxy : {
+					type : 'ajax',
+					url : appBaseUri + '/yca/queryTreeList',
+					extraParams : {listCode:"COST_CODE"},
+					reader : {
+						type : 'json',
+						root : 'children'
+					}
+				}
+			});
+			Ext.apply(this, {
+				rootVisible : false,
+				store : costTypeStore,
+				listeners : {
+					'itemclick' : function(item, record) {
+						if(record.data.id == 0){
+							return;
+						}
+						
+						me.lookValueId = record.data.id;
+						
+						Ext.getCmp('projectbitwin-tabpanel-costvaluegrid').getStore().load({
+							params : {
+								'lookValueId' : me.lookValueId
+							}
+						});
+					}
+				}
+			});
+			this.callParent(arguments);
+		}
+	});
+	
+	// 详细值
+	Ext.define('Budget.app.bussinessProcess.ProjectItemWin.TabPanel.CostValueGrid', {
+		extend : 'Ext.grid.Panel',
+		id : 'projectbitwin-tabpanel-costvaluegrid',
+		plain : true,
+		region : 'center',
+		initComponent : function() {
+			var me = this;
+
+			var bitItemGrid = me.bitItemGrid;
+			
+			Ext.define('CostValueList', {
+				extend : 'Ext.data.Model',
+				idProperty : 'id',
+				fields : [ {
+					name : 'looktype_id',
+					type : 'int'
+				}, 'code', 'name', 'unit', 'category']
+			});
+			
+			var costValueStore = Ext.create('Ext.data.Store', {
+				model : 'CostValueList',
+				autoLoad : false,
+				remoteSort : true,
+				pageSize : globalPageSize,
+				proxy : {
+					type : 'ajax',
+					url : appBaseUri + '/yca/queryYCAInfo',
+					extraParams : {"lookValueId": Ext.getCmp('projectbitwin-tabpanel-costtypetree').lookValueId},
+					reader : {
+						type : 'json',
+						root : 'data',
+						totalProperty : 'totalRecord',
+						successProperty : "success"
+					}
+				}
+			});
+			var costValueColumns = [ {
+				text : "费用代码",
+				dataIndex : 'code',
+				width : '14%',
+				hidden : false
+			},{
+				text : "费用名称",
+				dataIndex : 'name',
+				sortable : false,
+				width : '30%'
+			}, {
+				text : "单位",
+				dataIndex : 'unit',
+				sortable : false,
+				width : '14%'
+			}];
+			Ext.apply(this, {
+				store : costValueStore,
+				listeners : {
+					'itemdblclick' : function(item, record) {
+						
+						var bitRecord =  bitItemGrid.getSelectionModel().getSelection()[0];
+						
+						//修改
+						if(bitRecord.get("code") == null || bitRecord.get("code")  == ""){
+								
+							bitRecord.set('code', record.get('code'));
+							bitRecord.set('type', '定');
+							bitRecord.set('name', record.get('name'));
+							bitRecord.set('unit', record.get('unit'));
+							bitRecord.set('amount', null);
+							bitRecord.set('dtgcl', 1);
+							bitRecord.set('singlePrice', 1);
+							bitRecord.set('price', 1);
+							bitRecord.set('sumPrice', 1);
+							bitRecord.set('remark', null);
+						}else{
+							//数据对象
+							var newRecord = {
+									code: record.get('code'),
+									type: '定',
+									name: record.get('name'),
+									unit: record.get('unit'),
+									amount:null,
+									dtgcl:1,
+									singlePrice:1,
+									price:1,
+									sumPrice:1,
+									remark:null
+							};
+							bitItemGrid.getStore().add(newRecord);
+						}
+					}
+				},
+				selModel : Ext.create('Ext.selection.CheckboxModel'),
+				columns : costValueColumns,
+				bbar : Ext.create('Ext.PagingToolbar', {
+					store : costValueStore,
+					displayInfo : true
+				}),
+				viewConfig:{
+					loadingText : '正在查询数据，请耐心稍候...',
+					stripeRows:false,
+					enableTextSelection : true,
+					getRowClass : function(record, rowIndex){
+						if(record.get('enableFlag') == '0'){
+		                    return 'info_rp';
+						}
+		            }
+				}
+			});
+			
+			this.callParent(arguments);
+		}
+	});
+	
+	
 });
