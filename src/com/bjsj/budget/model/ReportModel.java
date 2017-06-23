@@ -8,6 +8,8 @@ public class ReportModel {
 	private Double materialFee;
 	private Double installationFee;
 	private Double csFee;
+	private Double totalAmount;
+	private Double projectPercent;
 	public String getProject_name() {
 		return project_name;
 	}
@@ -43,6 +45,18 @@ public class ReportModel {
 	}
 	public void setCsFee(Double csFee) {
 		this.csFee = csFee;
+	}
+	public Double getTotalAmount() {
+		return totalAmount;
+	}
+	public void setTotalAmount(Double totalAmount) {
+		this.totalAmount = totalAmount;
+	}
+	public Double getProjectPercent() {
+		return projectPercent;
+	}
+	public void setProjectPercent(Double projectPercent) {
+		this.projectPercent = projectPercent;
 	}
 	
 }

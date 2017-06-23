@@ -338,7 +338,7 @@ Ext.onReady(function() {
 				fields : [ {
 					name : 'project_id',
 					type : 'int'
-				}, 'project_name', 'projectTotal', 'projectPercent', 'transportFee','materialFee','installationFee','csFee' ]
+				}, 'project_name', 'totalAmount', 'projectPercent', 'transportFee','materialFee','installationFee','csFee' ]
 			});
 			
 			var costValueStore = Ext.create('Ext.data.Store', {
@@ -362,7 +362,10 @@ Ext.onReady(function() {
 				id : 'projectinfo-projectsummerygrid',
 				store : costValueStore,
 				title:"汇总信息",
-				selModel : Ext.create('Ext.selection.CheckboxModel'),
+				features: [{
+		                ftype: 'summary'
+		            }],
+				selModel : Ext.create('Ext.selection.Model'),
 				columns : [{
 						text:'序号', width:40,xtype:'rownumberer'
 					},
@@ -370,18 +373,19 @@ Ext.onReady(function() {
 						text:'名称', width:120, 	dataIndex : 'project_name',
 					},
 					{
-						text:'项目造价(元)', width:120, 	dataIndex : 'projectTotal', align:"right"
+						text:'项目造价(元)', width:120, 	dataIndex : 'totalAmount', align:"right"
 					},{
 						text:'占造价百分比(%)', width:120, 	dataIndex : 'projectPercent', align:"right"
 					},
 					{
 						text:"其中",
 			            columns:[
-			                {text: "运输费", width: 80, dataIndex: 'transportFee', sortable: false},
-			                {text: "材料费", width: 80, dataIndex: 'materialFee', sortable: false},
-			                {text: "安装费", width: 80, dataIndex: 'installationFee', sortable: false},
-			                {text: "措施费", width: 80, dataIndex: 'csFee', sortable: false}]
+			                {text: "运输费", width: 80, dataIndex: 'transportFee', sortable: false, summaryType: 'sum'},
+			                {text: "材料费", width: 80, dataIndex: 'materialFee', sortable: false, summaryType: 'sum'},
+			                {text: "安装费", width: 80, dataIndex: 'installationFee', sortable: false, summaryType: 'sum'},
+			                {text: "措施费", width: 80, dataIndex: 'csFee', sortable: false, summaryType: 'sum'}]
 					}
+					
 				],
 				viewConfig:{
 					loadingText : '正在查询数据，请耐心稍候...',
