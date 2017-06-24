@@ -2,6 +2,8 @@ package com.bjsj.budget.model;
 
 public class ReportModel {
 
+	private Integer index; //序号
+	
 	private String project_name;
 	private String project_id;
 	private Double transportFee;
@@ -57,6 +59,12 @@ public class ReportModel {
 	}
 	public void setProjectPercent(Double projectPercent) {
 		this.projectPercent = projectPercent;
+	}
+	public Integer getIndex() {
+		return index;
+	}
+	public void setIndex(Integer index) {
+		this.index = index;
 	}
 	
 }

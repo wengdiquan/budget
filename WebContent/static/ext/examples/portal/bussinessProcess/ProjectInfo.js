@@ -308,6 +308,10 @@ Ext.onReady(function() {
 					Ext.apply(store.proxy.extraParams, {"source": "spj"});
 					costValueStore.reload();
 				}
+				
+				if(record.data.depth == 3){
+					costValueStore.removeAll();
+				}
 			},
 			'itemdblclick' : function(_this, record, td, cellIndex, tr, rowIndex, e, eOpts){
 				var store = Ext.getCmp('projectinfo-projecttreeid').getStore();
@@ -335,7 +339,7 @@ Ext.onReady(function() {
 			Ext.define('CostValueList', {
 				extend : 'Ext.data.Model',
 				idProperty : 'project_id',
-				fields : [ {
+				fields : [ 'index', {
 					name : 'project_id',
 					type : 'int'
 				}, 'project_name', 'totalAmount', 'projectPercent', 'transportFee','materialFee','installationFee','csFee' ]
@@ -362,12 +366,12 @@ Ext.onReady(function() {
 				id : 'projectinfo-projectsummerygrid',
 				store : costValueStore,
 				title:"汇总信息",
-				features: [{
+				/*features: [{
 		                ftype: 'summary'
-		            }],
+		            }],*/
 				selModel : Ext.create('Ext.selection.Model'),
 				columns : [{
-						text:'序号', width:40,xtype:'rownumberer'
+						text:'序号', width:40,dataIndex:'index'
 					},
 					{
 						text:'名称', width:120, 	dataIndex : 'project_name',
@@ -380,12 +384,11 @@ Ext.onReady(function() {
 					{
 						text:"其中",
 			            columns:[
-			                {text: "运输费", width: 80, dataIndex: 'transportFee', sortable: false, summaryType: 'sum'},
-			                {text: "材料费", width: 80, dataIndex: 'materialFee', sortable: false, summaryType: 'sum'},
-			                {text: "安装费", width: 80, dataIndex: 'installationFee', sortable: false, summaryType: 'sum'},
-			                {text: "措施费", width: 80, dataIndex: 'csFee', sortable: false, summaryType: 'sum'}]
+			                {text: "运输费", width: 80, dataIndex: 'transportFee', align:"right", sortable: false},
+			                {text: "材料费", width: 80, dataIndex: 'materialFee', align:"right", sortable: false},
+			                {text: "安装费", width: 80, dataIndex: 'installationFee', align:"right", sortable: false},
+			                {text: "措施费", width: 80, dataIndex: 'csFee', align:"right", sortable: false}]
 					}
-					
 				],
 				viewConfig:{
 					loadingText : '正在查询数据，请耐心稍候...',

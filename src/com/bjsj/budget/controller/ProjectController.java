@@ -1,7 +1,6 @@
 package com.bjsj.budget.controller;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -13,7 +12,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.bjsj.budget.model.CategoryModelModel;
 import com.bjsj.budget.model.Project;
 import com.bjsj.budget.model.ReportModel;
 import com.bjsj.budget.service.ProjectService;
@@ -307,10 +305,82 @@ public class ProjectController {
 		//查询条件
 		Map<String, String> queryMap = TransforUtil.transRMapToMap(request.getParameterMap());
 		List<ReportModel> CMList = new ArrayList();
+		
 		if(queryMap.get("projectId") != null && queryMap.get("projectId") != ""){
 			CMList = projectService.getSumList(queryMap);
 		}
 		
+		int i = 1;
+		for(ReportModel model: CMList){
+			model.setIndex(i++);
+		}
+		//空白行
+		ReportModel reportModel = new ReportModel();
+		
+		//将一个汇总信息
+		ReportModel summaryModel = new ReportModel();
+		
+		summaryModel.setProject_name("汇总");
+		summaryModel.setProjectPercent(this.getAmount(0, CMList));
+		summaryModel.setTotalAmount(this.getAmount(1, CMList)); //项目造价
+		summaryModel.setTransportFee(this.getAmount(2, CMList)); //运输费造价
+		summaryModel.setMaterialFee(this.getAmount(3, CMList)); //材料费造价
+		summaryModel.setInstallationFee(this.getAmount(4, CMList)); //安装费造价
+		summaryModel.setCsFee(this.getAmount(5, CMList)); //措施费造价
+		
+		CMList.add(reportModel);
+		CMList.add(summaryModel);
+		
+		
 		return CMList;
+	}
+	
+	/**
+	 * 算总价
+	 * @param i
+	 * @param cMList
+	 * @return
+	 */
+	private Double getAmount(int i, List<ReportModel> cMList) {
+		double d = 0;
+		
+		if(i == 0){
+			for(ReportModel model : cMList){
+				d += model.getProjectPercent();
+			}
+		}
+		
+		
+		if(i == 1){
+			for(ReportModel model : cMList){
+				d += model.getTotalAmount();
+			}
+		}
+		
+		if(i == 2){
+			for(ReportModel model : cMList){
+				d += model.getTransportFee();
+			}
+		}
+		
+		if(i == 3){
+			for(ReportModel model : cMList){
+				d += model.getMaterialFee();
+			}
+		}
+		
+		if(i == 4){
+			for(ReportModel model : cMList){
+				d += model.getInstallationFee();
+			}
+		}
+		
+		if(i == 5){
+			for(ReportModel model : cMList){
+				d += model.getCsFee();
+			}
+		}
+		
+		return d;
 	}
 }
