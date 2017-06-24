@@ -13,6 +13,4 @@ Ext.onReady(function() {
 			this.callParent(arguments);
 		}
 	});
-	
-	
 });

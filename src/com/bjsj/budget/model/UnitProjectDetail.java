@@ -3,23 +3,23 @@ package com.bjsj.budget.model;
 public class UnitProjectDetail {
 	private Integer id;
 
-	private Integer unitprojectId;
+	private Integer unitprojectId; //单位工程ID
 
-	private String code;
+	private String code;       //编码
 
-	private String type;
+	private String type;	   //列别
 
-	private String name;
+	private String name;		//名称
 
-	private String typeInfo;
+	private String typeInfo;	//规格说明
 
-	private String unit;
+	private String unit;		//单位
 
-	private Double content;
+	private Double content;		//含量
 
-	private Double singlePrice;
+	private Double singleSumPrice;  //
 
-	private Double marketPrice;
+	private Double marketPrice;  //市场价
 
 	private Double amount;
 
@@ -89,12 +89,12 @@ public class UnitProjectDetail {
 		this.content = content;
 	}
 
-	public Double getSinglePrice() {
-		return singlePrice;
+	public Double getSingleSumPrice() {
+		return singleSumPrice;
 	}
 
-	public void setSinglePrice(Double singlePrice) {
-		this.singlePrice = singlePrice;
+	public void setSingleSumPrice(Double singleSumPrice) {
+		this.singleSumPrice = singleSumPrice;
 	}
 
 	public Double getMarketPrice() {

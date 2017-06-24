@@ -3,6 +3,8 @@ package com.bjsj.budget.service.impl;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -86,6 +88,10 @@ public class CategoryModelServiceImpl implements CategoryModelService{
 		CategoryModelYCAModel record = new CategoryModelYCAModel();
 		
 		TransforUtil.transFromMapToBean(map, record);
+		
+		if(Objects.isNull(record.getLookTypeId())){
+			record.setLookValueId(Integer.parseInt(map.get("lookValueId")[0]));
+		}
 		
 		Map queryMap = new HashMap();
 		queryMap.put("id", record.getId());

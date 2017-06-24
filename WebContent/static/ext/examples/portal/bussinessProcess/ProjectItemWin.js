@@ -35,10 +35,12 @@ Ext.onReady(function() {
                     layout : 'border',
                     items:[
                     	 Ext.create('Budget.app.bussinessProcess.ProjectItemWin.TabPanel.CMGrid',{
-                    		 bitItemGrid:me.bitItemGrid
+                    		 bitItemGrid:me.bitItemGrid,
+                    		 bitProjectId: me.bitProjectId
                     	 }),
                     	 Ext.create('Budget.app.bussinessProcess.ProjectItemWin.TabPanel.CMDetailGrid', {
-                    		 bitItemGrid:me.bitItemGrid
+                    		 bitItemGrid:me.bitItemGrid,
+                    		 bitProjectId: me.bitProjectId
                     	 })
                     ],
                     itemId: 'dinge'  
@@ -214,19 +216,45 @@ Ext.onReady(function() {
 						}else{
 							//数据对象
 							var newRecord = {
-									code: record.get('code'),
-									type: '定',
-									name: record.get('name'),
-									unit: record.get('unit'),
-									amount:null,
-									dtgcl:1,
-									singlePrice:1,
-									price:1,
-									sumPrice:1,
-									remark:null
+								code: record.get('code'),
+								type: '定',
+								name: record.get('name'),
+								unit: record.get('unit'),
+								amount:null,
+								dtgcl:1,
+								singlePrice:1,
+								price:1,
+								sumPrice:1,
+								remark:null
 							};
 							bitItemGrid.getStore().add(newRecord);
 						}
+						
+						//插入数据库
+						Ext.getCmp('projectbitwin-tabpanel-cmdetailgrid').getEl().mask('数据处理中，请稍候...');
+						Ext.Ajax.request({
+							 url : appBaseUri + '/project/insertBitProject', //新增单位工程
+							 params : {
+								 type:"DING",
+								 dingId:bitRecord.get("id"),
+								 bitProjectId: me.bitProjectId
+							 },
+							 method : "POST",
+							 success : function(response) {
+								 if (response.responseText != '') {
+									 var res = Ext.JSON.decode(response.responseText);
+									 if (res.success) {
+									 } else {
+										 globalObject.errTip(res.msg);
+									 }
+									 
+									 Ext.getCmp('projectbitwin-tabpanel-cmdetailgrid').getEl().unmask();
+								 }
+							 },
+							 failure : function(response) {
+								 globalObject.errTip('操作失败！');
+							 }
+						 });
 					}
 				},
 				selModel : Ext.create('Ext.selection.CheckboxModel'),

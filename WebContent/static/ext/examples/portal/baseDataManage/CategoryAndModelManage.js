@@ -7,7 +7,7 @@ Ext.onReady(function() {
 		constructor : function(config) {
 			config = config || {};
 			Ext.apply(config, {
-				title : '运材安新增',
+				title : '运材安维护',
 				width : 420,
 				height : 350,
 				bodyPadding : '10 5',
@@ -99,6 +99,11 @@ Ext.onReady(function() {
 							if (form.isValid()) {
 								window.getEl().mask('数据保存中，请稍候...');
 								var vals = form.getValues();
+								
+								var grid = Ext.getCmp("categoryandmodelmanage-YCAGrid");
+								var records = grid.getSelectionModel().getSelection();
+								vals.lookValueId = records[0].get('lookValueId')-0 ;
+								
 								Ext.Ajax.request({
 									url : appBaseUri + '/categorymodel/saveOrUpdateValue',
 									params : vals,
@@ -145,7 +150,7 @@ Ext.onReady(function() {
 			Ext.apply(config, {
 				title : '子目新增',
 				width : 420,
-				height : 350,
+				height : 220,
 				bodyPadding : '10 5',
 				modal : true,
 				layout : 'fit',
@@ -421,6 +426,11 @@ Ext.onReady(function() {
 				}
 			});
 			
+			costValueStore.on('beforeload',function(){
+				Ext.apply(costValueStore.proxy.extraParams, {"parentId": Ext.getCmp('categoryandmodelmanage-cmgrid').parentId});
+			});
+			
+			
 			this.callParent(arguments);
 		},
 		newCodeCodeFun: function(){
@@ -611,9 +621,12 @@ Ext.onReady(function() {
 			form.findField('code').setReadOnly(true);
 			form.findField('name').setReadOnly(true);
 			form.findField('unit').setReadOnly(true);
-			form.findField('lookValueId').setValue(gridRecord.data.lookValueId);
 			
-			win.down('#myActionColumn').hide();
+			var tree = win.down('#myActionColumn');
+			/*var node =  tree.getStore().getNodeById(gridRecord.data.lookValueId);
+			tree.getRootNode().expand();
+			tree.getSelectionModel().select(node);*/
+			tree.hide();
 			
 			form.loadRecord(gridRecord);
 			win.show();

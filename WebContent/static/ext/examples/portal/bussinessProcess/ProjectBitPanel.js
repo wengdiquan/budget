@@ -13,12 +13,13 @@ Ext.onReady(function() {
 			Ext.apply(this, {
 				layout : 'border',
 				height:  500,
-				items : [Ext.create("Budget.app.bussinessProcess.ProjectBitPanel.BitItemGrid", {
-					bitProjectId:me.bitProjectId,
-					id:"projectbitpanel-bititemgrid"
+				items : [
+					Ext.create("Budget.app.bussinessProcess.ProjectBitPanel.BitItemGrid", {
+						bitProjectId:me.bitProjectId,
+						id:"projectbitpanel-bititemgrid"
 				}),Ext.create("Budget.app.bussinessProcess.ProjectBitPanel.BitDetailGrid", {
-					bitProjectId:me.bitProjectId,
-					id:"projectbitpanel-bitdetailgrid"
+						bitProjectId:me.bitProjectId,
+						id:"projectbitpanel-bitdetailgrid"
 				})]
 			});
 			this.callParent(arguments);
@@ -110,7 +111,8 @@ Ext.onReady(function() {
 					editable:false,
 					onTriggerClick:function(){
 						Ext.create("Budget.app.bussinessProcess.ProjectItemWin", {
-							bitItemGrid:Ext.getCmp("projectbitpanel-bititemgrid")
+							bitItemGrid:Ext.getCmp("projectbitpanel-bititemgrid"),
+							bitProjectId:me.bitProjectId
 						}).show();
 					}
 				}
@@ -183,14 +185,11 @@ Ext.onReady(function() {
 			this.callParent(arguments);
 		},
 		newItemFun:function(){
-			
 			var grid = Ext.getCmp("projectbitpanel-bititemgrid");
 			var store = grid.getStore();
 			store.add({});
 		},
 		deleteItemFun:function(){
-			
-			
 			globalObject.confirmTip("删除该子目会同时删除下面板的运材安费用明细，确认删除吗?", 
 					 function(btn){
 						 if("yes" == btn){

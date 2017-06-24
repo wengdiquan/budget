@@ -33,6 +33,13 @@ public interface CategoryModelDao extends BaseDao{
 		
 		CategoryModelModel selectCMByPrimaryKey(@Param("map") Map<String, String> queryMap);
 		
+		/**
+		 * 根据定额查询运材安详情
+		 * @param id
+		 * @return
+		 */
+		List<CategoryModelYCAModel> getDetailYCA(Integer unitProjectId);
+		
 		//List<HashMap> getLookTypeList(@Param("map")Map<String, String> queryMap);
 
 }

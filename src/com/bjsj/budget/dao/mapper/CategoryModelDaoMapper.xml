@@ -100,7 +100,13 @@
 		select 
 	    	<include refid="Base_Column_List" />
 	    from tm_unitproject_base t 
-	    where t.id = #{map.id,jdbcType=INTEGER}   
+	    where 1 = 1 
+	    <if test="map.id != null and map.id != ''">
+			and t.id = #{map.id,jdbcType=INTEGER}   
+		</if>
+	    <if test="map.dingId != null and map.dingId != ''">
+			and t.id = #{map.dingId,jdbcType=INTEGER}   
+		</if>	
 	</select>
 	
 	<insert id="insertCM" parameterType="com.bjsj.budget.model.CategoryModelModel">
@@ -177,4 +183,12 @@
 		where id = #{id,jdbcType=INTEGER}
 	</update> 
 	
+	
+	<select id="getDetailYCA" parameterType="Integer" resultMap="CMYCAInfoMap">
+        select
+		<include refid="Base_Column_List_YCA" />
+		from tm_unitproject_detail_base t 
+		where t.unitproject_id = #{unitProjectId,jdbcType=INTEGER}   
+		order by t.unitproject_id 
+    </select>
 </mapper>

@@ -2,33 +2,37 @@ package com.bjsj.budget.model;
 
 public class UnitProject {
 
-	private Long id;
+	private Long id; // 主键
 
-	private String code;
+	private String code; // 编码
 
-	private String type;
+	private String type; // 类型
 
-	private String name;
+	private String name; // 名称
 
-	private String unit;
+	private String unit; // 单位
 
-	private Double amount;
+	private Double content; // 含量
 
 	private Double dtgcl; // 工程量
+	
+	private Double singlePrice; // 单价
 
-	private Double singlePrice; // 合价
+	private Double singleSumPrice; // 合价
 
 	private Double price; // 综合单价
 
 	private Double sumPrice; // 综合合价
 
-	private String remark;
+	private String remark; // 备注
 
-	private Integer parentid;
+	private Integer parentid; // 用于树形结构
 
-	private Integer leaf;
+	private Integer leaf; // 用于树形结构
 
-	private Integer bitProjectId;
+	private Integer bitProjectId; // 单位工程id
+
+	private String sourceType; // DING, YS, CL, AZ, CS //表示这一条是运材安类型
 
 	public Long getId() {
 		return id;
@@ -62,12 +66,12 @@ public class UnitProject {
 		this.unit = unit;
 	}
 
-	public Double getAmount() {
-		return amount;
+	public Double getContent() {
+		return content;
 	}
 
-	public void setAmount(Double amount) {
-		this.amount = amount;
+	public void setContent(Double content) {
+		this.content = content;
 	}
 
 	public Double getDtgcl() {
@@ -142,4 +146,27 @@ public class UnitProject {
 		this.sumPrice = sumPrice;
 	}
 
+	public String getSourceType() {
+		return sourceType;
+	}
+
+	public void setSourceType(String sourceType) {
+		this.sourceType = sourceType;
+	}
+
+	@Override
+	public String toString() {
+		return "UnitProject [id=" + id + ", code=" + code + ", type=" + type + ", name=" + name + ", unit=" + unit
+				+ ", content=" + content + ", dtgcl=" + dtgcl + ", singlePrice=" + singlePrice + ", price=" + price
+				+ ", sumPrice=" + sumPrice + ", remark=" + remark + ", parentid=" + parentid + ", leaf=" + leaf
+				+ ", bitProjectId=" + bitProjectId + ", sourceType=" + sourceType + "]";
+	}
+
+	public Double getSingleSumPrice() {
+		return singleSumPrice;
+	}
+
+	public void setSingleSumPrice(Double singleSumPrice) {
+		this.singleSumPrice = singleSumPrice;
+	}
 }

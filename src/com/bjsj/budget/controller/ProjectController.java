@@ -21,139 +21,106 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 @Controller
-@RequestMapping(value="/project")
+@RequestMapping(value = "/project")
 public class ProjectController {
-	
+
 	@Autowired
 	private ProjectService projectService;
-	
-	/*@RequestMapping("/getProjectTreeList")
-	@ResponseBody
-	public List<JSONObject> getProjectTreeList(HttpServletRequest request, HttpServletResponse response){
-		
-		Map<String, String> queryMap = TransforUtil.transRMapToMap(request.getParameterMap());
-		
-		List<JSONObject> resultList = new ArrayList<JSONObject>();
-		if("click".equals(queryMap.get("type"))){
-			//查询下级菜单
-			List<Project> projectPList = projectService.getLowerProjectTreeList(queryMap);
-			
-			if(projectPList.isEmpty()){
-				return resultList;
-			}
-			
-			String iconClsStr = "icon-room";
-			if(projectPList.get(0).getLevel() == 3){
-				iconClsStr = "icon-wood";
-			}
-			JSONObject jsonP = new JSONObject();
-			JSONArray sjsonArray = new JSONArray();
-			for(Project project: projectPList){
-				JSONObject jsonS = new JSONObject();
-				jsonS.element("id", project.getProjectId());
-				jsonS.element("text", project.getProjectName());
-				jsonS.element("leaf", false);
-				jsonS.element("iconCls", iconClsStr);
-				jsonS.element("expanded", true);
-				jsonS.element("level", project.getLevel());
-				queryMap.put("parentId", project.getProjectId() + "");
-				List<Project> bprojectList = projectService.getLowerProjectTreeList(queryMap);
-				JSONArray bjsonArray = new JSONArray();
-				for(Project bproject: bprojectList){
-					JSONObject jsonB = new JSONObject();
-					jsonB.element("id", bproject.getProjectId());
-					jsonB.element("text", bproject.getProjectName());
-					jsonB.element("leaf", false);
-					jsonB.element("iconCls", "icon-wood");
-					jsonB.element("expanded", true);
-					jsonB.element("level", bproject.getLevel());
-					bjsonArray.add(jsonB);
-				}
-				if(!bjsonArray.isEmpty()){
-					jsonS.element("children", bjsonArray);
-				}
-				sjsonArray.add(jsonS);
-			}
-			if(!sjsonArray.isEmpty()){
-				jsonP.element("children", sjsonArray);
-			}
-			
-			resultList.add(jsonP);
-			
-		}else{
-			//查询该项目或子节点
-			Project projectP = projectService.getProjectRoot(queryMap);
-			JSONObject jsonP = new JSONObject();
-			jsonP.element("id", projectP.getProjectId());
-			jsonP.element("text", projectP.getProjectName());
-			jsonP.element("leaf", false);
-			jsonP.element("iconCls", "icon-buliding");
-			jsonP.element("expanded", true);
-			jsonP.element("level", projectP.getLevel());
-			queryMap.put("parentId", projectP.getProjectId() + "");
-			List<Project> sprojectList = projectService.getLowerProjectTreeList(queryMap);
-			JSONArray sjsonArray = new JSONArray();
-			for(Project sproject: sprojectList){
-				JSONObject jsonS = new JSONObject();
-				jsonS.element("id", sproject.getProjectId());
-				jsonS.element("text", sproject.getProjectName());
-				jsonS.element("leaf", false);
-				jsonS.element("iconCls", "icon-room");
-				jsonS.element("expanded", true);
-				jsonS.element("level", sproject.getLevel());
-				
-				queryMap.put("parentId", sproject.getProjectId() + "");
-				List<Project> bprojectList = projectService.getLowerProjectTreeList(queryMap);
-				JSONArray bjsonArray = new JSONArray();
-				for(Project bproject: bprojectList){
-					JSONObject jsonB = new JSONObject();
-					jsonB.element("id", bproject.getProjectId());
-					jsonB.element("text", bproject.getProjectName());
-					jsonB.element("leaf", false);
-					jsonB.element("iconCls", "icon-wood");
-					jsonB.element("expanded", true);
-					jsonB.element("level", bproject.getLevel());
-					bjsonArray.add(jsonB);
-				}
-				if(!bjsonArray.isEmpty()){
-					jsonS.element("children", bjsonArray);
-				}
-				sjsonArray.add(jsonS);
-			}
-			if(!sjsonArray.isEmpty()){
-				jsonP.element("children", sjsonArray);
-			}
-			
-			resultList.add(jsonP);
-		}
-		
-		return resultList;
-	}*/
-	
+
+	/*
+	 * @RequestMapping("/getProjectTreeList")
+	 * 
+	 * @ResponseBody public List<JSONObject>
+	 * getProjectTreeList(HttpServletRequest request, HttpServletResponse
+	 * response){
+	 * 
+	 * Map<String, String> queryMap =
+	 * TransforUtil.transRMapToMap(request.getParameterMap());
+	 * 
+	 * List<JSONObject> resultList = new ArrayList<JSONObject>();
+	 * if("click".equals(queryMap.get("type"))){ //查询下级菜单 List<Project>
+	 * projectPList = projectService.getLowerProjectTreeList(queryMap);
+	 * 
+	 * if(projectPList.isEmpty()){ return resultList; }
+	 * 
+	 * String iconClsStr = "icon-room"; if(projectPList.get(0).getLevel() == 3){
+	 * iconClsStr = "icon-wood"; } JSONObject jsonP = new JSONObject();
+	 * JSONArray sjsonArray = new JSONArray(); for(Project project:
+	 * projectPList){ JSONObject jsonS = new JSONObject(); jsonS.element("id",
+	 * project.getProjectId()); jsonS.element("text", project.getProjectName());
+	 * jsonS.element("leaf", false); jsonS.element("iconCls", iconClsStr);
+	 * jsonS.element("expanded", true); jsonS.element("level",
+	 * project.getLevel()); queryMap.put("parentId", project.getProjectId() +
+	 * ""); List<Project> bprojectList =
+	 * projectService.getLowerProjectTreeList(queryMap); JSONArray bjsonArray =
+	 * new JSONArray(); for(Project bproject: bprojectList){ JSONObject jsonB =
+	 * new JSONObject(); jsonB.element("id", bproject.getProjectId());
+	 * jsonB.element("text", bproject.getProjectName()); jsonB.element("leaf",
+	 * false); jsonB.element("iconCls", "icon-wood"); jsonB.element("expanded",
+	 * true); jsonB.element("level", bproject.getLevel());
+	 * bjsonArray.add(jsonB); } if(!bjsonArray.isEmpty()){
+	 * jsonS.element("children", bjsonArray); } sjsonArray.add(jsonS); }
+	 * if(!sjsonArray.isEmpty()){ jsonP.element("children", sjsonArray); }
+	 * 
+	 * resultList.add(jsonP);
+	 * 
+	 * }else{ //查询该项目或子节点 Project projectP =
+	 * projectService.getProjectRoot(queryMap); JSONObject jsonP = new
+	 * JSONObject(); jsonP.element("id", projectP.getProjectId());
+	 * jsonP.element("text", projectP.getProjectName()); jsonP.element("leaf",
+	 * false); jsonP.element("iconCls", "icon-buliding");
+	 * jsonP.element("expanded", true); jsonP.element("level",
+	 * projectP.getLevel()); queryMap.put("parentId", projectP.getProjectId() +
+	 * ""); List<Project> sprojectList =
+	 * projectService.getLowerProjectTreeList(queryMap); JSONArray sjsonArray =
+	 * new JSONArray(); for(Project sproject: sprojectList){ JSONObject jsonS =
+	 * new JSONObject(); jsonS.element("id", sproject.getProjectId());
+	 * jsonS.element("text", sproject.getProjectName()); jsonS.element("leaf",
+	 * false); jsonS.element("iconCls", "icon-room"); jsonS.element("expanded",
+	 * true); jsonS.element("level", sproject.getLevel());
+	 * 
+	 * queryMap.put("parentId", sproject.getProjectId() + ""); List<Project>
+	 * bprojectList = projectService.getLowerProjectTreeList(queryMap);
+	 * JSONArray bjsonArray = new JSONArray(); for(Project bproject:
+	 * bprojectList){ JSONObject jsonB = new JSONObject(); jsonB.element("id",
+	 * bproject.getProjectId()); jsonB.element("text",
+	 * bproject.getProjectName()); jsonB.element("leaf", false);
+	 * jsonB.element("iconCls", "icon-wood"); jsonB.element("expanded", true);
+	 * jsonB.element("level", bproject.getLevel()); bjsonArray.add(jsonB); }
+	 * if(!bjsonArray.isEmpty()){ jsonS.element("children", bjsonArray); }
+	 * sjsonArray.add(jsonS); } if(!sjsonArray.isEmpty()){
+	 * jsonP.element("children", sjsonArray); }
+	 * 
+	 * resultList.add(jsonP); }
+	 * 
+	 * return resultList; }
+	 */
+
 	/**
 	 * 请求别的系统，获取项目信息
+	 * 
 	 * @return
 	 */
 	@RequestMapping("/getProjectTreeList")
 	@ResponseBody
-	public List<JSONObject> getProjectTreeList(HttpServletRequest request, HttpServletResponse response){
+	public List<JSONObject> getProjectTreeList(HttpServletRequest request, HttpServletResponse response) {
 		Map<String, String> queryMap = TransforUtil.transRMapToMap(request.getParameterMap());
-		
+
 		List<JSONObject> resultList = new ArrayList<JSONObject>();
-		if("init".equals(queryMap.get("source"))){
+		if ("init".equals(queryMap.get("source"))) {
 			List<Project> otherProjectList = new ArrayList<Project>();
 			Project p1 = new Project();
 			p1.setProjectId(1);
 			p1.setProjectName("项目1");
-			
+
 			Project p2 = new Project();
 			p2.setProjectId(2);
 			p2.setProjectName("项目2");
-			
+
 			otherProjectList.add(p1);
 			otherProjectList.add(p2);
-			
-			for(Project pproject: otherProjectList){
+
+			for (Project pproject : otherProjectList) {
 				JSONObject jsonp = new JSONObject();
 				jsonp.element("id", pproject.getProjectId());
 				jsonp.element("text", pproject.getProjectName());
@@ -161,11 +128,11 @@ public class ProjectController {
 				jsonp.element("iconCls", "icon-buliding");
 				jsonp.element("expanded", true);
 				jsonp.element("level", pproject.getLevel());
-				
+
 				queryMap.put("parentId", pproject.getProjectId() + "");
 				List<Project> sprojectList = projectService.getLowerProjectTreeList(queryMap);
 				JSONArray sjsonArray = new JSONArray();
-				for(Project sproject: sprojectList){
+				for (Project sproject : sprojectList) {
 					JSONObject jsonS = new JSONObject();
 					jsonS.element("id", sproject.getProjectId());
 					jsonS.element("text", sproject.getProjectName());
@@ -173,11 +140,11 @@ public class ProjectController {
 					jsonS.element("iconCls", "icon-room");
 					jsonS.element("expanded", true);
 					jsonS.element("level", sproject.getLevel());
-					
+
 					queryMap.put("parentId", sproject.getProjectId() + "");
 					List<Project> bprojectList = projectService.getLowerProjectTreeList(queryMap);
 					JSONArray bjsonArray = new JSONArray();
-					for(Project bproject: bprojectList){
+					for (Project bproject : bprojectList) {
 						JSONObject jsonB = new JSONObject();
 						jsonB.element("id", bproject.getProjectId());
 						jsonB.element("text", bproject.getProjectName());
@@ -191,62 +158,61 @@ public class ProjectController {
 					sjsonArray.add(jsonS);
 				}
 				jsonp.element("children", sjsonArray);
-				
+
 				resultList.add(jsonp);
 			}
 		}
-		
+
 		return resultList;
 	}
-	
+
 	@RequestMapping(value = "/saveOrUpdateProject")
 	@ResponseBody
-	public String saveOrUpdateProject (HttpServletRequest request,
-			HttpServletResponse response){
-		
+	public String saveOrUpdateProject(HttpServletRequest request, HttpServletResponse response) {
+
 		Project project = new Project();
-		
-		try
-		{
+
+		try {
 			TransforUtil.transFromMapToBean(request.getParameterMap(), project);
-			
-			if("edit".equals(request.getParameter("cmd"))){
+
+			if ("edit".equals(request.getParameter("cmd"))) {
 				projectService.updateProject(project);
-			}else{
+			} else {
 				projectService.insertProject(project);
 			}
-			
-		}catch (Exception ex) {
+
+		} catch (Exception ex) {
 			ex.printStackTrace();
 			return "{success:false,msg:'错误:" + ex.getMessage() + "'}";
 		}
-		return "{success:true, data:'" + project.getProjectId() +"'}";
+		return "{success:true, data:'" + project.getProjectId() + "'}";
 	}
-	
+
 	/**
 	 * 请求别的系统，获取项目信息
+	 * 
 	 * @return
 	 */
 	@RequestMapping("/getProjectSum")
 	@ResponseBody
-	public List<JSONObject> getProjectSum(HttpServletRequest request, HttpServletResponse response){
+	public List<JSONObject> getProjectSum(HttpServletRequest request, HttpServletResponse response) {
 		Map<String, String> queryMap = TransforUtil.transRMapToMap(request.getParameterMap());
-		
+
 		List<JSONObject> resultList = new ArrayList<JSONObject>();
-		if("init".equals(queryMap.get("source"))){
+		if ("init".equals(queryMap.get("source"))) {
 			List<Project> otherProjectList = new ArrayList<Project>();
 			Project p1 = new Project();
 			p1.setProjectId(1);
 			p1.setProjectName("项目1");
-			
+
 			Project p2 = new Project();
 			p2.setProjectId(2);
 			p2.setProjectName("项目2");
-			
+
 			otherProjectList.add(p1);
 			otherProjectList.add(p2);
-			
-			for(Project pproject: otherProjectList){
+
+			for (Project pproject : otherProjectList) {
 				JSONObject jsonp = new JSONObject();
 				jsonp.element("id", pproject.getProjectId());
 				jsonp.element("text", pproject.getProjectName());
@@ -254,11 +220,11 @@ public class ProjectController {
 				jsonp.element("iconCls", "icon-buliding");
 				jsonp.element("expanded", true);
 				jsonp.element("level", pproject.getLevel());
-				
+
 				queryMap.put("parentId", pproject.getProjectId() + "");
 				List<Project> sprojectList = projectService.getLowerProjectTreeList(queryMap);
 				JSONArray sjsonArray = new JSONArray();
-				for(Project sproject: sprojectList){
+				for (Project sproject : sprojectList) {
 					JSONObject jsonS = new JSONObject();
 					jsonS.element("id", sproject.getProjectId());
 					jsonS.element("text", sproject.getProjectName());
@@ -266,11 +232,11 @@ public class ProjectController {
 					jsonS.element("iconCls", "icon-room");
 					jsonS.element("expanded", true);
 					jsonS.element("level", sproject.getLevel());
-					
+
 					queryMap.put("parentId", sproject.getProjectId() + "");
 					List<Project> bprojectList = projectService.getLowerProjectTreeList(queryMap);
 					JSONArray bjsonArray = new JSONArray();
-					for(Project bproject: bprojectList){
+					for (Project bproject : bprojectList) {
 						JSONObject jsonB = new JSONObject();
 						jsonB.element("id", bproject.getProjectId());
 						jsonB.element("text", bproject.getProjectName());
@@ -284,103 +250,125 @@ public class ProjectController {
 					sjsonArray.add(jsonS);
 				}
 				jsonp.element("children", sjsonArray);
-				
+
 				resultList.add(jsonp);
 			}
 		}
-		
+
 		return resultList;
 	}
-	
+
 	/**
 	 * 查询 汇总数据
+	 * 
 	 * @param request
 	 * @param response
 	 * @return
 	 */
 	@RequestMapping(value = "/getSumList")
 	@ResponseBody
-	public List getSumList(HttpServletRequest request,
-			HttpServletResponse response){
-		//查询条件
+	public List getSumList(HttpServletRequest request, HttpServletResponse response) {
+		// 查询条件
 		Map<String, String> queryMap = TransforUtil.transRMapToMap(request.getParameterMap());
 		List<ReportModel> CMList = new ArrayList();
-		
-		if(queryMap.get("projectId") != null && queryMap.get("projectId") != ""){
+
+		if (queryMap.get("projectId") != null && queryMap.get("projectId") != "") {
 			CMList = projectService.getSumList(queryMap);
 		}
-		
+
 		int i = 1;
-		for(ReportModel model: CMList){
+		for (ReportModel model : CMList) {
 			model.setIndex(i++);
 		}
-		//空白行
+		// 空白行
 		ReportModel reportModel = new ReportModel();
-		
-		//将一个汇总信息
+
+		// 将一个汇总信息
 		ReportModel summaryModel = new ReportModel();
-		
+
 		summaryModel.setProject_name("汇总");
 		summaryModel.setProjectPercent(this.getAmount(0, CMList));
-		summaryModel.setTotalAmount(this.getAmount(1, CMList)); //项目造价
-		summaryModel.setTransportFee(this.getAmount(2, CMList)); //运输费造价
-		summaryModel.setMaterialFee(this.getAmount(3, CMList)); //材料费造价
-		summaryModel.setInstallationFee(this.getAmount(4, CMList)); //安装费造价
-		summaryModel.setCsFee(this.getAmount(5, CMList)); //措施费造价
-		
+		summaryModel.setTotalAmount(this.getAmount(1, CMList)); // 项目造价
+		summaryModel.setTransportFee(this.getAmount(2, CMList)); // 运输费造价
+		summaryModel.setMaterialFee(this.getAmount(3, CMList)); // 材料费造价
+		summaryModel.setInstallationFee(this.getAmount(4, CMList)); // 安装费造价
+		summaryModel.setCsFee(this.getAmount(5, CMList)); // 措施费造价
+
 		CMList.add(reportModel);
 		CMList.add(summaryModel);
-		
-		
+
 		return CMList;
 	}
-	
+
 	/**
 	 * 算总价
+	 * 
 	 * @param i
 	 * @param cMList
 	 * @return
 	 */
 	private Double getAmount(int i, List<ReportModel> cMList) {
 		double d = 0;
-		
-		if(i == 0){
-			for(ReportModel model : cMList){
+
+		if (i == 0) {
+			for (ReportModel model : cMList) {
 				d += model.getProjectPercent();
 			}
 		}
-		
-		
-		if(i == 1){
-			for(ReportModel model : cMList){
+
+		if (i == 1) {
+			for (ReportModel model : cMList) {
 				d += model.getTotalAmount();
 			}
 		}
-		
-		if(i == 2){
-			for(ReportModel model : cMList){
+
+		if (i == 2) {
+			for (ReportModel model : cMList) {
 				d += model.getTransportFee();
 			}
 		}
-		
-		if(i == 3){
-			for(ReportModel model : cMList){
+
+		if (i == 3) {
+			for (ReportModel model : cMList) {
 				d += model.getMaterialFee();
 			}
 		}
-		
-		if(i == 4){
-			for(ReportModel model : cMList){
+
+		if (i == 4) {
+			for (ReportModel model : cMList) {
 				d += model.getInstallationFee();
 			}
 		}
-		
-		if(i == 5){
-			for(ReportModel model : cMList){
+
+		if (i == 5) {
+			for (ReportModel model : cMList) {
 				d += model.getCsFee();
 			}
 		}
-		
 		return d;
+	}
+
+	/**
+	 * 新增单位工程
+	 * 
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	@RequestMapping(value = "/insertBitProject")
+	@ResponseBody
+	public JSONObject insertBitProject(HttpServletRequest request, HttpServletResponse response) {
+		// 查询条件
+		Map<String, String> queryMap = TransforUtil.transRMapToMap(request.getParameterMap());
+		
+		JSONObject json = new JSONObject();
+		json.put("success", true);
+		try{
+			projectService.insertBitProject(queryMap);
+		}catch (Exception ex) {
+			json.put("success", false);
+			json.put("msg", "出错:" + ex.getMessage());
+		}
+		return json;
 	}
 }
