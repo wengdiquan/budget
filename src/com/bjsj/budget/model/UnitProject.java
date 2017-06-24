@@ -2,7 +2,7 @@ package com.bjsj.budget.model;
 
 public class UnitProject {
 
-	private Long id; // 主键
+	private Integer id; // 主键
 
 	private String code; // 编码
 
@@ -16,10 +16,14 @@ public class UnitProject {
 
 	private Double dtgcl; // 工程量
 	
-	private Double singlePrice; // 单价
-
+	private Double singlePrice; // 不含税单价
+	
+	private Double taxSinglePrice; //含税单价
+	
 	private Double singleSumPrice; // 合价
-
+	
+	private Double taxSingleSumPrice; //含税合价
+	
 	private Double price; // 综合单价
 
 	private Double sumPrice; // 综合合价
@@ -32,13 +36,16 @@ public class UnitProject {
 
 	private Integer bitProjectId; // 单位工程id
 
-	private String sourceType; // DING, YS, CL, AZ, CS //表示这一条是运材安类型
+	private Integer lookTypeId; // 费用类型ID,如果 是 定额的话，为空
+	
+	private Integer seq;  //排序
+	
 
-	public Long getId() {
+	public Integer getId() {
 		return id;
 	}
 
-	public void setId(Long id) {
+	public void setId(Integer id) {
 		this.id = id;
 	}
 
@@ -146,12 +153,12 @@ public class UnitProject {
 		this.sumPrice = sumPrice;
 	}
 
-	public String getSourceType() {
-		return sourceType;
+	public Integer getLookTypeId() {
+		return lookTypeId;
 	}
 
-	public void setSourceType(String sourceType) {
-		this.sourceType = sourceType;
+	public void setSourceType(Integer lookTypeId) {
+		this.lookTypeId = lookTypeId;
 	}
 
 	@Override
@@ -159,7 +166,7 @@ public class UnitProject {
 		return "UnitProject [id=" + id + ", code=" + code + ", type=" + type + ", name=" + name + ", unit=" + unit
 				+ ", content=" + content + ", dtgcl=" + dtgcl + ", singlePrice=" + singlePrice + ", price=" + price
 				+ ", sumPrice=" + sumPrice + ", remark=" + remark + ", parentid=" + parentid + ", leaf=" + leaf
-				+ ", bitProjectId=" + bitProjectId + ", sourceType=" + sourceType + "]";
+				+ ", bitProjectId=" + bitProjectId + ", lookTypeId=" + lookTypeId + "]";
 	}
 
 	public Double getSingleSumPrice() {
@@ -168,5 +175,29 @@ public class UnitProject {
 
 	public void setSingleSumPrice(Double singleSumPrice) {
 		this.singleSumPrice = singleSumPrice;
+	}
+
+	public Double getTaxSinglePrice() {
+		return taxSinglePrice;
+	}
+
+	public void setTaxSinglePrice(Double taxSinglePrice) {
+		this.taxSinglePrice = taxSinglePrice;
+	}
+
+	public Double getTaxSingleSumPrice() {
+		return taxSingleSumPrice;
+	}
+
+	public void setTaxSingleSumPrice(Double taxSingleSumPrice) {
+		this.taxSingleSumPrice = taxSingleSumPrice;
+	}
+
+	public Integer getSeq() {
+		return seq;
+	}
+
+	public void setSeq(Integer seq) {
+		this.seq = seq;
 	}
 }

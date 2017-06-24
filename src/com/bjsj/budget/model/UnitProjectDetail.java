@@ -3,27 +3,33 @@ package com.bjsj.budget.model;
 public class UnitProjectDetail {
 	private Integer id;
 
-	private Integer unitprojectId; //单位工程ID
+	private Integer unitprojectId; // 子目Id
 
-	private String code;       //编码
+	private String code; // 编码
 
-	private String type;	   //列别
+	private String type; // 类别
 
-	private String name;		//名称
+	private String name; // 名称
 
-	private String typeInfo;	//规格说明
+	private String typeInfo; // 规格说明
 
-	private String unit;		//单位
+	private String unit; // 单位
 
-	private Double content;		//含量
+	private Double content; // 含量
+	
+	private Double amount; //数量
+	
+	private Double singleSumPrice; // 不含税合价
+	private Double taxSingleSumPrice; // 含税合价
 
-	private Double singleSumPrice;  //
-
-	private Double marketPrice;  //市场价
-
-	private Double amount;
+	private Double taxPrice; // 含税单价
+	private Double noTaxPrice; // 不含税单价
 
 	private Double origCount;
+
+	private Integer lookValueId;
+	
+	private Integer seq;
 
 	public Integer getId() {
 		return id;
@@ -97,12 +103,28 @@ public class UnitProjectDetail {
 		this.singleSumPrice = singleSumPrice;
 	}
 
-	public Double getMarketPrice() {
-		return marketPrice;
+	public Double getTaxSingleSumPrice() {
+		return taxSingleSumPrice;
 	}
 
-	public void setMarketPrice(Double marketPrice) {
-		this.marketPrice = marketPrice;
+	public void setTaxSingleSumPrice(Double taxSingleSumPrice) {
+		this.taxSingleSumPrice = taxSingleSumPrice;
+	}
+
+	public Double getTaxPrice() {
+		return taxPrice;
+	}
+
+	public void setTaxPrice(Double taxPrice) {
+		this.taxPrice = taxPrice;
+	}
+
+	public Double getNoTaxPrice() {
+		return noTaxPrice;
+	}
+
+	public void setNoTaxPrice(Double noTaxPrice) {
+		this.noTaxPrice = noTaxPrice;
 	}
 
 	public Double getAmount() {
@@ -119,5 +141,29 @@ public class UnitProjectDetail {
 
 	public void setOrigCount(Double origCount) {
 		this.origCount = origCount;
+	}
+
+	@Override
+	public String toString() {
+		return "UnitProjectDetail [id=" + id + ", unitprojectId=" + unitprojectId + ", code=" + code + ", type=" + type
+				+ ", name=" + name + ", typeInfo=" + typeInfo + ", unit=" + unit + ", content=" + content
+				+ ", singleSumPrice=" + singleSumPrice + ", taxSingleSumPrice=" + taxSingleSumPrice + ", taxPrice="
+				+ taxPrice + ", noTaxPrice=" + noTaxPrice + ", amount=" + amount + ", origCount=" + origCount + "]";
+	}
+
+	public Integer getLookValueId() {
+		return lookValueId;
+	}
+
+	public void setLookValueId(Integer lookValueId) {
+		this.lookValueId = lookValueId;
+	}
+
+	public Integer getSeq() {
+		return seq;
+	}
+
+	public void setSeq(Integer seq) {
+		this.seq = seq;
 	}
 }

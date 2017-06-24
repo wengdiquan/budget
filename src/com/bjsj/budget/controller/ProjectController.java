@@ -347,28 +347,5 @@ public class ProjectController {
 		}
 		return d;
 	}
-
-	/**
-	 * 新增单位工程
-	 * 
-	 * @param request
-	 * @param response
-	 * @return
-	 */
-	@RequestMapping(value = "/insertBitProject")
-	@ResponseBody
-	public JSONObject insertBitProject(HttpServletRequest request, HttpServletResponse response) {
-		// 查询条件
-		Map<String, String> queryMap = TransforUtil.transRMapToMap(request.getParameterMap());
-		
-		JSONObject json = new JSONObject();
-		json.put("success", true);
-		try{
-			projectService.insertBitProject(queryMap);
-		}catch (Exception ex) {
-			json.put("success", false);
-			json.put("msg", "出错:" + ex.getMessage());
-		}
-		return json;
-	}
+	
 }

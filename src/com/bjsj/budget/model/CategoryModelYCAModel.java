@@ -7,7 +7,7 @@ public class CategoryModelYCAModel {
 	private String code;
 	private String name;
 	private String unit;
-	private Integer content;
+	private Double content;
 	private Double amount;
 	private Double noPrice;
 	private Double price;
@@ -17,6 +17,7 @@ public class CategoryModelYCAModel {
 	private Integer lookValueId;//
 
 	private Integer lookTypeId; // 根据这个类型判断是运输费，材料费，安装费
+	private String lookTypeName; 
 
 	public Integer getId() {
 		return id;
@@ -50,11 +51,11 @@ public class CategoryModelYCAModel {
 		this.unit = unit;
 	}
 
-	public Integer getContent() {
+	public Double getContent() {
 		return content;
 	}
 
-	public void setContent(Integer content) {
+	public void setContent(Double content) {
 		this.content = content;
 	}
 
@@ -130,4 +131,11 @@ public class CategoryModelYCAModel {
 		this.lookTypeId = lookTypeId;
 	}
 
+	public String getLookTypeName() {
+		return lookTypeName;
+	}
+
+	public void setLookTypeName(String lookTypeName) {
+		this.lookTypeName = lookTypeName;
+	}
 }

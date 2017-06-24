@@ -1,56 +1,92 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.bjsj.budget.dao.UnitProjectDao">
-	<resultMap id="BaseResultMap" type="com.bjsj.budget.model.UnitProject">
-		<id column="t_id" property="id" jdbcType="INTEGER" />
-		<id column="t_sumprice" property="sumprice" jdbcType="DOUBLE" />
-		<result column="t_code" property="code" jdbcType="VARCHAR" />
-		<result column="t_name" property="name" jdbcType="VARCHAR" />
-		<result column="t_unit" property="unit" jdbcType="VARCHAR" />
-		<result column="t_amount" property="amount" jdbcType="DOUBLE" />
-		<result column="t_dtgcl" property="dtgcl" jdbcType="DOUBLE" />
-		<result column="t_price" property="price" jdbcType="DOUBLE" />
-		<result column="t_remark" property="remark" jdbcType="VARCHAR" />
-		<result column="t_parentid" property="parentid" jdbcType="INTEGER" />
-		<result column="t_leaf" property="leaf" jdbcType="INTEGER" />
-		<result column="t_bit_project_id" property="bitProjectId"
-			jdbcType="INTEGER" />
-	</resultMap>
 
 	<sql id="Base_Column_List">
-		t.id as t_id, t.sumprice as t_sumprice, t.code as t_code, t.name as
-		t_name, t.unit as t_unit,
-		t.amount as t_amount, t.dtgcl as t_dtgcl, t.price as t_price, t.remark as
-		t_remark,
-		t.parentid as t_parentid, t.leaf as t_leaf, t.bit_project_id as t_bit_project_id
+		t.id as id, 
+		t.code as code, 
+		t.type as type,
+		t.name as name, 
+		t.unit as unit,
+		t.content as content,
+		t.dtgcl as dtgcl, 
+		t.single_price as singlePrice, 
+		t.tax_single_price as taxSinglePrice,
+		t.single_sumprice as singleSumPrice,
+		t.tax_single_sumprice as taxSingleSumPrice,
+		t.price as price,
+		t.sumprice as sumPrice, 
+		t.remark as remark,
+		t.parentid as parentid, 
+		t.leaf as leaf,
+		t.bit_project_id as bitProjectId,
+		t.looktype_id as lookTypeId,
+		t.seq as seq
 	</sql>
-	<insert id="insert" parameterType="com.bjsj.budget.model.UnitProject">
-		insert into tm_unitproject (id, sumprice, code,
-		name, unit, amount,
-		dtgcl, price, remark,
-		parentid, leaf, bit_project_id
+	<insert id="insert" parameterType="com.bjsj.budget.model.UnitProject" useGeneratedKeys="true" keyProperty="id">
+		insert into tm_unitproject (code,
+		name, type, unit, content, dtgcl, single_price, tax_single_price, 
+		single_sumprice, tax_single_sumprice, price, sumprice, remark,
+		parentid, leaf, bit_project_id,looktype_id, seq
 		)
-		values (#{id,jdbcType=INTEGER}, #{sumprice,jdbcType=DOUBLE},
-		#{code,jdbcType=VARCHAR},
-		#{name,jdbcType=VARCHAR}, #{unit,jdbcType=VARCHAR}, #{amount,jdbcType=DOUBLE},
-		#{dtgcl,jdbcType=DOUBLE}, #{price,jdbcType=DOUBLE},
-		#{remark,jdbcType=VARCHAR},
-		#{parentid,jdbcType=INTEGER}, #{leaf,jdbcType=INTEGER}, #{bitProjectId,jdbcType=INTEGER}
+		values (#{code,jdbcType=VARCHAR},
+		#{name,jdbcType=VARCHAR}, #{type,jdbcType=VARCHAR}, #{unit,jdbcType=VARCHAR},
+		 #{content,jdbcType=DOUBLE}, #{dtgcl,jdbcType=DOUBLE}, #{singlePrice,jdbcType=DOUBLE},  
+		 #{taxSinglePrice,jdbcType=DOUBLE}, #{singleSumPrice,jdbcType=DOUBLE},  
+		 #{taxSingleSumPrice,jdbcType=DOUBLE},  #{price,jdbcType=DOUBLE},
+		 #{sumPrice,jdbcType=DOUBLE}, #{remark,jdbcType=VARCHAR},
+		 #{parentid,jdbcType=INTEGER}, #{leaf,jdbcType=INTEGER}, #{bitProjectId,jdbcType=INTEGER},
+		 #{lookTypeId,jdbcType=INTEGER}, #{seq,jdbcType=INTEGER}
 		)
 	</insert>
 	<update id="updateByPrimaryKey" parameterType="com.bjsj.budget.model.UnitProject">
 		update tm_unitproject
 		set code = #{code,jdbcType=VARCHAR},
 		name = #{name,jdbcType=VARCHAR},
+		type =  #{type,jdbcType=VARCHAR},
 		unit = #{unit,jdbcType=VARCHAR},
-		amount = #{amount,jdbcType=DOUBLE},
+		content = #{content,jdbcType=DOUBLE},
 		dtgcl = #{dtgcl,jdbcType=DOUBLE},
+		single_price = #{singlePrice,jdbcType=DOUBLE},
+		tax_single_price = #{taxSinglePrice,jdbcType=DOUBLE},
+		single_sumprice = #{singleSumPrice,jdbcType=DOUBLE},
+		tax_single_sumprice = #{taxSingleSumPrice,jdbcType=DOUBLE},
 		price = #{price,jdbcType=DOUBLE},
+		sumprice = #{sumPrice,jdbcType=DOUBLE},
 		remark = #{remark,jdbcType=VARCHAR},
 		parentid = #{parentid,jdbcType=INTEGER},
 		leaf = #{leaf,jdbcType=INTEGER},
-		bit_project_id = #{bitProjectId,jdbcType=INTEGER}
+		bit_project_id = #{bitProjectId,jdbcType=INTEGER},
+		looktype_id = #{lookTypeId,jdbcType=INTEGER},
+		seq = #{seq,jdbcType=INTEGER}
 		where id = #{id,jdbcType=INTEGER}
-		and sumprice = #{sumprice,jdbcType=DOUBLE}
 	</update>
+	
+	<select id="getMaxSeqByMap" parameterType="HashMap" resultType="Integer">
+        select
+			max(t.seq)
+		from  tm_unitproject t 
+		where t.bit_project_id = #{bitProjectId,jdbcType=INTEGER}   
+    </select>
+    
+    <select id="getBitProjectItemInfo" parameterType="HashMap" resultType="com.bjsj.budget.model.UnitProject">
+		select
+			<include refid="Base_Column_List"/>
+		from tm_unitproject t 
+		where t.bit_project_id = #{bitProjectId,jdbcType=INTEGER}   
+		order by t.seq
+    </select>
+    
+    <delete id="deleteByUnitProjectId" parameterType="HashMap">
+		delete from tm_unitproject
+		where id = #{unitProjectId,jdbcType=INTEGER}  
+	</delete>
+	
+	<select id="getUnitProjectById" parameterType="HashMap" resultType="com.bjsj.budget.model.UnitProject">
+		select
+			<include refid="Base_Column_List"/>
+		from tm_unitproject t 
+		where t.id = #{unitProjectId,jdbcType=INTEGER}   
+	</select>
+
 </mapper>

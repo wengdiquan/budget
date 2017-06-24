@@ -42,7 +42,5 @@ public interface ProjectService {
 	 * @return
 	 */
 	List<ReportModel> getSumList(@Param("map")Map<String, String> queryMap);
-
-	void insertBitProject(Map<String, String> queryMap) throws Exception;
 	
 }

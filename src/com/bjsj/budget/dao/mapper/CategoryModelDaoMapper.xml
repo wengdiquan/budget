@@ -186,9 +186,14 @@
 	
 	<select id="getDetailYCA" parameterType="Integer" resultMap="CMYCAInfoMap">
         select
-		<include refid="Base_Column_List_YCA" />
+		<include refid="Base_Column_List_YCA" />,
+		lt.looktype_id lookTypeId,
+		lt.looktype_name lookTypeName
 		from tm_unitproject_detail_base t 
-		where t.unitproject_id = #{unitProjectId,jdbcType=INTEGER}   
+		inner join tm_lookvalue lv on t.lookvalueid = lv.lookvalue_id
+		inner join tm_looktype lt on lv.looktype_id = lt.looktype_id
+		where t.unitproject_id = #{unitProjectId,jdbcType=INTEGER}
+		and locate('@', t.code) = 0  
 		order by t.unitproject_id 
     </select>
 </mapper>

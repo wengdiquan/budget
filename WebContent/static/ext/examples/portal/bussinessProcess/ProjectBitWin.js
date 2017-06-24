@@ -39,7 +39,7 @@ Ext.onReady(function() {
                     title: '运材安汇总',  
                     items:[
                     	Ext.create("Budget.app.bussinessProcess.ProjectYCATotalPanel", {
-                    		
+                    		bitProjectId:me.bitProjectId
                     	})
                     ],
                     itemId: 'ycatotal'
@@ -47,7 +47,7 @@ Ext.onReady(function() {
                     title: '费用汇总',  
                     items:[
                     	Ext.create("Budget.app.bussinessProcess.ProjectCostTotalPanel", {
-                    		
+                    		bitProjectId:me.bitProjectId
                     	})
                     ], 
                     itemId: 'costtotal'  

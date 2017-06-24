@@ -6,7 +6,6 @@ Ext.onReady(function() {
 		width: "100%",  
 	    defaults: {  
            collapsible: true, // 支持该区域的展开和折叠  
-           split: true// 支持用户拖放改变该区域的大小  
         },
 		initComponent : function() {
 			var me = this;
@@ -45,29 +44,48 @@ Ext.onReady(function() {
 			var me = this;
 			Ext.define('ModelList', {
 				extend : 'Ext.data.Model',
-				idProperty : 'id',
 				fields : [ {
 					name : 'id',
-					type : 'long'
-				}, 'code', 'unit', 'type', 'name', {
-					name : 'amount',
+					type : 'int'
+				}, 'code', 'type', 'name', 'unit', {
+					name : 'content',
 					type : 'double'
 				}, {
 					name : 'dtgcl',
 					type : 'double'
-				},  {
+				}, {
+					name : 'singlePrice',
+					type : 'double'
+				}, {
+					name : 'taxSinglePrice',
+					type : 'double'
+				},{
+					name : 'singleSumPrice',
+					type : 'double'
+				},{
+					name : 'taxSingleSumPrice',
+					type : 'double'
+				},{
 					name : 'price',
 					type : 'double'
-				}, 'remark',{
+				},{
+					name : 'sumPrice',
+					type : 'double'
+				},'remark',{
 					name : 'parentid',
-					type : 'long'
+					type : 'int'
 				},{
 					name : 'leaf',
-					type : 'long'
-				},
-				{
+					type : 'int'
+				},{
 					name : 'bitProjectId',
-					type : 'long'
+					type : 'int'
+				},{
+					name : 'lookTypeId',
+					type : 'int'
+				},{
+					name : 'seq',
+					type : 'int'
 				}]
 			});
 			
@@ -78,7 +96,7 @@ Ext.onReady(function() {
 				pageSize : 10000,
 				proxy : {
 					type : 'ajax',
-					url : appBaseUri + '/project/getBitProjectInfo',
+					url : appBaseUri + '/unitproject/getBitProjectItemInfo',
 					extraParams : {"bitProjectId": me.bitProjectId},
 					reader : {
 						type : 'json',
@@ -98,12 +116,17 @@ Ext.onReady(function() {
 				dataIndex : 'bitProjectId',
 				hidden : true
 			},{
+				text : "seq",
+				dataIndex : 'seq',
+				hidden : true
+			},{
 				text:'', width:25,xtype:'rownumberer'
 			}
 			,{
 				text : "编码",
 				dataIndex : 'code',
 				sortable : false,
+				align:'center',
 				width : '10%',
 				editor: {
 					xtype:'triggerfield',
@@ -119,35 +142,69 @@ Ext.onReady(function() {
 			}, {
 				text : "类别",
 				dataIndex : 'type',
+				align:'center',
+				sortable : false,
 				width : '7%'
 			}, {
 				text : "名称",
 				dataIndex : 'name',
-				width : '10%'
+				align:'center',
+				sortable : false,
+				width : '12%'
 			}, {
 				text : "单位",
 				dataIndex : 'unit',
-				width : '7%'
+				width : '7%',
+				sortable : false,
+				align:'center'
 			},{
 				text : "含量",
-				dataIndex : 'amount',
-				width : '8%'
+				dataIndex : 'content',
+				width : '5%',
+				sortable : false,
+				align:'right'
 			},{
 				text : "工程量",
 				dataIndex : 'dtgcl',
-				width : '8%'
+				width : '7%',
+				sortable : false,
+				align:'right'
 			},{
-				text : "合价",
+				text : "不含税单价",
 				dataIndex : 'singlePrice',
-				width : '8%'
+				width : '8%',
+				sortable : false,
+				align:'right'
+			},{
+				text : "含税单价",
+				dataIndex : 'taxSinglePrice',
+				width : '6%',
+				sortable : false,
+				align:'right'
+			},{
+				text : "不含税合价",
+				dataIndex : 'singleSumPrice',
+				width : '8%',
+				sortable : false,
+				align:'right'
+			},{
+				text : "含税合价",
+				dataIndex : 'taxSingleSumPrice',
+				width : '6%',
+				sortable : false,
+				align:'right'
 			},{
 				text : "综合单价",
 				dataIndex : 'price',
-				width : '8%'
+				width : '8%',
+				sortable : false,
+				align:'right'
 			},{
 				text : "综合合价",
 				dataIndex : 'sumPrice',
-				width : '8%'
+				width : '8%',
+				sortable : false,
+				align:'right'
 			},{
 				text : "备注",
 				dataIndex : 'remark',
@@ -158,7 +215,7 @@ Ext.onReady(function() {
 			Ext.apply(this, {
 				id:"projectbitpanel-bititemgrid",
 				store : bitProjectStore,
-				selModel : Ext.create('Ext.selection.CheckboxModel'),
+				selModel : Ext.create('Ext.selection.CheckboxModel', {mode:'single', allowDeselect:true}),
 				columns : bitProjectColumns,
 				tbar : [ {
 					xtype : 'button',
@@ -179,6 +236,15 @@ Ext.onReady(function() {
 					enableTextSelection : true,
 					getRowClass : function(record, rowIndex){
 		            }
+				},
+				listeners : {
+					'itemclick' : function(item, record) {
+						Ext.getCmp('projectbitpanel-bitdetailgrid').getStore().load({
+							params : {
+								'unitProjectId' : record.get('id')
+							}
+						});
+					}
 				}
 			});
 			
@@ -186,47 +252,79 @@ Ext.onReady(function() {
 		},
 		newItemFun:function(){
 			var grid = Ext.getCmp("projectbitpanel-bititemgrid");
+			var records = grid.getSelectionModel().getSelection();
 			var store = grid.getStore();
-			store.add({});
+			
+			var pos = store.getCount();
+			var needOrderFlag = "N";
+			//如果选选中了的话，会在之前插入一条，也就是需要刷当前的id包括之后的seq+1
+			if(records.length != 0){
+				needOrderFlag = "Y";
+				pos = records[0].index;
+			}
+			
+			//新增一条空白的
+			Ext.getCmp('projectbitpanel-bititemgrid').getEl().mask('数据处理中，请稍候...');
+			Ext.Ajax.request({
+				 url : appBaseUri + '/unitproject/insertBlankItem', //新增单位工程
+				 params : {
+					 needOrderFlag : needOrderFlag,
+					 bitProjectId: Ext.getCmp('projectbitpanel-bititemgrid').bitProjectId,
+					 pos: pos
+				 },
+				 method : "POST",
+				 success : function(response) {
+					 if (response.responseText != '') {
+						 var res = Ext.JSON.decode(response.responseText);
+						 if (res.success) {
+							 store.reload();
+						 } else {
+							 globalObject.errTip(res.msg);
+						 }
+						 
+						 Ext.getCmp('projectbitpanel-bititemgrid').getEl().unmask();
+					 }
+				 },
+				 failure : function(response) {
+					 globalObject.errTip('操作失败！');
+				 }
+			 });
 		},
 		deleteItemFun:function(){
 			globalObject.confirmTip("删除该子目会同时删除下面板的运材安费用明细，确认删除吗?", 
 					 function(btn){
 						 if("yes" == btn){
-							 
 							 var records = Ext.getCmp('projectbitpanel-bititemgrid').getSelectionModel().getSelection();	 
-							 
 							 if(records.length == 0){
 								 globalObject.infoTip("请选择至少一条子目进行删除.");
 								 return;
 							 }
 							 
-							 Ext.getCmp('projectbitpanel-bititemgrid').getStore().remove(records);
-							 
-							/* Ext.getCmp('projectinfo-projecttreeid').getEl().mask('数据处理中，请稍候...');
+							Ext.getCmp('projectbitpanel-bititemgrid').getEl().mask('数据处理中，请稍候...');
 							 Ext.Ajax.request({
-								 url : appBaseUri + '/project/saveOrUpdateProject',
+								 url : appBaseUri + '/unitproject/deleteBitProjectItem',
 								 params : {
 									 "cmd":"edit",
-									 "projectId":records[0].data.id
+									 "unitProjectId":records[0].data.id
 								 },
 								 method : "POST",
 								 success : function(response) {
 									 if (response.responseText != '') {
 										 var res = Ext.JSON.decode(response.responseText);
 										 if (res.success) {
-											 records[0].remove();
+											 Ext.getCmp('projectbitpanel-bititemgrid').getStore().reload();
+											 Ext.getCmp('projectbitpanel-bitdetailgrid').getStore().removeAll();
 										 } else {
 											 globalObject.errTip(res.msg);
 										 }
+										 Ext.getCmp('projectbitpanel-bititemgrid').getEl().unmask();
 									 }
 								 },
 								 failure : function(response) {
 									 globalObject.errTip('操作失败！');
 								 }
 							 });
-							 
-							 Ext.getCmp('projectinfo-projecttreeid').getEl().unmask();*/
+							
 						 }
 				 	});
 		}
@@ -242,28 +340,39 @@ Ext.onReady(function() {
 			var me = this;
 			Ext.define('ModelList', {
 				extend : 'Ext.data.Model',
-				idProperty : 'id',
 				fields : [ {
 					name : 'id',
-					type : 'long'
+					type : 'int'
 				},  {
 					name : 'unitprojectId',
-					type : 'long'
+					type : 'int'
 				}, 'code', 'type', 'name', 'typeInfo', 'unit', {
 					name : 'content',
 					type : 'double'
 				}, {
-					name : 'singlePrice',
-					type : 'double'
-				},  {
-					name : 'marketPrice',
-					type : 'double'
-				}, 'remark',{
 					name : 'amount',
 					type : 'double'
-				},{
+				},  {
+					name : 'singleSumPrice',
+					type : 'double'
+				},  {
+					name : 'taxSingleSumPrice',
+					type : 'double'
+				},  {
+					name : 'taxPrice',
+					type : 'double'
+				},  {
+					name : 'noTaxPrice',
+					type : 'double'
+				}, {
 					name : 'origCount',
 					type : 'double'
+				},{
+					name : 'lookValueId',
+					type : 'int'
+				},{
+					name : 'seq',
+					type : 'int'
 				}]
 			});
 			
@@ -273,8 +382,8 @@ Ext.onReady(function() {
 				pageSize : 10000,
 				proxy : {
 					type : 'ajax',
-					url : appBaseUri + '/project/getBitProjectDetailInfo',
-					extraParams : {"bitProjectId": me.bitProjectId},
+					url : appBaseUri + '/unitproject/getBitProjectDetailInfo',
+					extraParams : {},
 					reader : {
 						type : 'json',
 						root : 'data',
@@ -290,49 +399,90 @@ Ext.onReady(function() {
 				hidden : true
 			},{
 				text:'', width:25,xtype:'rownumberer'
-			}
-			,{
+			},{
 				text : "编码",
 				dataIndex : 'code',
+				hidden:true
+			},{
+				text : "编码",
+				dataIndex : '',
 				sortable : false,
-				width : '10%'
-			}, {
+				width : '10%',
+				renderer:function(v, metv, record){
+					return record.get('code').substr(record.get('code').indexOf('-') + 1);
+				}
+			},{
 				text : "类别",
 				dataIndex : 'type',
-				width : '7%'
+				sortable : false,
+				align:'center',
+				width : '5%'
 			}, {
 				text : "名称",
 				dataIndex : 'name',
+				sortable : false,
 				width : '10%'
 			}, {
 				text : "规格及型号",
-				dataIndex : 'type_info',
-				width : '10%'
+				dataIndex : 'typeInfo',
+				sortable : false,
+				width : '8%'
 			}, {
 				text : "单位",
 				dataIndex : 'unit',
-				width : '7%'
+				sortable : false,
+				align:'center',
+				width : '5%'
 			},{
 				text : "含量",
 				dataIndex : 'content',
+				sortable : false,
+				align:'right',
 				width : '8%'
 			},{
 				text : "数量",
 				dataIndex : 'amount',
+				sortable : false,
+				align:'right',
 				width : '8%'
 			},{
-				text : "市场价",
-				dataIndex : 'marketPrice',
+				text : "含税单价",
+				dataIndex : 'taxPrice',
+				sortable : false,
+				align:'right',
 				width : '8%'
-			},
-			{
-				text : "合价",
-				dataIndex : 'singlePrice',
+			},{
+				text : "不含税单价",
+				dataIndex : 'noTaxPrice',
+				sortable : false,
+				align:'right',
+				width : '8%'
+			},{
+				text : "含税合价",
+				dataIndex : 'taxSingleSumPrice',
+				sortable : false,
+				align:'right',
+				width : '8%'
+			},{
+				text : "不含税合价",
+				dataIndex : 'singleSumPrice',
+				sortable : false,
+				align:'right',
 				width : '8%'
 			},{
 				text : "原始含量",
 				dataIndex : 'origCount',
+				sortable : false,
+				align:'right',
 				width : '8%'
+			},{
+				text : "lookValueId",
+				dataIndex : 'lookValueId',
+				hidden:true
+			},{
+				text : "seq",
+				dataIndex : 'seq',
+				hidden:true
 			}];
 			
 			Ext.apply(this, {
@@ -342,13 +492,13 @@ Ext.onReady(function() {
 				tbar : [ {
 					xtype : 'button',
 					iconCls : 'icon-add',
-					text : '新增模块',
+					text : '新增运材安',
 					scope : this,
 					handler : me.newDetailFun
 				},{
 					xtype : 'button',
 					iconCls : 'icon-delete',
-					text : '删除模块',
+					text : '删除运材安',
 					scope : this,
 					handler : me.deleteDetailFun
 				}],

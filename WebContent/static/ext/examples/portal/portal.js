@@ -2,7 +2,7 @@ Ext.Ajax.timeout = 60000;
 Ext.Loader.setConfig({
 	enabled : true
 });
-Ext.require([ 'Ext.util.History', 'Ext.ux.statusbar.StatusBar', 'Ext.app.PortalPanel', 'Ext.ux.TabScrollerMenu', 'Ext.state.*', 'Ext.window.MessageBox', 'Ext.tip.*' ]);
+Ext.require([ 'Ext.util.History', 'Ext.ux.statusbar.StatusBar', 'Ext.app.PortalPanel', 'Ext.ux.TabScrollerMenu', 'Ext.state.*', 'Ext.window.MessageBox', 'Ext.tip.*', 'Ext.grid.*' ]);
 
 var mainTab, globalPageSize = 20, // 全局分页大小
 globalDateColumnWidth = 160;// 全局时间列宽度

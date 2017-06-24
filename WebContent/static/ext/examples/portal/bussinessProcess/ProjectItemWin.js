@@ -168,7 +168,7 @@ Ext.onReady(function() {
 				sortable : false,
 				width : '20%'
 			},{
-				text : "运费",
+				text : "运输费",
 				dataIndex : 'transportFee',
 				sortable : false,
 				width : '10%',
@@ -190,6 +190,7 @@ Ext.onReady(function() {
 				dataIndex : 'id',
 				hidden : true
 			}];
+			var times = 1;
 			Ext.apply(this, {
 				store : costValueStore,
 				listeners : {
@@ -197,12 +198,10 @@ Ext.onReady(function() {
 						if(record.data.id == 0){
 							return;
 						}
-						
 						var bitRecord =  bitItemGrid.getSelectionModel().getSelection()[0];
-						
 						//修改
-						if(bitRecord.get("code") == null || bitRecord.get("code")  == ""){
-								
+						/*
+						if(bitRecord.get("id") == null || bitRecord.get("id")  == ""){
 							bitRecord.set('code', record.get('code'));
 							bitRecord.set('type', '定');
 							bitRecord.set('name', record.get('name'));
@@ -228,22 +227,27 @@ Ext.onReady(function() {
 								remark:null
 							};
 							bitItemGrid.getStore().add(newRecord);
-						}
+						}*/
 						
 						//插入数据库
 						Ext.getCmp('projectbitwin-tabpanel-cmdetailgrid').getEl().mask('数据处理中，请稍候...');
 						Ext.Ajax.request({
-							 url : appBaseUri + '/project/insertBitProject', //新增单位工程
+							 url : appBaseUri + '/unitproject/insertItem', //新增单位工程的子目
 							 params : {
 								 type:"DING",
-								 dingId:bitRecord.get("id"),
-								 bitProjectId: me.bitProjectId
+								 dingId:record.get("id"),
+								 bitProjectId: me.bitProjectId,
+								 unitProjectId:bitRecord.get("id"),
+								 unitProjectCode:bitRecord.get("code"),
+								 times:times
 							 },
 							 method : "POST",
 							 success : function(response) {
 								 if (response.responseText != '') {
 									 var res = Ext.JSON.decode(response.responseText);
 									 if (res.success) {
+										 times++;
+										 bitItemGrid.getStore().reload();
 									 } else {
 										 globalObject.errTip(res.msg);
 									 }
@@ -378,7 +382,7 @@ Ext.onReady(function() {
 					'itemdblclick' : function(item, record) {
 						
 						var bitRecord =  bitItemGrid.getSelectionModel().getSelection()[0];
-						
+						var itmes = 1;
 						//修改
 						if(bitRecord.get("code") == null || bitRecord.get("code")  == ""){
 								
