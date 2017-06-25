@@ -119,11 +119,11 @@ public class UnitProjectSericeImpl implements UnitProjectService {
 		
 		//判断是否需要刷顺序
 		String needOrderFlag = queryMap.get("needOrderFlag");
-		int pos = Integer.parseInt(queryMap.get("pos")); //选择的是第几行 (0开始)
 		
 		//查询所有单位工程下子目
 		List<UnitProject> itemInfoList = unitProjectDao.getBitProjectItemInfo(queryMap);
 		if("Y".equals(needOrderFlag)){
+			int pos = Integer.parseInt(queryMap.get("pos")); //选择的是第几行 (0开始)
 			UnitProject u = new UnitProject();
 			u.setDtgcl(1d);
 			u.setBitProjectId(Integer.parseInt(queryMap.get("bitProjectId")));

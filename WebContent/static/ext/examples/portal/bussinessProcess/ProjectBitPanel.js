@@ -27,10 +27,11 @@ Ext.onReady(function() {
 	
 	//子目页面
 	Ext.define('Budget.app.bussinessProcess.ProjectBitPanel.BitItemGrid', {
-		extend : 'Ext.grid.Panel',
+		extend : 'Ext.tree.Panel',
 		region : 'north',
 		height : '50%',
 		header: false,
+		rootVisible: false,
 		plugins:[{
   	        ptype: 'cellediting',
   	        clicksToEdit: 1,
@@ -76,7 +77,7 @@ Ext.onReady(function() {
 					type : 'int'
 				},{
 					name : 'leaf',
-					type : 'int'
+					type : 'boolean'
 				},{
 					name : 'bitProjectId',
 					type : 'int'
@@ -89,25 +90,26 @@ Ext.onReady(function() {
 				}]
 			});
 			
-			var bitProjectStore = Ext.create('Ext.data.Store', {
+			var bitProjectStore = Ext.create('Ext.data.TreeStore', {
 				model : 'ModelList',
 				autoLoad : true,
-				remoteSort : true,
 				pageSize : 10000,
+			/*	root:{
+					iconCls:'no-icon'
+				},*/
 				proxy : {
 					type : 'ajax',
 					url : appBaseUri + '/unitproject/getBitProjectItemInfo',
 					extraParams : {"bitProjectId": me.bitProjectId},
 					reader : {
 						type : 'json',
-						root : 'data',
-						totalProperty : 'totalRecord',
-						successProperty : "success"
+						root : 'children'
 					}
 				}
 			});
 			
-			var bitProjectColumns = [ {
+			var bitProjectColumns = [
+            {
 				text : "id",
 				dataIndex : 'id',
 				hidden : true
@@ -126,8 +128,8 @@ Ext.onReady(function() {
 				text : "编码",
 				dataIndex : 'code',
 				sortable : false,
-				align:'center',
 				width : '10%',
+				xtype:'treecolumn',
 				editor: {
 					xtype:'triggerfield',
 					triggerCls: Ext.baseCSSPrefix + 'form-search-trigger',
@@ -245,7 +247,10 @@ Ext.onReady(function() {
 							}
 						});
 					}
-				}
+				},  
+	            defaults: {  
+	                flex: 1  
+	            }  
 			});
 			
 			this.callParent(arguments);
@@ -258,9 +263,10 @@ Ext.onReady(function() {
 			var pos = store.getCount();
 			var needOrderFlag = "N";
 			//如果选选中了的话，会在之前插入一条，也就是需要刷当前的id包括之后的seq+1
+			console.log(records[0]);
 			if(records.length != 0){
 				needOrderFlag = "Y";
-				pos = records[0].index;
+				pos = records[0].data.index;
 			}
 			
 			//新增一条空白的

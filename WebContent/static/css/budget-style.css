@@ -96,5 +96,6 @@
 	background-image: url(/budget/static/ext/examples/shared/icons/fam/plugin.gif) !important;
 }
 
+.no-icon {visibility:hidden;}
 
 

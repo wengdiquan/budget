@@ -10,36 +10,174 @@ Ext.onReady(function() {
 			Ext.define('User', {  
 		        extend: 'Ext.data.Model',  
 		        fields: [  
-		            {name: 'field',  type: 'string'},  
-		            {name: 'field_A',   type: 'string'},  
-		            {name: 'field_B', type: 'string'},  
+		            {name: 'code',  type: 'string'},  
+		            {name: 'name',   type: 'string'},
+		            {
+						name : 'content',
+						type : 'double'
+					}, {
+						name : 'dtgcl',
+						type : 'double'
+					}, {
+						name : 'singlePrice',
+						type : 'double'
+					}, {
+						name : 'taxSinglePrice',
+						type : 'double'
+					},{
+						name : 'singleSumPrice',
+						type : 'double'
+					},{
+						name : 'taxSingleSumPrice',
+						type : 'double'
+					},{
+						name : 'price',
+						type : 'double'
+					},{
+						name : 'sumPrice',
+						type : 'double'
+					},{
+						name : 'parentid',
+						type : 'int'
+					},{
+						name : 'leaf',
+						type : 'boolean'
+					},{
+						name : 'bitProjectId',
+						type : 'int'
+					},{
+						name : 'lookTypeId',
+						type : 'int'
+					},{
+						name : 'seq',
+						type : 'int'
+					}
 		        ]  
 		    });  
 
 			var store = Ext.create('Ext.data.TreeStore', {
 				model : "User",
 				root : {
-					expanded : true,
-					children : [ {
-						text : "detention",
-						field : "field",
-						field_A : "a",
-						field_B : "b",
-						leaf : true,
-						expanded : true
-					}, {
-						text : "homework",
-						field : "field",
-						field_A : "a",
-						field_B : "b",
-						leaf : true
-					}, {
-						text : "buy lottery tickets",
-						field : "field",
-						field_A : "a",
-						field_B : "b",
-						leaf : true
-					} ]
+					  	"name": "整个项目",
+					    "singlePrice": 356.85,
+					    "taxSinglePrice": 415,
+					    "price": 6345.5,
+					    "sumPrice": 6345.5,
+					    "leaf": false,
+					    "expanded": true,
+					    "iconCls": "no-icon",
+					    "children": [
+					        {
+					            "bitProjectId": 236,
+					            "code": "1-1",
+					            "content": 0,
+					            "dtgcl": 1,
+					            "id": 20,
+					            "leaf": true,
+					            "lookTypeId": 0,
+					            "name": "首层角柱-高度：3010mm  方管柱规格：200mm*200mm*6mm 榫头182*182*5 高度：675mm",
+					            "parentid": 0,
+					            "price": 1269.1,
+					            "remark": "",
+					            "seq": 10,
+					            "singlePrice": 71.37,
+					            "singleSumPrice": 71.37,
+					            "sumPrice": 1269.1,
+					            "taxSinglePrice": 83,
+					            "taxSingleSumPrice": 83,
+					            "type": "定",
+					            "unit": "个",
+					            "iconCls": "no-icon"
+					        },
+					        {
+					            "bitProjectId": 236,
+					            "code": "1-1",
+					            "content": 0,
+					            "dtgcl": 1,
+					            "id": 21,
+					            "leaf": true,
+					            "lookTypeId": 0,
+					            "name": "首层角柱-高度：3010mm  方管柱规格：200mm*200mm*6mm 榫头182*182*5 高度：675mm",
+					            "parentid": 0,
+					            "price": 1269.1,
+					            "remark": "",
+					            "seq": 10,
+					            "singlePrice": 71.37,
+					            "singleSumPrice": 71.37,
+					            "sumPrice": 1269.1,
+					            "taxSinglePrice": 83,
+					            "taxSingleSumPrice": 83,
+					            "type": "定",
+					            "unit": "个",
+					            "iconCls": "no-icon"
+					        },
+					        {
+					            "bitProjectId": 236,
+					            "code": "1-1",
+					            "content": 0,
+					            "dtgcl": 1,
+					            "id": 22,
+					            "leaf": true,
+					            "lookTypeId": 0,
+					            "name": "首层角柱-高度：3010mm  方管柱规格：200mm*200mm*6mm 榫头182*182*5 高度：675mm",
+					            "parentid": 0,
+					            "price": 1269.1,
+					            "remark": "",
+					            "seq": 10,
+					            "singlePrice": 71.37,
+					            "singleSumPrice": 71.37,
+					            "sumPrice": 1269.1,
+					            "taxSinglePrice": 83,
+					            "taxSingleSumPrice": 83,
+					            "type": "定",
+					            "unit": "个",
+					            "iconCls": "no-icon"
+					        },
+					        {
+					            "bitProjectId": 236,
+					            "code": "1-1",
+					            "content": 0,
+					            "dtgcl": 1,
+					            "id": 11,
+					            "leaf": true,
+					            "lookTypeId": 0,
+					            "name": "首层角柱-高度：3010mm  方管柱规格：200mm*200mm*6mm 榫头182*182*5 高度：675mm",
+					            "parentid": 0,
+					            "price": 1269.1,
+					            "remark": "",
+					            "seq": 11,
+					            "singlePrice": 71.37,
+					            "singleSumPrice": 71.37,
+					            "sumPrice": 1269.1,
+					            "taxSinglePrice": 83,
+					            "taxSingleSumPrice": 83,
+					            "type": "定",
+					            "unit": "个",
+					            "iconCls": "no-icon"
+					        },
+					        {
+					            "bitProjectId": 236,
+					            "code": "1-1",
+					            "content": 0,
+					            "dtgcl": 1,
+					            "id": 15,
+					            "leaf": true,
+					            "lookTypeId": 0,
+					            "name": "首层角柱-高度：3010mm  方管柱规格：200mm*200mm*6mm 榫头182*182*5 高度：675mm",
+					            "parentid": 0,
+					            "price": 1269.1,
+					            "remark": "",
+					            "seq": 12,
+					            "singlePrice": 71.37,
+					            "singleSumPrice": 71.37,
+					            "sumPrice": 1269.1,
+					            "taxSinglePrice": 83,
+					            "taxSingleSumPrice": 83,
+					            "type": "定",
+					            "unit": "个",
+					            "iconCls": "no-icon"
+					        }
+					    ]
 				}
 			});  
 		  
@@ -60,24 +198,10 @@ Ext.onReady(function() {
 		            items: [{  
 		                xtype:"treecolumn",  
 		                text: "columnOne",  
-		                dataIndex:"field",  
-		            },{  
-		                text: "Column A",  
-		                dataIndex: "field_A",  
-		                editor: {
-							xtype:'triggerfield',
-							triggerCls: Ext.baseCSSPrefix + 'form-search-trigger',
-							editable:false,
-							onTriggerClick:function(){
-								Ext.create("Budget.app.bussinessProcess.ProjectItemWin", {
-									bitItemGrid:Ext.getCmp("projectbitpanel-bititemgrid"),
-									bitProjectId:me.bitProjectId
-								}).show();
-							}
-						}
+		                dataIndex:"code",  
 		            },{  
 		                text: "Column B",  
-		                dataIndex: "field_B",  
+		                dataIndex: "name",  
 		            }],  
 		            defaults: {  
 		                flex: 1  

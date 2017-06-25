@@ -230,6 +230,7 @@ Ext.onReady(function() {
 						}*/
 						
 						//插入数据库
+						console.log(bitRecord.data);
 						Ext.getCmp('projectbitwin-tabpanel-cmdetailgrid').getEl().mask('数据处理中，请稍候...');
 						Ext.Ajax.request({
 							 url : appBaseUri + '/unitproject/insertItem', //新增单位工程的子目
