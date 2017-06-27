@@ -113,7 +113,7 @@ Ext.onReady(function() {
 		extend : 'Ext.tree.Panel',
 		id : 'ycamanage-costtypegrid',
 		region : 'west',
-		width : '35%',
+		width : '15%',
 		border : true,
 		title:"大类名称",
 		animate : true,//动画效果
@@ -203,19 +203,19 @@ Ext.onReady(function() {
 				dataIndex : 'unit',
 				sortable : false,
 				width : '14%'
-			},{
+			},/*{
 				text : "种类",
 				dataIndex : 'category',
 				sortable : false,
 				width : '14%'
-			},{
+			},*/{
 				text : "looktype_id",
 				dataIndex : 'looktype_id',
 				hidden : true
 			}];
 			Ext.apply(this, {
 				store : costValueStore,
-				selModel : Ext.create('Ext.selection.CheckboxModel'),
+				selModel : Ext.create('Ext.selection.CheckboxModel', {mode:'single'/*, allowDeselect:true*/}),
 				columns : costValueColumns,
 				tbar : [ {
 					xtype : 'button',

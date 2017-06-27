@@ -401,7 +401,7 @@ Ext.onReady(function() {
 						});
 					}
 				},
-				selModel : Ext.create('Ext.selection.CheckboxModel'),
+				selModel : Ext.create('Ext.selection.CheckboxModel', {mode:'single'/*, allowDeselect:true*/}),
 				columns : costValueColumns,
 				tbar : [ {
 					xtype : 'button',
@@ -547,7 +547,7 @@ Ext.onReady(function() {
 			}];
 			Ext.apply(this, {
 				store : YCAGridStore,
-				selModel : Ext.create('Ext.selection.CheckboxModel'),
+				selModel : Ext.create('Ext.selection.CheckboxModel', {mode:'single'/*, allowDeselect:true*/}),
 				columns : costValueColumns,
 				tbar : [ {
 					xtype : 'button',
