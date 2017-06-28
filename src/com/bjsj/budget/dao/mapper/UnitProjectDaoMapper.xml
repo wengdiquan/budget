@@ -73,7 +73,13 @@
 		select
 			<include refid="Base_Column_List"/>
 		from tm_unitproject t 
-		where t.bit_project_id = #{bitProjectId,jdbcType=INTEGER}   
+		where 1 = 1
+		<if test="bitProjectId != null and bitProjectId != ''">
+			and t.bit_project_id = #{bitProjectId,jdbcType=INTEGER}   
+		</if>
+		<if test="unitProjectId != null and unitProjectId != ''">
+			and t.id = #{unitProjectId,jdbcType=INTEGER}   
+		</if>
 		order by t.seq
     </select>
     

@@ -413,6 +413,11 @@ globalObject.listReload = function() {
 		mainTab.getActiveTab().down('gridpanel').getStore().reload();
 }
 
+//操作提示
+globalObject.messageTip = function(msg){
+	Ext.example.msg('提示', msg);
+}
+
 // 成功提示
 globalObject.msgTip = function(msg) {
 	function createBox(t, s) {

@@ -4,13 +4,19 @@ Ext.onReady(function() {
 	// 费用代码维护
 	Ext.define('Budget.app.bussinessProcess.YCATotal', {
 		extend : 'Ext.panel.Panel',
+		width: "100%",  
 		initComponent : function() {
 			var me = this;
 			Ext.apply(this, {
 				layout : 'border',
+				height:  520,
 				items : [  
-				            	  Ext.create('Budget.app.bussinessProcess.YCATotal.CostTypeGrid'), 
-								  Ext.create('Budget.app.bussinessProcess.YCATotal.CostValueGrid')
+	            	  Ext.create('Budget.app.bussinessProcess.YCATotal.CostTypeGrid',{
+	            		  bitProjectId:me.bitProjectId
+	            	  }), 
+					  Ext.create('Budget.app.bussinessProcess.YCATotal.CostValueGrid',{
+						  bitProjectId:me.bitProjectId
+					  })
 				 ]
 			});
 			this.callParent(arguments);
@@ -88,7 +94,9 @@ Ext.onReady(function() {
 				proxy : {
 					type : 'ajax',
 					url : appBaseUri + '/ycatotal/queryYCATotalInfo',
-					extraParams : {"lookTypeId": Ext.getCmp('ycatotal-costtypegrid').lookTypeId},
+					extraParams : {"lookTypeId": Ext.getCmp('ycatotal-costtypegrid').lookTypeId,
+						"bitProjectId" : me.bitProjectId
+					},
 					reader : {
 						type : 'json',
 						root : 'data',

@@ -271,4 +271,103 @@ public class UnitProjectController {
 		return json;
 	}
 	
+	/**
+	 * 刷新当前行
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	@RequestMapping(value = "/getItemById")
+	@ResponseBody
+	public JSONObject getItemById(HttpServletRequest request, HttpServletResponse response){
+		// 查询条件
+		Map<String, String> queryMap = TransforUtil.transRMapToMap(request.getParameterMap());
+		
+		JSONObject json = new JSONObject();
+		json.put("success", true);
+		try{
+			json.put("data", JSONObject.fromObject(unitProjectService.getItemById(queryMap)));
+		}catch (Exception ex) {
+			ex.printStackTrace();
+			json.put("success", false);
+			json.put("msg", "出错:" + ex.getMessage());
+		}
+		return json;
+	}
+	
+	/**
+	 * 新增详细
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	@RequestMapping(value = "/insertDetail")
+	@ResponseBody
+	public JSONObject insertDetail(HttpServletRequest request, HttpServletResponse response) {
+		// 查询条件
+		Map<String, String> queryMap = TransforUtil.transRMapToMap(request.getParameterMap());
+		
+		JSONObject json = new JSONObject();
+		json.put("success", true);
+		try{
+			unitProjectService.insertDetail(queryMap);
+		}catch (Exception ex) {
+			ex.printStackTrace();
+			json.put("success", false);
+			json.put("msg", "出错:" + ex.getMessage());
+		}
+		return json;
+	}
+	
+	/**
+	 * 删除详细
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	@RequestMapping(value = "/deleteBitProjectDetail")
+	@ResponseBody
+	public JSONObject deleteBitProjectDetail(HttpServletRequest request, HttpServletResponse response) {
+		// 查询条件
+		Map<String, String> queryMap = TransforUtil.transRMapToMap(request.getParameterMap());
+		
+		JSONObject json = new JSONObject();
+		json.put("success", true);
+		try{
+			unitProjectService.deleteBitProjectDetail(queryMap);
+		}catch (Exception ex) {
+			ex.printStackTrace();
+			json.put("success", false);
+			json.put("msg", "出错:" + ex.getMessage());
+		}
+		return json;
+	}
+	
+	/**
+	 * 更新运财安值
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	@RequestMapping(value = "/updateDetailAndItem")
+	@ResponseBody
+	public JSONObject updateDetailAndItem(HttpServletRequest request, HttpServletResponse response) {
+		// 查询条件
+		Map<String, String> queryMap = TransforUtil.transRMapToMap(request.getParameterMap());
+		
+		JSONObject json = new JSONObject();
+		json.put("success", true);
+		try{
+			unitProjectService.updateDetailAndItem(queryMap);
+		}catch (Exception ex) {
+			ex.printStackTrace();
+			json.put("success", false);
+			json.put("msg", "出错:" + ex.getMessage());
+		}
+		return json;
+	}
+	
+	
+	
+	
 }

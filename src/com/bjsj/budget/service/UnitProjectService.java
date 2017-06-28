@@ -2,6 +2,7 @@ package com.bjsj.budget.service;
 
 import java.util.Map;
 
+import com.bjsj.budget.model.UnitProject;
 import com.bjsj.budget.page.PageInfo;
 import com.bjsj.budget.page.PageObject;
 
@@ -47,4 +48,28 @@ public interface UnitProjectService {
 	 * @param queryMap
 	 */
 	void updateItemAndDetail(Map<String, String> queryMap);
+	
+	/**
+	 * 刷新当前行
+	 * @param queryMap
+	 */
+	UnitProject getItemById(Map<String, String> queryMap);
+	
+	/**
+	 * 新增详细值
+	 * @param queryMap
+	 */
+	void insertDetail(Map<String, String> queryMap);
+	
+	/**
+	 * 删除详细值
+	 * @param queryMap
+	 */
+	void deleteBitProjectDetail(Map<String, String> queryMap);
+	
+	/**
+	 * 更新运材安的值
+	 * @param queryMap
+	 */
+	void updateDetailAndItem(Map<String, String> queryMap);
 }

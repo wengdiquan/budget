@@ -1,11 +1,9 @@
 package com.bjsj.budget.service.impl;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
+import java.math.RoundingMode;
 import java.util.List;
 import java.util.Map;
-
-import javax.batch.api.Decider;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,11 +15,11 @@ import com.bjsj.budget.model.CategoryModelModel;
 import com.bjsj.budget.model.CategoryModelYCAModel;
 import com.bjsj.budget.model.UnitProject;
 import com.bjsj.budget.model.UnitProjectDetail;
-import com.bjsj.budget.model.YCAModel;
 import com.bjsj.budget.page.PageInfo;
 import com.bjsj.budget.page.PageObject;
 import com.bjsj.budget.service.UnitProjectService;
 import com.bjsj.budget.util.StringUtil;
+import com.sun.mail.util.QEncoderStream;
 
 @Service("unitProjectSericeImpl")
 public class UnitProjectSericeImpl implements UnitProjectService {
@@ -252,10 +250,9 @@ public class UnitProjectSericeImpl implements UnitProjectService {
 		UnitProject unitProjectDB = unitProjectDao.getUnitProjectById(queryMap);
 		String name = queryMap.get("name");
 		String value = queryMap.get("value");
-		Double v = Double.parseDouble(value);
 		//工程量（含税合价|不含税合价|综合单价|综合合价） 修改含量
 		if("dtgcl".equals(name) || "content".equals(name)){
-			
+			Double v = Double.parseDouble(value);
 			unitProjectDB.setContent(v);
 			unitProjectDB.setDtgcl(v);
 			
@@ -290,6 +287,12 @@ public class UnitProjectSericeImpl implements UnitProjectService {
 		
 		//修改不含税单价
 		if("notax".equals(name)){
+			Double v = Double.parseDouble(value);
+			BigDecimal  subV = BigDecimal.valueOf(v).subtract(BigDecimal.valueOf(unitProjectDB.getSinglePrice()));
+			if(subV.doubleValue() == 0){
+				return;
+			}
+			
 			if(StringUtil.isEmpty(unitProjectDB.getLookValueId())){
 				
 				//计算运材安的比例
@@ -310,7 +313,6 @@ public class UnitProjectSericeImpl implements UnitProjectService {
 				}
 				
 				BigDecimal total = ybc.add(cbc).add(abc); 
-				BigDecimal  subV = BigDecimal.valueOf(v).subtract(BigDecimal.valueOf(unitProjectDB.getSinglePrice()));
 				
 				/**
 				 * 是否含有补充费用。
@@ -336,7 +338,7 @@ public class UnitProjectSericeImpl implements UnitProjectService {
 				}
 				
 				//新增
-				ybc = ybc.divide(total).multiply(subV);
+				ybc = ybc.divide(total, 5, RoundingMode.HALF_DOWN).multiply(subV);
 				if(StringUtil.isEmpty(yDetail.getCode())){
 					yDetail.setCode("YSFTZ");
 					yDetail.setType("运"); //列别
@@ -361,7 +363,7 @@ public class UnitProjectSericeImpl implements UnitProjectService {
 					unitProjectDetailDao.updateByPrimaryKey(yDetail);
 				}
 				
-				cbc = cbc.divide(total).multiply(subV);
+				cbc = cbc.divide(total, 5, RoundingMode.HALF_DOWN).multiply(subV);
 				if(StringUtil.isEmpty(cDetail.getCode())){
 					cDetail.setCode("CLFTZ");
 					cDetail.setType("材"); //列别
@@ -386,11 +388,12 @@ public class UnitProjectSericeImpl implements UnitProjectService {
 					unitProjectDetailDao.updateByPrimaryKey(cDetail);
 				}
 				
-				abc = abc.divide(total).multiply(subV);
+				//安装费
+				abc = abc.divide(total,5, RoundingMode.HALF_DOWN).multiply(subV);
 				if(StringUtil.isEmpty(aDetail.getCode())){
-					aDetail.setCode("CLFTZ");
-					aDetail.setType("材"); //列别
-					aDetail.setName("材料费调整");
+					aDetail.setCode("AZFTZ");
+					aDetail.setType("安"); //列别
+					aDetail.setName("安装费调整");
 					aDetail.setTypeInfo(null);
 					aDetail.setUnit("元");
 					aDetail.setContent(abc.doubleValue()); //含量
@@ -418,10 +421,11 @@ public class UnitProjectSericeImpl implements UnitProjectService {
 				
 				detailList = unitProjectDetailDao.getBitProjectDetailInfo(queryMap);
 
-				BigDecimal singlePrice = BigDecimal.ZERO;
-				for(UnitProjectDetail detail: detailList){
-				//	singlePrice.add(detail) TODO 
-				}
+				//修改不含税合价，综合单价 //TODO 直接相加
+				unitProjectDB.setSinglePrice(v);
+				unitProjectDB.setSingleSumPrice(BigDecimal.valueOf(unitProjectDB.getSingleSumPrice()).add(BigDecimal.valueOf(v)).doubleValue());
+				unitProjectDB.setPrice(BigDecimal.valueOf(unitProjectDB.getPrice()).add(BigDecimal.valueOf(v)).doubleValue());
+				unitProjectDao.updateByPrimaryKey(unitProjectDB);
 				
 			}else{
 				unitProjectDB.setSinglePrice(Double.parseDouble(value));
@@ -444,5 +448,66 @@ public class UnitProjectSericeImpl implements UnitProjectService {
 			unitProjectDB.setRemark(value);
 			unitProjectDao.updateByPrimaryKey(unitProjectDB);
 		}
+	}
+	
+	@Override
+	public UnitProject getItemById(Map<String, String> queryMap) {
+		List<UnitProject> itemInfoList = unitProjectDao.getBitProjectItemInfo(queryMap);
+		return itemInfoList.get(0);
+	}
+	
+	@Override
+	public void insertDetail(Map<String, String> queryMap) {
+		String className = queryMap.get("class");
+		String type = queryMap.get("type");
+		
+		
+		String typeName = "";
+		if("安".equals(type)){
+			typeName = "安装";
+		}else if("材".equals(type)){
+			typeName = "材料";
+		}else if("运".equals(type)){
+			typeName = "运输";
+		}
+		
+		//插入
+		if("add".equals(className)){
+			UnitProjectDetail upd = new UnitProjectDetail();
+			upd.setUnitprojectId(Integer.parseInt(queryMap.get("unitProjectId")));
+			upd.setCode("补充" + typeName + "001");
+			upd.setType(type);
+			List<UnitProjectDetail> detailList = unitProjectDetailDao.getBitProjectDetailInfo(queryMap);
+			upd.setSeq(detailList.get(detailList.size() -1).getSeq() + 1);
+			unitProjectDetailDao.insert(upd);
+		}
+		
+		//插入 暂不支持 TODO
+		if("insert".equals(className)){
+			UnitProjectDetail upd = new UnitProjectDetail();
+			upd.setUnitprojectId(Integer.parseInt(queryMap.get("unitProjectId")));
+			upd.setCode("补充" + typeName + "001");
+			upd.setType(type);
+			List<UnitProjectDetail> detailList = unitProjectDetailDao.getBitProjectDetailInfo(queryMap);
+			upd.setSeq(detailList.get(detailList.size() -1).getSeq() + 1);
+			unitProjectDetailDao.insert(upd);
+		}
+	}
+	
+	@Override
+	public void deleteBitProjectDetail(Map<String, String> queryMap) {
+		
+		List<UnitProjectDetail> detailList = unitProjectDetailDao.getBitProjectDetailInfo(queryMap);
+		
+		//修改上面的单价
+		
+		//删除详细值
+		unitProjectDetailDao.deleteByPrimaryKey(Integer.parseInt(queryMap.get("unitProjectDetailId")));
+		
+	}
+	
+	@Override
+	public void updateDetailAndItem(Map<String, String> queryMap) {
+		
 	}
 }

@@ -38,7 +38,7 @@ Ext.onReady(function() {
                 },{  
                     title: '运材安汇总',  
                     items:[
-                    	Ext.create("Budget.app.bussinessProcess.ProjectYCATotalPanel", {
+                    	Ext.create("Budget.app.bussinessProcess.YCATotal", {
                     		bitProjectId:me.bitProjectId
                     	})
                     ],
