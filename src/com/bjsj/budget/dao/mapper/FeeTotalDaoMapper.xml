@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bjsj.budget.dao.FeeTotalDao">
+
+	<resultMap id="FeeTotalInfoMap" type="com.bjsj.budget.model.FeeTotalModel">
+	</resultMap>
+	<sql id="Base_Column_List">
+		t.id, t.seq, t.feeCode, t.name, t.calculatedRadix, t.radixRemark,
+		t.rate, t.amount, t.remark,t.templetId
+	</sql>
+	
+    <select id="queryFeeTotalInfo" parameterType="HashMap" resultMap="FeeTotalInfoMap">
+   	 	select 
+	   		<include refid="Base_Column_List" /> 
+	   	from tm_fee_total t where 1 =1 
+	    <if test="map.templetId != null">
+	    	and t.templetId = #{map.templetId,jdbcType=INTEGER} 
+	    </if>	
+    </select>
+    <select id="getFeeTotalInfoCount" parameterType="HashMap" resultType="Integer">
+		select 
+	   		count(1) 
+	   	from tm_fee_total t where 1 =1 
+	    <if test="map.templetId != null">
+	    	and t.templetId = #{map.templetId,jdbcType=INTEGER} 
+	    </if>	
+	</select>
+	
+	<update id="updateByPrimaryKey" parameterType="com.bjsj.budget.model.FeeTotalModel">
+		update
+		tm_fee_total
+		set calculatedRadix = #{calculatedRadix,jdbcType=VARCHAR},
+		radixRemark = #{radixRemark,jdbcType=VARCHAR}
+		where id = #{id,jdbcType=INTEGER}
+	</update> 
+    
+</mapper>
