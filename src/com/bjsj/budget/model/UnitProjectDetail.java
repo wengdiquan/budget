@@ -30,6 +30,8 @@ public class UnitProjectDetail {
 	private Integer lookValueId;
 	
 	private Integer seq;
+	
+	private Integer isSuppleCost; //是不是补充费用
 
 	public Integer getId() {
 		return id;
@@ -165,5 +167,13 @@ public class UnitProjectDetail {
 
 	public void setSeq(Integer seq) {
 		this.seq = seq;
+	}
+	
+	public Integer getIsSuppleCost() {
+		return isSuppleCost;
+	}
+
+	public void setIsSuppleCost(Integer isSuppleCost) {
+		this.isSuppleCost = isSuppleCost;
 	}
 }

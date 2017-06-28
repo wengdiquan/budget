@@ -3,7 +3,6 @@ package com.bjsj.budget.dao;
 import java.util.List;
 import java.util.Map;
 
-import com.bjsj.budget.model.UnitProject;
 import com.bjsj.budget.model.UnitProjectDetail;
 
 public interface UnitProjectDetailDao extends BaseDao {
@@ -21,7 +20,7 @@ public interface UnitProjectDetailDao extends BaseDao {
 	 * @param queryMap
 	 * @return
 	 */
-	List<UnitProject> getBitProjectDetailInfo(Map<String, String> queryMap);
+	List<UnitProjectDetail> getBitProjectDetailInfo(Map<String, String> queryMap);
 	
 	/**
 	 * 根据子目删除所有details

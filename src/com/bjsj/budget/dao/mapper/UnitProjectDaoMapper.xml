@@ -20,14 +20,14 @@
 		t.parentid as parentid, 
 		t.leaf as leaf,
 		t.bit_project_id as bitProjectId,
-		t.looktype_id as lookTypeId,
+		t.lookvalue_id as lookValueId,
 		t.seq as seq
 	</sql>
 	<insert id="insert" parameterType="com.bjsj.budget.model.UnitProject" useGeneratedKeys="true" keyProperty="id">
 		insert into tm_unitproject (code,
 		name, type, unit, content, dtgcl, single_price, tax_single_price, 
 		single_sumprice, tax_single_sumprice, price, sumprice, remark,
-		parentid, leaf, bit_project_id,looktype_id, seq
+		parentid, leaf, bit_project_id,lookvalue_id, seq
 		)
 		values (#{code,jdbcType=VARCHAR},
 		#{name,jdbcType=VARCHAR}, #{type,jdbcType=VARCHAR}, #{unit,jdbcType=VARCHAR},
@@ -36,7 +36,7 @@
 		 #{taxSingleSumPrice,jdbcType=DOUBLE},  #{price,jdbcType=DOUBLE},
 		 #{sumPrice,jdbcType=DOUBLE}, #{remark,jdbcType=VARCHAR},
 		 #{parentid,jdbcType=INTEGER}, #{leaf,jdbcType=INTEGER}, #{bitProjectId,jdbcType=INTEGER},
-		 #{lookTypeId,jdbcType=INTEGER}, #{seq,jdbcType=INTEGER}
+		 #{lookValueId,jdbcType=INTEGER}, #{seq,jdbcType=INTEGER}
 		)
 	</insert>
 	<update id="updateByPrimaryKey" parameterType="com.bjsj.budget.model.UnitProject">
@@ -57,7 +57,7 @@
 		parentid = #{parentid,jdbcType=INTEGER},
 		leaf = #{leaf,jdbcType=INTEGER},
 		bit_project_id = #{bitProjectId,jdbcType=INTEGER},
-		looktype_id = #{lookTypeId,jdbcType=INTEGER},
+		lookvalue_id = #{lookValueId,jdbcType=INTEGER},
 		seq = #{seq,jdbcType=INTEGER}
 		where id = #{id,jdbcType=INTEGER}
 	</update>

@@ -40,6 +40,12 @@ public interface CategoryModelDao extends BaseDao{
 		 */
 		List<CategoryModelYCAModel> getDetailYCA(Integer unitProjectId);
 		
+		/**
+		 * 获取运材安值
+		 * @param code
+		 */
+		CategoryModelYCAModel getDetailInfoByCode(String code);
+		
 		//List<HashMap> getLookTypeList(@Param("map")Map<String, String> queryMap);
 
 }

@@ -15,15 +15,15 @@ public class UnitProject {
 	private Double content; // 含量
 
 	private Double dtgcl; // 工程量
-	
+
 	private Double singlePrice; // 不含税单价
-	
-	private Double taxSinglePrice; //含税单价
-	
-	private Double singleSumPrice; // 合价
-	
-	private Double taxSingleSumPrice; //含税合价
-	
+
+	private Double taxSinglePrice; // 含税单价
+
+	private Double singleSumPrice; // 不含税合价
+
+	private Double taxSingleSumPrice; // 含税合价
+
 	private Double price; // 综合单价
 
 	private Double sumPrice; // 综合合价
@@ -36,10 +36,9 @@ public class UnitProject {
 
 	private Integer bitProjectId; // 单位工程id
 
-	private Integer lookTypeId; // 费用类型ID,如果 是 定额的话，为空
-	
-	private Integer seq;  //排序
-	
+	private Integer lookValueId; // 费用类型ID,如果 是 定额的话，为空
+
+	private Integer seq; // 排序
 
 	public Integer getId() {
 		return id;
@@ -153,12 +152,12 @@ public class UnitProject {
 		this.sumPrice = sumPrice;
 	}
 
-	public Integer getLookTypeId() {
-		return lookTypeId;
+	public Integer getLookValueId() {
+		return lookValueId;
 	}
 
-	public void setSourceType(Integer lookTypeId) {
-		this.lookTypeId = lookTypeId;
+	public void setLookValueId(Integer lookValueId) {
+		this.lookValueId = lookValueId;
 	}
 
 	@Override
@@ -166,7 +165,7 @@ public class UnitProject {
 		return "UnitProject [id=" + id + ", code=" + code + ", type=" + type + ", name=" + name + ", unit=" + unit
 				+ ", content=" + content + ", dtgcl=" + dtgcl + ", singlePrice=" + singlePrice + ", price=" + price
 				+ ", sumPrice=" + sumPrice + ", remark=" + remark + ", parentid=" + parentid + ", leaf=" + leaf
-				+ ", bitProjectId=" + bitProjectId + ", lookTypeId=" + lookTypeId + "]";
+				+ ", bitProjectId=" + bitProjectId + ", lookValueId=" + lookValueId + "]";
 	}
 
 	public Double getSingleSumPrice() {
@@ -200,4 +199,5 @@ public class UnitProject {
 	public void setSeq(Integer seq) {
 		this.seq = seq;
 	}
+	
 }

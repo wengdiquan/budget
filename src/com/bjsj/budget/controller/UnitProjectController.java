@@ -142,7 +142,7 @@ public class UnitProjectController {
 		if(i == 1){
 			for(UnitProject u : unitProjectList){
 				if(!Objects.isNull(u.getSinglePrice())){
-					decimal.add(BigDecimal.valueOf(u.getSinglePrice()));
+					decimal = decimal.add(BigDecimal.valueOf(u.getSinglePrice()));
 				}
 			}
 		}
@@ -222,4 +222,53 @@ public class UnitProjectController {
 		}
 		return json;
 	}
+	
+	/**
+	 * 改变顺序
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	@RequestMapping(value = "/changeSeq")
+	@ResponseBody
+	public JSONObject changeSeq(HttpServletRequest request, HttpServletResponse response) {
+		// 查询条件
+		Map<String, String> queryMap = TransforUtil.transRMapToMap(request.getParameterMap());
+		
+		JSONObject json = new JSONObject();
+		json.put("success", true);
+		try{
+			unitProjectService.changeSeq(queryMap);
+		}catch (Exception ex) {
+			ex.printStackTrace();
+			json.put("success", false);
+			json.put("msg", "出错:" + ex.getMessage());
+		}
+		return json;
+	}
+	
+	/**
+	 * 更新字段
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	@RequestMapping(value = "/updateItemAndDetail")
+	@ResponseBody
+	public JSONObject updateItemAndDetail(HttpServletRequest request, HttpServletResponse response){
+		// 查询条件
+		Map<String, String> queryMap = TransforUtil.transRMapToMap(request.getParameterMap());
+		
+		JSONObject json = new JSONObject();
+		json.put("success", true);
+		try{
+			unitProjectService.updateItemAndDetail(queryMap);
+		}catch (Exception ex) {
+			ex.printStackTrace();
+			json.put("success", false);
+			json.put("msg", "出错:" + ex.getMessage());
+		}
+		return json;
+	}
+	
 }

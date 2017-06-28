@@ -140,15 +140,15 @@ Ext.onReady(function() {
 				store : costTypeStore,
 				listeners : {
 					'itemclick' : function(item, record) {
-						if(record.get('id') == 0){
-							return;
-						}
-						
 						me.lookTypeId = record.get('id');
+						var lookTypeId = me.lookTypeId;
+						if(record.get('id') == 0){
+							lookTypeId = '';
+						}
 						
 						Ext.getCmp('costmoneymanage-costvaluegrid').getStore().load({
 							params : {
-								'lookTypeId' : me.lookTypeId
+								'lookTypeId' : lookTypeId
 							}
 						});
 					}

@@ -35,4 +35,16 @@ public interface UnitProjectService {
 	 * @throws Exception 
 	 */
 	void deleteBitProjectItem(Map<String, String> queryMap) throws Exception;
+	
+	/**
+	 * 修改数据
+	 * @param queryMap
+	 */
+	void changeSeq(Map<String, String> queryMap);
+	
+	/**
+	 * 更新子目字段
+	 * @param queryMap
+	 */
+	void updateItemAndDetail(Map<String, String> queryMap);
 }

@@ -19,7 +19,8 @@
 		t.notax_price as noTaxPrice, 
 		t.orig_count as origCount, 
 		t.lookvalueid as lookValueId,
-		t.seq as seq
+		t.seq as seq,
+		t.is_supple_cost as isSuppleCost
 	</sql>
 	<select id="selectByPrimaryKey" resultMap="BaseResultMap"
 		parameterType="java.lang.Integer">
@@ -37,14 +38,15 @@
 		type, name, type_info,
 		unit, content, amount, single_sumprice, tax_single_sumprice,
 		tax_price, notax_price, orig_count, lookvalueid,
-		seq)
+		seq, is_supple_cost)
 		values (#{unitprojectId,jdbcType=INTEGER},
 		#{code,jdbcType=VARCHAR},
 		#{type,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{typeInfo,jdbcType=VARCHAR},
 		#{unit,jdbcType=VARCHAR}, #{content,jdbcType=DOUBLE}, #{amount,jdbcType=DOUBLE},
 		#{singleSumPrice,jdbcType=DOUBLE}, #{taxSingleSumPrice,jdbcType=DOUBLE},
 		#{taxPrice,jdbcType=DOUBLE}, #{noTaxPrice,jdbcType=DOUBLE},
-		#{origCount,jdbcType=DOUBLE}, #{lookValueId,jdbcType=INTEGER}, #{seq,jdbcType=INTEGER}
+		#{origCount,jdbcType=DOUBLE}, #{lookValueId,jdbcType=INTEGER}, #{seq,jdbcType=INTEGER},
+		#{isSuppleCost,jdbcType=INTEGER}
 		)
 	</insert>
 	<update id="updateByPrimaryKey" parameterType="com.bjsj.budget.model.UnitProjectDetail">
@@ -56,10 +58,15 @@
 		type_info = #{typeInfo,jdbcType=VARCHAR},
 		unit = #{unit,jdbcType=VARCHAR},
 		content = #{content,jdbcType=DOUBLE},
-		single_price = #{singlePrice,jdbcType=DOUBLE},
-		Market_price = #{marketPrice,jdbcType=DOUBLE},
 		amount = #{amount,jdbcType=DOUBLE},
-		orig_count = #{origCount,jdbcType=DOUBLE}
+		single_sumprice = #{singleSumPrice,jdbcType=DOUBLE},
+		tax_single_sumprice = #{taxSingleSumPrice,jdbcType=DOUBLE},
+		tax_price = #{taxPrice,jdbcType=DOUBLE},
+		notax_price = #{noTaxPrice,jdbcType=DOUBLE},
+		orig_count = #{origCount,jdbcType=DOUBLE},
+		lookvalueid = #{lookValueId,jdbcType=INTEGER},
+		seq = #{seq,jdbcType=DOUBLE},
+		is_supple_cost = #{isSuppleCost,jdbcType=INTEGER}
 		where id = #{id,jdbcType=INTEGER}
 	</update>
 	
@@ -75,4 +82,5 @@
 		delete from tm_unitproject_detail 
 		where unitproject_id = #{unitProjectId,jdbcType=INTEGER}  
 	</delete>
+	
 </mapper>
