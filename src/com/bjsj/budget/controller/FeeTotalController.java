@@ -1,10 +1,12 @@
 package com.bjsj.budget.controller;
 
+import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -28,7 +30,7 @@ public class FeeTotalController {
 	 */
 	@RequestMapping(value = "/queryFeeTotalInfo")
 	@ResponseBody
-	public ListView queryYCATotalInfo(HttpServletRequest request,
+	public ListView queryFeeTotalInfo(HttpServletRequest request,
 			HttpServletResponse response){
 		//查询条件
 		Map<String, String> queryMap = TransforUtil.transRMapToMap(request.getParameterMap());
@@ -45,9 +47,34 @@ public class FeeTotalController {
 		return typeList;
 	}
 	
+	/**
+	 * 查询 费用 汇总 模板
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	@RequestMapping(value = "/queryFeeTemplate")
+	@ResponseBody
+	public ListView queryFeeTemplate(HttpServletRequest request,
+			HttpServletResponse response){
+		//查询条件
+		Map<String, String> queryMap = TransforUtil.transRMapToMap(request.getParameterMap());
+		
+		PageInfo pageInfo = new PageInfo();
+		pageInfo.setCurrentResult(Integer.parseInt(request.getParameter("start")));
+		pageInfo.setShowCount(Integer.parseInt(request.getParameter("limit")));
+		
+		PageObject pageObj = feeTotalService.queryFeeTemplate(queryMap, pageInfo);
+		
+		ListView typeList = new ListView();
+		typeList.setData(pageObj.getRows());
+		typeList.setTotalRecord(pageObj.getRecords());
+		return typeList;
+	}
+	
 	@RequestMapping(value = "/saveOrUpdateValue")
 	@ResponseBody
-	public String saveOrUpdateValue (HttpServletRequest request,HttpServletResponse response){
+	public String saveOrUpdateValue (@RequestBody List<FeeTotalModel> FeeTotalList, HttpServletRequest request,HttpServletResponse response){
 		FeeTotalModel record = new FeeTotalModel();
 		
 		try
@@ -73,6 +100,7 @@ public class FeeTotalController {
 		}
 		return "{success:true}";
 	}
+	
 	/**//**
 	 * 查询 字典类型
 	 * @param request

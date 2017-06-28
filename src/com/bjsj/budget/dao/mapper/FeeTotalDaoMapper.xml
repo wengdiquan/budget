@@ -4,6 +4,9 @@
 
 	<resultMap id="FeeTotalInfoMap" type="com.bjsj.budget.model.FeeTotalModel">
 	</resultMap>
+	<resultMap id="FeeTemplateMap" type="com.bjsj.budget.model.FeeTemplateModel">
+	</resultMap>
+	
 	<sql id="Base_Column_List">
 		t.id, t.seq, t.feeCode, t.name, t.calculatedRadix, t.radixRemark,
 		t.rate, t.amount, t.remark,t.templetId
@@ -26,6 +29,26 @@
 	    </if>	
 	</select>
 	
+	<sql id="Base_Column_List_Tem">
+		t.id, t.name
+	</sql>
+	<select id="queryFeeTemplate" parameterType="HashMap" resultMap="FeeTemplateMap">
+   	 	select 
+	   		<include refid="Base_Column_List_Tem" /> 
+	   	from tm_fee_total_template t where 1 =1 
+	    <if test="map.id != null">
+	    	and t.id = #{map.id,jdbcType=INTEGER} 
+	    </if>	
+    </select>
+    <select id="getFeeTemplateCount" parameterType="HashMap" resultType="Integer">
+		select 
+	   		count(1) 
+	   	from tm_fee_total_template t where 1 =1 
+	    <if test="map.id != null">
+	    	and t.id = #{map.id,jdbcType=INTEGER} 
+	    </if>		
+	</select>
+	
 	<update id="updateByPrimaryKey" parameterType="com.bjsj.budget.model.FeeTotalModel">
 		update
 		tm_fee_total
@@ -33,5 +56,16 @@
 		radixRemark = #{radixRemark,jdbcType=VARCHAR}
 		where id = #{id,jdbcType=INTEGER}
 	</update> 
+	
+	<insert id="insertByBatch" parameterType="java.util.List">
+        insert into tm_fee_total (id, seq, feeCode, name, calculatedRadix, radixRemark,  rate, amount, remark, templetId)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.id,jdbcType=INTEGER}, #{item.seq,jdbcType=VARCHAR}, #{item.feeCode,jdbcType=VARCHAR}, #{item.name,jdbcType=VARCHAR}
+            ,#{item.calculatedRadix,jdbcType=VARCHAR}, #{item.radixRemark,jdbcType=VARCHAR}, #{item.rate,jdbcType=DOUBLE}, 
+            #{item.amount,jdbcType=DOUBLE}, #{item.remark,jdbcType=DOUBLE}, #{item.templetId,jdbcType=INTEGER}
+            )
+        </foreach>
+    </insert>
     
 </mapper>

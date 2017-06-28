@@ -5,6 +5,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.bjsj.budget.dao.FeeTotalDao;
+import com.bjsj.budget.model.FeeTemplateModel;
 import com.bjsj.budget.model.FeeTotalModel;
 import com.bjsj.budget.page.PageInfo;
 import com.bjsj.budget.page.PageObject;
@@ -26,6 +27,20 @@ public class FeeTotalServiceImpl implements FeeTotalService{
 	@Override
 	public void updateValue(FeeTotalModel record) throws Exception {
 		feeTotalDao.updateByPrimaryKey(record);
+	}
+
+	@Override
+	public void insertValue(List<FeeTotalModel> record) throws Exception {
+		feeTotalDao.insertByBatch(record);
+	}
+
+	@Override
+	public PageObject queryFeeTemplate(Map<String, String> queryMap, PageInfo pageInfo) {
+		PageObject pageObj = new PageObject();
+		List<FeeTemplateModel> orderChangeHeaders = feeTotalDao.queryFeeTemplate(queryMap, pageInfo);
+		pageObj.setRecords(feeTotalDao.getFeeTemplateCount(queryMap));
+		pageObj.setRows(orderChangeHeaders);
+		return pageObj;
 	}
 
 }

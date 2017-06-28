@@ -1,6 +1,88 @@
 // 用户管理
 Ext.onReady(function() {
 	Ext.tip.QuickTipManager.init();
+	Ext.define('App.bussinessProcess.FeeTotal.InfoWindow', {
+		extend : 'Ext.window.Window',
+		constructor : function(config) {
+			config = config || {};
+			Ext.apply(config, {
+				title : '模板保存',
+				width : 420,
+				height : 350,
+				bodyPadding : '10 5',
+				modal : true,
+				layout : 'fit',
+				items : [ {
+					xtype : 'form',
+					fieldDefaults : {
+						labelAlign : 'left',
+						labelWidth : 90,
+						anchor : '100%'
+					},
+					items : [{
+						name : "cmd",
+						xtype : "hidden",
+						value : 'new'
+					},{
+						xtype : 'textfield',
+						name : 'name',
+						fieldLabel:'模板名称<font color="red">*</font>',
+						allowBlank : false
+					}],
+					buttons : [ '->', {
+						id : 'infowindow-save',
+						text : '保存',
+						iconCls : 'icon-save',
+						width : 80,
+						handler : function(btn, eventObj) {
+							var window = btn.up('window');
+							var form = window.down('form').getForm();
+							if (form.isValid()) {
+								window.getEl().mask('数据保存中，请稍候...');
+								var vals = form.getValues();
+								
+								var grid = Ext.getCmp("categoryandmodelmanage-YCAGrid");
+								var records = grid.getSelectionModel().getSelection();
+								vals.lookValueId = records[0].get('lookValueId')-0 ;
+								
+								Ext.Ajax.request({
+									url : appBaseUri + '/categorymodel/saveOrUpdateValue',
+									params : vals,
+									method : "POST",
+									success : function(response) {
+										if (response.responseText != '') {
+											var res = Ext.JSON.decode(response.responseText);
+											if (res.success) {
+												globalObject.msgTip('操作成功！');
+												Ext.getCmp('categoryandmodelmanage-cmdetailgrid').getStore().reload();
+												Ext.getCmp('categoryandmodelmanage-YCAGrid').getStore().reload();
+											} else {
+												globalObject.errTip(res.msg);
+											}
+										}
+									},
+									failure : function(response) {
+										globalObject.errTip('操作失败！');
+									}
+								});
+								window.getEl().unmask();
+								window.close();
+							}
+						}
+					}, {
+						id : 'infowindow-cancel',
+						text : '取消',
+						iconCls : 'icon-cancel',
+						width : 80,
+						handler : function() {
+							this.up('window').close();
+						}
+					},'->']
+				} ]
+			});
+			App.bussinessProcess.FeeTotal.InfoWindow.superclass.constructor.call(this, config);
+		}
+	});
 	// 费用汇总
 	Ext.define('Budget.app.bussinessProcess.FeeTotal', {
 		extend : 'Ext.panel.Panel',
@@ -153,17 +235,38 @@ Ext.onReady(function() {
 		},
 		newCodeCodeFun: function(){
 			var me = this;
-			var dataall = Ext.getCmp('feetotal-feedetailgrid').getStore();
-			if (!parentId) {
-				globalObject.infoTip('请先选模块名称！');
-				return;
-			};
-			var win = new App.bussinessProcess.FeeTotal.InfoWindowCM({
-				hidden : true
+			var grid = Ext.getCmp('feetotal-feedetailgrid');
+			var store = grid.getStore();
+			grid.getEl().mask('数据保存中，请稍候...');
+			
+			var paramsA = [];
+			store.each(function(record){
+				var node = record.data;
+				node["id"] = {id:Ext.getCmp('feetotal-feedetailgrid').feeTotalId};
+				paramsA.push(node);
 			});
-			var form = win.down('form').getForm();
-			form.findField('parentId').setValue(parentId);
-			win.show();
+			Ext.Ajax.request({
+				url : appBaseUri + '/feetotal/saveOrUpdateValue',
+				params :  Ext.encode(paramsA),
+				headers: {'Content-Type':'application/json'},
+				method : "POST",
+				success : function(response) {
+					if (response.responseText != '') {
+						var res = Ext.JSON.decode(response.responseText);
+						if (res.success) {
+							globalObject.msgTip('操作成功！');
+							Ext.getCmp('feetotal-feedetailgrid').getStore().reload();
+						} else {
+							globalObject.errTip(res.msg);
+						}
+					}
+				},
+				failure : function(response) {
+					globalObject.errTip('操作失败！');
+				}
+			});
+			grid.getEl().unmask();
+			
 		}
 	});
 	
