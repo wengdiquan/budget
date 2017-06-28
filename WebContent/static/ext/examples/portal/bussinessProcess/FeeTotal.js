@@ -40,6 +40,92 @@ Ext.onReady(function() {
 							if (form.isValid()) {
 								window.getEl().mask('数据保存中，请稍候...');
 								var vals = form.getValues();
+								var store = Ext.getCmp('feetotal-feedetailgrid').getStore();
+								var paramsA = [];
+								store.each(function(record){
+									var node = record.data;
+									paramsA.push(node);
+								});
+								var paramsfinal = {
+										name : vals.name,
+										Temvo : Ext.encode(paramsA)
+								};
+								Ext.Ajax.request({
+									url : appBaseUri + '/feetotal/saveOrUpdateValue',
+									params : paramsfinal ,
+									//headers: {'Content-Type':'application/json'},
+									method : "POST",
+									success : function(response) {
+										if (response.responseText != '') {
+											var res = Ext.JSON.decode(response.responseText);
+											if (res.success) {
+												globalObject.msgTip('操作成功！');
+												Ext.getCmp('feetotal-feedetailgrid').getStore().reload();
+											} else {
+												globalObject.errTip(res.msg);
+											}
+										}
+									},
+									failure : function(response) {
+										globalObject.errTip('操作失败！');
+									}
+								});
+								window.getEl().unmask();
+								window.close();
+							}
+						}
+					}, {
+						id : 'infowindow-cancel',
+						text : '取消',
+						iconCls : 'icon-cancel',
+						width : 80,
+						handler : function() {
+							this.up('window').close();
+						}
+					},'->']
+				} ]
+			});
+			App.bussinessProcess.FeeTotal.InfoWindow.superclass.constructor.call(this, config);
+		}
+	});
+	//模板选择
+	Ext.define('App.bussinessProcess.FeeTotal.InfoWindowSelect', {
+		extend : 'Ext.window.Window',
+		constructor : function(config) {
+			config = config || {};
+			Ext.apply(config, {
+				title : '模板选择',
+				id : 'mywin',
+				width : 420,
+				height : 350,
+				bodyPadding : '10 5',
+				modal : true,
+				layout : 'fit',
+				items : [ {
+					xtype : 'form',
+					fieldDefaults : {
+						labelAlign : 'left',
+						labelWidth : 90,
+						anchor : '100%'
+					},
+					items : [{
+						name : "cmd",
+						xtype : "hidden",
+						value : 'new'
+					},
+					Ext.create('Budget.app.bussinessProcess.FeeTotal.FeeTemplateGrid')
+					],
+					buttons : [ '->'/*, {
+						id : 'infowindow-save',
+						text : '保存',
+						iconCls : 'icon-save',
+						width : 80,
+						handler : function(btn, eventObj) {
+							var window = btn.up('window');
+							var form = window.down('form').getForm();
+							if (form.isValid()) {
+								window.getEl().mask('数据保存中，请稍候...');
+								var vals = form.getValues();
 								
 								var grid = Ext.getCmp("categoryandmodelmanage-YCAGrid");
 								var records = grid.getSelectionModel().getSelection();
@@ -69,7 +155,7 @@ Ext.onReady(function() {
 								window.close();
 							}
 						}
-					}, {
+					}*/, {
 						id : 'infowindow-cancel',
 						text : '取消',
 						iconCls : 'icon-cancel',
@@ -80,9 +166,95 @@ Ext.onReady(function() {
 					},'->']
 				} ]
 			});
-			App.bussinessProcess.FeeTotal.InfoWindow.superclass.constructor.call(this, config);
+			App.bussinessProcess.FeeTotal.InfoWindowSelect.superclass.constructor.call(this, config);
 		}
 	});
+	
+	Ext.define('Budget.app.bussinessProcess.FeeTotal.FeeTemplateGrid', {
+		extend : 'Ext.grid.Panel',
+		id : 'feetotal-feetemplategrid',
+		plain : true,
+		region : 'center',
+		height : 250,
+		border:true,
+		initComponent : function() {
+			var me = this;
+			Ext.define('FeeTemplateList', {
+				extend : 'Ext.data.Model',
+				idProperty : 'id',
+				fields : [ {
+					name : 'id',
+					type : 'int'
+				},  'name']
+			});
+			var costValueStore = Ext.create('Ext.data.Store', {
+				model : 'FeeTemplateList',
+				autoLoad : true,
+				remoteSort : true,
+				pageSize : globalPageSize,
+				proxy : {
+					type : 'ajax',
+					url : appBaseUri + '/feetotal/queryFeeTemplate',
+					extraParams : {"templetId": 1},
+					reader : {
+						type : 'json',
+						root : 'data',
+						totalProperty : 'totalRecord',
+						successProperty : "success"
+					}
+				}
+			});
+			var costValueColumns = [ 
+			{
+				text : "模板名称",
+				dataIndex : 'name',
+				sortable : false,
+				width : '40%'
+			},{
+				text : "id",
+				dataIndex : 'id',
+				hidden : true
+			}];
+			Ext.apply(this, {
+				store : costValueStore,
+				/*listeners : {
+					'itemclick' : function(item, record) {
+						if(record.data.id == 0){
+							return;
+						}
+						me.feeTotalId = record.data.id;
+					}
+				},*/
+				selModel : Ext.create('Ext.selection.Model'),//Ext.create('Ext.selection.CheckboxModel', {mode:'single'/*, allowDeselect:true*/}),
+				columns : costValueColumns,
+				bbar : Ext.create('Ext.PagingToolbar', {
+					store : costValueStore,
+					displayInfo : true
+				}),
+				viewConfig:{
+					loadingText : '正在查询数据，请耐心稍候...',
+					stripeRows:false,
+					enableTextSelection : true,
+					getRowClass : function(record, rowIndex){
+						if(record.get('enableFlag') == '0'){
+		                    return 'info_rp';
+						}
+		            }
+				}
+			});
+			
+			this.callParent(arguments);
+		},
+		listeners : {
+			'itemdblclick' : function(_this, record, td, cellIndex, tr, rowIndex, e, eOpts){
+		        	var store = Ext.getCmp('feetotal-feedetailgrid').getStore();  
+		        	Ext.apply(store.proxy.extraParams, {"templetId": record.data.id});
+		        	Ext.getCmp('feetotal-feedetailgrid').getStore().reload();
+		        	Ext.getCmp('mywin').close();
+			}
+		}
+	});
+	
 	// 费用汇总
 	Ext.define('Budget.app.bussinessProcess.FeeTotal', {
 		extend : 'Ext.panel.Panel',
@@ -115,6 +287,19 @@ Ext.onReady(function() {
 		region : 'north',
 		height : '60%',
 		border:true,
+		plugins:[{
+  	        ptype: 'cellediting',
+  	        clicksToEdit: 1,
+  	        editing:false, 
+  	        listeners:{
+  	        	beforeedit:function(editor , context , eOpts){
+  	        		var records = editor.grid.getSelectionModel().getSelection();
+  	        		if(records[0].data.id == undefined){
+  	        			return false;
+  	        		}
+  	        	}
+  	        }
+  	    }],
 		initComponent : function() {
 			var me = this;
 			Ext.define('FeeValueList', {
@@ -147,17 +332,116 @@ Ext.onReady(function() {
 				text : "序号",
 				dataIndex : 'seq',
 				width : '7%',
-				hidden : false
+				hidden : false,
+				editor:{
+			        xtype: 'textfield',
+			        allowDecimals: true,
+			        decimalPrecision: 5,
+			        listeners :{
+			        	'change': function(obj, newValue, oldValue, eOpt){
+			        		var grid = Ext.getCmp("feetotal-feedetailgrid");
+			    			var bitRecord = grid.getSelectionModel().getSelection()[0];
+			        		Ext.Ajax.request({
+								 url : appBaseUri + '/feetotal/updateValue', 
+								 params : {
+									 id :bitRecord.get('id'),
+									 seq :newValue
+								 },
+								 method : "POST",
+								 success : function(response) {
+									 if (response.responseText != '') {
+										 var res = Ext.JSON.decode(response.responseText);
+										 if (res.success) {
+											 me.reloadAndSelect();
+										 } else {
+											 globalObject.errTip(res.msg);
+										 }
+									 }
+								 },
+								 failure : function(response) {
+									 globalObject.errTip('操作失败！');
+								 }
+							 });
+			        		
+			        	}
+			        }
+			    }
 			},{
 				text : "费用代号",
 				dataIndex : 'feeCode',
 				sortable : false,
-				width : '7%'
+				width : '7%',
+				editor:{
+			        xtype: 'textfield',
+			        allowDecimals: true,
+			        decimalPrecision: 5,
+			        listeners :{
+			        	'change': function(obj, newValue, oldValue, eOpt){
+			        		var grid = Ext.getCmp("feetotal-feedetailgrid");
+			    			var bitRecord = grid.getSelectionModel().getSelection()[0];
+			        		Ext.Ajax.request({
+								 url : appBaseUri + '/feetotal/updateValue', 
+								 params : {
+									 id :bitRecord.get('id'),
+									 feeCode :newValue
+								 },
+								 method : "POST",
+								 success : function(response) {
+									 if (response.responseText != '') {
+										 var res = Ext.JSON.decode(response.responseText);
+										 if (res.success) {
+											 me.reloadAndSelect();
+										 } else {
+											 globalObject.errTip(res.msg);
+										 }
+									 }
+								 },
+								 failure : function(response) {
+									 globalObject.errTip('操作失败！');
+								 }
+							 });
+			        		
+			        	}
+			        }
+			    }
 			}, {
 				text : "名称",
 				dataIndex : 'name',
 				sortable : false,
-				width : '20%'
+				width : '20%',
+				editor:{
+			        xtype: 'textfield',
+			        allowDecimals: true,
+			        decimalPrecision: 5,
+			        listeners :{
+			        	'change': function(obj, newValue, oldValue, eOpt){
+			        		var grid = Ext.getCmp("feetotal-feedetailgrid");
+			    			var bitRecord = grid.getSelectionModel().getSelection()[0];
+			        		Ext.Ajax.request({
+								 url : appBaseUri + '/feetotal/updateValue', 
+								 params : {
+									 id :bitRecord.get('id'),
+									 name :newValue
+								 },
+								 method : "POST",
+								 success : function(response) {
+									 if (response.responseText != '') {
+										 var res = Ext.JSON.decode(response.responseText);
+										 if (res.success) {
+											 me.reloadAndSelect();
+										 } else {
+											 globalObject.errTip(res.msg);
+										 }
+									 }
+								 },
+								 failure : function(response) {
+									 globalObject.errTip('操作失败！');
+								 }
+							 });
+			        		
+			        	}
+			        }
+			    }
 			},{
 				text : "计算基数",
 				dataIndex : 'calculatedRadix',
@@ -172,7 +456,40 @@ Ext.onReady(function() {
 				text : "费率(%)",
 				dataIndex : 'rate',
 				sortable : false,
-				width : '10%'
+				width : '10%',
+				editor:{
+			        xtype: 'textfield',
+			        allowDecimals: true,
+			        decimalPrecision: 5,
+			        listeners :{
+			        	'change': function(obj, newValue, oldValue, eOpt){
+			        		var grid = Ext.getCmp("feetotal-feedetailgrid");
+			    			var bitRecord = grid.getSelectionModel().getSelection()[0];
+			        		Ext.Ajax.request({
+								 url : appBaseUri + '/feetotal/updateValue', 
+								 params : {
+									 id :bitRecord.get('id'),
+									 rate :newValue
+								 },
+								 method : "POST",
+								 success : function(response) {
+									 if (response.responseText != '') {
+										 var res = Ext.JSON.decode(response.responseText);
+										 if (res.success) {
+											 me.reloadAndSelect();
+										 } else {
+											 globalObject.errTip(res.msg);
+										 }
+									 }
+								 },
+								 failure : function(response) {
+									 globalObject.errTip('操作失败！');
+								 }
+							 });
+			        		
+			        	}
+			        }
+			    }
 			},{
 				text : "金额",
 				dataIndex : 'amount',
@@ -182,7 +499,40 @@ Ext.onReady(function() {
 				text : "备注",
 				dataIndex : 'remark',
 				sortable : false,
-				width : '10%'
+				width : '10%',
+				editor:{
+			        xtype: 'textfield',
+			        allowDecimals: true,
+			        decimalPrecision: 5,
+			        listeners :{
+			        	'change': function(obj, newValue, oldValue, eOpt){
+			        		var grid = Ext.getCmp("feetotal-feedetailgrid");
+			    			var bitRecord = grid.getSelectionModel().getSelection()[0];
+			        		Ext.Ajax.request({
+								 url : appBaseUri + '/feetotal/updateValue', 
+								 params : {
+									 id :bitRecord.get('id'),
+									 remark :newValue
+								 },
+								 method : "POST",
+								 success : function(response) {
+									 if (response.responseText != '') {
+										 var res = Ext.JSON.decode(response.responseText);
+										 if (res.success) {
+											 me.reloadAndSelect();
+										 } else {
+											 globalObject.errTip(res.msg);
+										 }
+									 }
+								 },
+								 failure : function(response) {
+									 globalObject.errTip('操作失败！');
+								 }
+							 });
+			        		
+			        	}
+			        }
+			    }
 			},{
 				text : "id",
 				dataIndex : 'id',
@@ -210,6 +560,18 @@ Ext.onReady(function() {
 					text : '保存模板',
 					scope : this,
 					handler : me.newCodeCodeFun
+				},{
+					xtype : 'button',
+					iconCls : 'icon-edit',
+					text : '载入模板',
+					scope : this,
+					handler : me.selectTempalteFun
+				}, {
+					xtype : 'button',
+					iconCls : 'icon-add',
+					text : '新增一条记录',
+					scope : this,
+					handler : me.newItemFun
 				}],
 				bbar : Ext.create('Ext.PagingToolbar', {
 					store : costValueStore,
@@ -237,36 +599,58 @@ Ext.onReady(function() {
 			var me = this;
 			var grid = Ext.getCmp('feetotal-feedetailgrid');
 			var store = grid.getStore();
-			grid.getEl().mask('数据保存中，请稍候...');
-			
-			var paramsA = [];
-			store.each(function(record){
-				var node = record.data;
-				node["id"] = {id:Ext.getCmp('feetotal-feedetailgrid').feeTotalId};
-				paramsA.push(node);
+			if (store.getCount() <= 0 ) {
+				globalObject.infoTip('请至少输入一条记录！');
+				return;
+			};
+			var win = new App.bussinessProcess.FeeTotal.InfoWindow({
+				hidden : true
 			});
+			var form = win.down('form').getForm();
+			win.show();
+			
+		},
+		newItemFun:function(){
+			var grid = Ext.getCmp("feetotal-feedetailgrid");
+			var records = grid.getSelectionModel().getSelection();
+			var store = grid.getStore();
+			var store11 = Ext.getCmp('feetotal-feedetailgrid').getStore();
+			var templetId = "";
+			store11.each(function(record){
+				templetId = record.data.templetId;
+			});
+			//新增一条空白的
+			Ext.getCmp('feetotal-feedetailgrid').getEl().mask('数据处理中，请稍候...');
 			Ext.Ajax.request({
-				url : appBaseUri + '/feetotal/saveOrUpdateValue',
-				params :  Ext.encode(paramsA),
-				headers: {'Content-Type':'application/json'},
-				method : "POST",
-				success : function(response) {
-					if (response.responseText != '') {
-						var res = Ext.JSON.decode(response.responseText);
-						if (res.success) {
-							globalObject.msgTip('操作成功！');
-							Ext.getCmp('feetotal-feedetailgrid').getStore().reload();
-						} else {
-							globalObject.errTip(res.msg);
-						}
-					}
-				},
-				failure : function(response) {
-					globalObject.errTip('操作失败！');
-				}
+				 url : appBaseUri + '/feetotal/saveValue', //新增单位工程
+				 params : {
+					 templetId: templetId
+				 },
+				 method : "POST",
+				 success : function(response) {
+					 if (response.responseText != '') {
+						 var res = Ext.JSON.decode(response.responseText);
+						 if (res.success) {
+							 store.reload();
+						 } else {
+							 globalObject.errTip(res.msg);
+						 }
+						 
+						 Ext.getCmp('feetotal-feedetailgrid').getEl().unmask();
+					 }
+				 },
+				 failure : function(response) {
+					 globalObject.errTip('操作失败！');
+				 }
+			 });
+		},
+		selectTempalteFun: function(){
+			var me = this;
+			var win = new App.bussinessProcess.FeeTotal.InfoWindowSelect({
+				hidden : true
 			});
-			grid.getEl().unmask();
-			
+			var form = win.down('form').getForm();
+			win.show();
 		}
 	});
 	
@@ -429,7 +813,7 @@ Ext.onReady(function() {
                     		cmd : "edit"
                     };
                     Ext.Ajax.request({
-						url : appBaseUri + '/feetotal/saveOrUpdateValue',
+						url : appBaseUri + '/feetotal/updateValue',
 						params : vals,
 						method : "POST",
 						success : function(response) {

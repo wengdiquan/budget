@@ -1,5 +1,6 @@
 package com.bjsj.budget.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
@@ -16,6 +17,8 @@ import com.bjsj.budget.page.PageObject;
 import com.bjsj.budget.service.FeeTotalService;
 import com.bjsj.budget.util.ListView;
 import com.bjsj.budget.util.TransforUtil;
+
+import net.sf.json.JSONArray;
 @Controller
 @RequestMapping(value="/feetotal")
 public class FeeTotalController {
@@ -74,27 +77,39 @@ public class FeeTotalController {
 	
 	@RequestMapping(value = "/saveOrUpdateValue")
 	@ResponseBody
-	public String saveOrUpdateValue (@RequestBody List<FeeTotalModel> FeeTotalList, HttpServletRequest request,HttpServletResponse response){
+	public String saveOrUpdateValue ( HttpServletRequest request,HttpServletResponse response){
+		try
+		{
+			feeTotalService.insertValue(request.getParameterMap());
+		}catch (Exception ex) {
+			return "{success:false,msg:'" + ex.getMessage() + "'}";
+		}
+		return "{success:true}";
+	}
+	
+	@RequestMapping(value = "/saveValue")
+	@ResponseBody
+	public String saveValue ( HttpServletRequest request,HttpServletResponse response){
+		FeeTotalModel vo =new FeeTotalModel();
+		try
+		{
+			TransforUtil.transFromMapToBean(request.getParameterMap(),vo);
+			feeTotalService.insertValueNull(vo);
+		}catch (Exception ex) {
+			return "{success:false,msg:'" + ex.getMessage() + "'}";
+		}
+		return "{success:true}";
+	}
+	
+	@RequestMapping(value = "/updateValue")
+	@ResponseBody
+	public String updateValue ( HttpServletRequest request,HttpServletResponse response){
 		FeeTotalModel record = new FeeTotalModel();
 		
 		try
 		{
 			TransforUtil.transFromMapToBean(request.getParameterMap(), record);
-			
-			if("edit".equals(request.getParameter("cmd"))){
-				feeTotalService.updateValue(record);
-			}else{
-				/*Map<String, String> queryMap = TransforUtil.transRMapToMap(request.getParameterMap());
-				List<LookValue> lookValue = yCAService.getLookValueList(queryMap);
-				if(lookValue.size() > 0){
-					LookValue tt = lookValue.get(0);
-					String code = record.getCode();
-					record.setCode(tt.getLookvalueCode() + "-" + code);
-					yCAService.insertValue(record);
-				}*/
-			}
-			
-			
+			feeTotalService.updateValue(record);
 		}catch (Exception ex) {
 			return "{success:false,msg:" + ex.getMessage() + "}";
 		}

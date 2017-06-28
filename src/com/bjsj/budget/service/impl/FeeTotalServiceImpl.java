@@ -1,5 +1,6 @@
 package com.bjsj.budget.service.impl;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,9 @@ import com.bjsj.budget.model.FeeTotalModel;
 import com.bjsj.budget.page.PageInfo;
 import com.bjsj.budget.page.PageObject;
 import com.bjsj.budget.service.FeeTotalService;
+
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 @Service("feeTotalServiceImpl")
 public class FeeTotalServiceImpl implements FeeTotalService{
 	@Autowired
@@ -30,8 +34,32 @@ public class FeeTotalServiceImpl implements FeeTotalService{
 	}
 
 	@Override
-	public void insertValue(List<FeeTotalModel> record) throws Exception {
-		feeTotalDao.insertByBatch(record);
+	public void insertValue(Map<String,String[]> map) throws Exception {
+		String temList = map.get("Temvo")[0];
+		String tempalteName = map.get("name")[0];
+		HashMap<String, String> hm = new HashMap<String, String>();
+		hm.put("name", tempalteName);
+		FeeTemplateModel tmpvo = feeTotalDao.selectByPrimaryKey(hm);
+		if(tmpvo != null){
+			throw new Exception("模板名称存在，请重新输入"); 
+		}
+		
+		FeeTemplateModel temVO = new FeeTemplateModel();
+		temVO.setName(tempalteName);
+		temVO.setId(null);
+		feeTotalDao.insertTemplateTable(temVO);
+		tmpvo = feeTotalDao.selectByPrimaryKey(hm);
+		
+		JSONArray jsonArray=JSONArray.fromObject(temList);
+		for(int i = 0; i < jsonArray.size(); i++){
+			Object o=jsonArray.get(i);
+			JSONObject jsonObject=JSONObject.fromObject(o);
+			FeeTotalModel vo=(FeeTotalModel)JSONObject.toBean(jsonObject, FeeTotalModel.class);
+			vo.setId(null);
+			vo.setTempletId(tmpvo.getId());
+			feeTotalDao.insertTemplate(vo);
+		}
+		
 	}
 
 	@Override
@@ -41,6 +69,12 @@ public class FeeTotalServiceImpl implements FeeTotalService{
 		pageObj.setRecords(feeTotalDao.getFeeTemplateCount(queryMap));
 		pageObj.setRows(orderChangeHeaders);
 		return pageObj;
+	}
+
+	@Override
+	public void insertValueNull(FeeTotalModel record) throws Exception {
+		record.setId(null);
+		feeTotalDao.insertTemplate(record);
 	}
 
 }

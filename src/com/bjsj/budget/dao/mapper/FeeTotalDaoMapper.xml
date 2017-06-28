@@ -52,8 +52,29 @@
 	<update id="updateByPrimaryKey" parameterType="com.bjsj.budget.model.FeeTotalModel">
 		update
 		tm_fee_total
-		set calculatedRadix = #{calculatedRadix,jdbcType=VARCHAR},
-		radixRemark = #{radixRemark,jdbcType=VARCHAR}
+		<trim prefix="set" suffixOverrides=",">
+			 <if test="calculatedRadix != null" >
+		    	 calculatedRadix = #{calculatedRadix,jdbcType=VARCHAR},
+		    </if>
+		    <if test="radixRemark != null" >
+		    	radixRemark = #{radixRemark,jdbcType=VARCHAR},
+		    </if>
+		    <if test="seq != null" >
+		    	seq = #{seq,jdbcType=VARCHAR},
+		    </if>
+		    <if test="feeCode != null" >
+		    	feeCode = #{feeCode,jdbcType=VARCHAR},
+		    </if>
+		    <if test="name != null" >
+		    	name = #{name,jdbcType=VARCHAR},
+		    </if>
+		    <if test="rate != null" >
+		    	rate = #{rate,jdbcType=DOUBLE},
+		    </if>
+		    <if test="remark != null" >
+		    	remark = #{remark,jdbcType=VARCHAR},
+		    </if>
+		</trim>
 		where id = #{id,jdbcType=INTEGER}
 	</update> 
 	
@@ -67,5 +88,30 @@
             )
         </foreach>
     </insert>
+    
+    <insert id="insertTemplate" parameterType="com.bjsj.budget.model.FeeTotalModel">
+		 insert into tm_fee_total (id, seq, feeCode, name, calculatedRadix, radixRemark,  rate, amount, remark, templetId)
+        values
+            (#{id,jdbcType=INTEGER}, #{seq,jdbcType=VARCHAR}, #{feeCode,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}
+            ,#{calculatedRadix,jdbcType=VARCHAR}, #{radixRemark,jdbcType=VARCHAR}, #{rate,jdbcType=DOUBLE}, 
+            #{amount,jdbcType=DOUBLE}, #{remark,jdbcType=DOUBLE}, #{templetId,jdbcType=INTEGER}
+            )
+	</insert>
+	
+	  <insert id="insertTemplateTable" parameterType="com.bjsj.budget.model.FeeTemplateModel">
+		 insert into tm_fee_total_template (id, name)
+        values
+            (#{id,jdbcType=INTEGER},  #{name,jdbcType=VARCHAR})
+	</insert>
+	
+	<select id="selectByPrimaryKey" parameterType="HashMap" resultMap="FeeTemplateMap">
+		select 
+	    	t.id, t.name
+	    from tm_fee_total_template t 
+	    where 1 = 1 
+	    <if test="map.name != null and map.name != ''">
+			and t.name = #{map.name,jdbcType=VARCHAR}   
+		</if>	
+	</select>
     
 </mapper>

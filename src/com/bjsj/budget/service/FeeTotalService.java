@@ -35,5 +35,7 @@ public interface FeeTotalService {
 	 * @param record
 	 * @throws Exception
 	 */
-	public void insertValue(List<FeeTotalModel> record) throws Exception;
+	public void insertValue(Map<String,String[]> map) throws Exception;
+	
+	public void insertValueNull(FeeTotalModel record) throws Exception;
 }
