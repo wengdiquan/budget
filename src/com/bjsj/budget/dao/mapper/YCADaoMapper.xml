@@ -25,14 +25,26 @@
 		<include refid="Base_Column_List" />
 		from tm_yca_detail t 
 		inner join tm_lookvalue lv on lv.lookvalue_id = t.lookvalue_id
-		where t.lookvalue_id = #{map.lookValueId,jdbcType=INTEGER}
+		where 1 = 1
+		<if test="map.lookValueId != null and map.lookValueId != ''">
+			and t.lookvalue_id = #{map.lookValueId,jdbcType=INTEGER} 
+	    </if>
+	    <if test="map.lookTypeId != null and map.lookTypeId != ''">
+			and lv.looktype_id = #{map.lookTypeId,jdbcType=INTEGER} 
+	    </if>
     </select>
     <select id="getYCAInfoCount" parameterType="HashMap" resultType="Integer">
 		select 
 	    	count(1)
 	    from tm_yca_detail t 
 		inner join tm_lookvalue lv on lv.lookvalue_id = t.lookvalue_id 
-		where t.lookvalue_id = #{map.lookValueId,jdbcType=INTEGER}
+		where 1 = 1
+		<if test="map.lookValueId != null and map.lookValueId != ''">
+			and t.lookvalue_id = #{map.lookValueId,jdbcType=INTEGER} 
+	    </if>
+	    <if test="map.lookTypeId != null and map.lookTypeId != ''">
+			and lv.looktype_id = #{map.lookTypeId,jdbcType=INTEGER} 
+	    </if>
 	</select>
     <insert id="insertYCA" parameterType="com.bjsj.budget.model.YCAModel">
 		insert into tm_yca_detail

@@ -141,12 +141,20 @@ Ext.onReady(function() {
 						}
 						
 						me.lookValueId = record.data.id;
-						
-						Ext.getCmp('ycamanage-ycavaluegrid').getStore().load({
-							params : {
-								'lookValueId' : me.lookValueId
-							}
-						});
+						if(record.data.depth == 1){
+							Ext.getCmp('ycamanage-ycavaluegrid').getStore().load({
+								params : {
+									'lookTypeId' : me.lookValueId
+								}
+							});
+						}
+						if(record.data.depth == 2){
+							Ext.getCmp('ycamanage-ycavaluegrid').getStore().load({
+								params : {
+									'lookValueId' : me.lookValueId
+								}
+							});
+						}
 					}
 				}
 			});
@@ -179,7 +187,7 @@ Ext.onReady(function() {
 				proxy : {
 					type : 'ajax',
 					url : appBaseUri + '/yca/queryYCAInfo',
-					extraParams : {"lookValueId": Ext.getCmp('ycamanage-ycatypegrid').lookValueId},
+					//extraParams : {"lookValueId": Ext.getCmp('ycamanage-ycatypegrid').lookValueId},
 					reader : {
 						type : 'json',
 						root : 'data',
@@ -245,9 +253,9 @@ Ext.onReady(function() {
 		            }
 				}
 			});
-			ycaValueStore.on('beforeload',function(){
+			/*ycaValueStore.on('beforeload',function(){
 				Ext.apply(ycaValueStore.proxy.extraParams, {"lookValueId": Ext.getCmp('ycamanage-ycatypegrid').lookValueId});
-			});
+			});*/
 			this.callParent(arguments);
 		},
 		newCodeCodeFun: function(){

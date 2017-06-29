@@ -100,10 +100,6 @@ Ext.onReady(function() {
 								window.getEl().mask('数据保存中，请稍候...');
 								var vals = form.getValues();
 								
-								var grid = Ext.getCmp("categoryandmodelmanage-YCAGrid");
-								var records = grid.getSelectionModel().getSelection();
-								vals.lookValueId = records[0].get('lookValueId')-0 ;
-								
 								Ext.Ajax.request({
 									url : appBaseUri + '/categorymodel/saveOrUpdateValue',
 									params : vals,
@@ -621,12 +617,8 @@ Ext.onReady(function() {
 			form.findField('code').setReadOnly(true);
 			form.findField('name').setReadOnly(true);
 			form.findField('unit').setReadOnly(true);
-			
-			var tree = win.down('#myActionColumn');
-			/*var node =  tree.getStore().getNodeById(gridRecord.data.lookValueId);
-			tree.getRootNode().expand();
-			tree.getSelectionModel().select(node);*/
-			tree.hide();
+			form.findField('lookValueId').setValue(gridRecord.data.lookValueId);
+			win.down('#myActionColumn').hide();
 			
 			form.loadRecord(gridRecord);
 			win.show();
