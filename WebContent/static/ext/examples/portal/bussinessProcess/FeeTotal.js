@@ -751,21 +751,6 @@ Ext.onReady(function() {
 				sortable : false,
 				width : '14%'
 			},{
-				text : "含税单价",
-				dataIndex : 'tax_Price',
-				sortable : false,
-				width : '10%'
-			},{
-				text : "不含税单价",
-				dataIndex : 'notax_Price',
-				sortable : false,
-				width : '10%'
-			},{
-				text : "数量",
-				dataIndex : 'amount',
-				sortable : false,
-				width : '10%'
-			},{
 				text : "含税合价",
 				dataIndex : 'tax_Single_SumPrice',
 				sortable : false,
@@ -810,6 +795,7 @@ Ext.onReady(function() {
                     		id : feeTotalId,
                     		calculatedRadix : data[0].get("calculatedRadix") + "+" + record.data.code ,
                     		radixRemark : data[0].get("radixRemark") + "+" + record.data.name,
+                    		amount : data[0].get("amount") + record.data.tax_Single_SumPrice,
                     		cmd : "edit"
                     };
                     Ext.Ajax.request({

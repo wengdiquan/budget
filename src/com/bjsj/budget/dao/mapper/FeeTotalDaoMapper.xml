@@ -74,6 +74,9 @@
 		    <if test="remark != null" >
 		    	remark = #{remark,jdbcType=VARCHAR},
 		    </if>
+		    <if test="amount != null" >
+		    	amount = #{amount,jdbcType=DOUBLE},
+		    </if>
 		</trim>
 		where id = #{id,jdbcType=INTEGER}
 	</update> 

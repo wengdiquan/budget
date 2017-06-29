@@ -63,7 +63,7 @@ Ext.onReady(function() {
 											var res = Ext.JSON.decode(response.responseText);
 											if (res.success) {
 												globalObject.msgTip('操作成功！');
-												Ext.getCmp('ycamanage-costvaluegrid').getStore().reload();
+												Ext.getCmp('ycamanage-ycavaluegrid').getStore().reload();
 											} else {
 												globalObject.errTip(res.msg);
 											}
@@ -100,8 +100,8 @@ Ext.onReady(function() {
 			Ext.apply(this, {
 				layout: 'border',
 				items : [ 
-				          Ext.create('Budget.app.baseDataManage.YCAManage.CostTypeGrid'), 
-						  Ext.create('Budget.app.baseDataManage.YCAManage.CostValueGrid')
+				          Ext.create('Budget.app.baseDataManage.YCAManage.YCATypeGrid'), 
+						  Ext.create('Budget.app.baseDataManage.YCAManage.YCAValueGrid')
 						  ]
 			});
 			this.callParent(arguments);
@@ -109,9 +109,9 @@ Ext.onReady(function() {
 	});
 	
 	//费用大类
-	Ext.define('Budget.app.baseDataManage.YCAManage.CostTypeGrid', {
+	Ext.define('Budget.app.baseDataManage.YCAManage.YCATypeGrid', {
 		extend : 'Ext.tree.Panel',
-		id : 'ycamanage-costtypegrid',
+		id : 'ycamanage-ycatypegrid',
 		region : 'west',
 		width : '15%',
 		border : true,
@@ -119,7 +119,7 @@ Ext.onReady(function() {
 		animate : true,//动画效果
 		initComponent : function() {
 			var me = this;
-			var costTypeStore = Ext.create('Ext.data.TreeStore', {
+			var ycaTypeStore = Ext.create('Ext.data.TreeStore', {
 				autoLoad : true,
 				proxy : {
 					type : 'ajax',
@@ -133,7 +133,7 @@ Ext.onReady(function() {
 			});
 			Ext.apply(this, {
 				rootVisible : false,
-				store : costTypeStore,
+				store : ycaTypeStore,
 				listeners : {
 					'itemclick' : function(item, record) {
 						if(record.data.id == 0){
@@ -142,7 +142,7 @@ Ext.onReady(function() {
 						
 						me.lookValueId = record.data.id;
 						
-						Ext.getCmp('ycamanage-costvaluegrid').getStore().load({
+						Ext.getCmp('ycamanage-ycavaluegrid').getStore().load({
 							params : {
 								'lookValueId' : me.lookValueId
 							}
@@ -155,31 +155,31 @@ Ext.onReady(function() {
 	});
 
 	// 详细值
-	Ext.define('Budget.app.baseDataManage.YCAManage.CostValueGrid', {
+	Ext.define('Budget.app.baseDataManage.YCAManage.YCAValueGrid', {
 		extend : 'Ext.grid.Panel',
-		id : 'ycamanage-costvaluegrid',
+		id : 'ycamanage-ycavaluegrid',
 		plain : true,
 		region : 'center',
 		initComponent : function() {
 			var me = this;
-			Ext.define('CostValueList', {
+			Ext.define('YCAValueList', {
 				extend : 'Ext.data.Model',
 				idProperty : 'id',
 				fields : [ {
-					name : 'looktype_id',
+					name : 'id',
 					type : 'int'
 				}, 'code', 'name', 'unit', 'category']
 			});
 			
-			var costValueStore = Ext.create('Ext.data.Store', {
-				model : 'CostValueList',
+			var ycaValueStore = Ext.create('Ext.data.Store', {
+				model : 'YCAValueList',
 				autoLoad : false,
 				remoteSort : true,
 				pageSize : globalPageSize,
 				proxy : {
 					type : 'ajax',
 					url : appBaseUri + '/yca/queryYCAInfo',
-					extraParams : {"lookValueId": Ext.getCmp('ycamanage-costtypegrid').lookValueId},
+					extraParams : {"lookValueId": Ext.getCmp('ycamanage-ycatypegrid').lookValueId},
 					reader : {
 						type : 'json',
 						root : 'data',
@@ -188,7 +188,7 @@ Ext.onReady(function() {
 					}
 				}
 			});
-			var costValueColumns = [ {
+			var ycaValueColumns = [ {
 				text : "费用代码",
 				dataIndex : 'code',
 				width : '14%',
@@ -214,9 +214,9 @@ Ext.onReady(function() {
 				hidden : true
 			}];
 			Ext.apply(this, {
-				store : costValueStore,
+				store : ycaValueStore,
 				selModel : Ext.create('Ext.selection.CheckboxModel'),
-				columns : costValueColumns,
+				columns : ycaValueColumns,
 				tbar : [ {
 					xtype : 'button',
 					iconCls : 'icon-add',
@@ -231,7 +231,7 @@ Ext.onReady(function() {
 					handler : me.editCodeCodeFun
 				}],
 				bbar : Ext.create('Ext.PagingToolbar', {
-					store : costValueStore,
+					store : ycaValueStore,
 					displayInfo : true
 				}),
 				viewConfig:{
@@ -245,12 +245,14 @@ Ext.onReady(function() {
 		            }
 				}
 			});
-			
+			ycaValueStore.on('beforeload',function(){
+				Ext.apply(ycaValueStore.proxy.extraParams, {"lookValueId": Ext.getCmp('ycamanage-ycatypegrid').lookValueId});
+			});
 			this.callParent(arguments);
 		},
 		newCodeCodeFun: function(){
 			var me = this;
-			var lookValueId = Ext.getCmp('ycamanage-costtypegrid').lookValueId;
+			var lookValueId = Ext.getCmp('ycamanage-ycatypegrid').lookValueId;
 			if (!lookValueId) {
 				globalObject.infoTip('请先选择费用小类！');
 				return;
@@ -264,13 +266,13 @@ Ext.onReady(function() {
 		},
 		editCodeCodeFun : function() {
 			var me = this;
-			var lookValueId = Ext.getCmp('ycamanage-costtypegrid').lookValueId;
+			var lookValueId = Ext.getCmp('ycamanage-ycatypegrid').lookValueId;
 			if (!lookValueId) {
 				globalObject.infoTip('请先选择费用小类！');
 				return;
 			};
 			
-			var grid = Ext.getCmp("ycamanage-costvaluegrid");
+			var grid = Ext.getCmp("ycamanage-ycavaluegrid");
 			var records = grid.getSelectionModel().getSelection();
 			if(records.length != 1){
 				globalObject.infoTip('请先选择需要修改的记录！');
