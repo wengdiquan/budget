@@ -255,6 +255,10 @@ Ext.onReady(function() {
 				}
 			});
 			
+			costValueStore.on('beforeload',function(){
+				Ext.apply(costValueStore.proxy.extraParams, {"lookTypeId": Ext.getCmp('costmoneymanage-costtypegrid').lookTypeId});
+			});
+			
 			this.callParent(arguments);
 		},
 		newCodeCodeFun: function(){
