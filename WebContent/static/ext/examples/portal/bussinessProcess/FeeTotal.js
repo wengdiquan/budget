@@ -446,7 +446,15 @@ Ext.onReady(function() {
 				text : "计算基数",
 				dataIndex : 'calculatedRadix',
 				sortable : false,
-				width : '20%'
+				width : '20%',
+				editor: {
+					xtype:'triggerfield',
+					triggerCls: Ext.baseCSSPrefix + 'form-search-trigger',
+					editable:false,
+					onTriggerClick:function(){
+						Ext.create("Budget.app.bussinessProcess.FeeTotalCalculatedWin").show();
+					}
+				}
 			},{
 				text : "基数说明",
 				dataIndex : 'radixRemark',
@@ -744,22 +752,22 @@ Ext.onReady(function() {
 				text : "编码",
 				dataIndex : 'code',
 				sortable : false,
-				width : '14%'
+				width : '15%'
 			},{
 				text : "名称",
 				dataIndex : 'name',
 				sortable : false,
-				width : '14%'
+				width : '15%'
 			},{
 				text : "含税合价",
 				dataIndex : 'tax_Single_SumPrice',
 				sortable : false,
-				width : '10%'
+				width : '12%'
 			},{
 				text : "不含税合价",
 				dataIndex : 'single_SumPrice',
 				sortable : false,
-				width : '10%'
+				width : '12%'
 			}];
 			Ext.apply(this, {
 				store : costValueStore,

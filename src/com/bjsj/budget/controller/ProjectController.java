@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.bjsj.budget.model.Project;
 import com.bjsj.budget.model.ReportModel;
 import com.bjsj.budget.service.ProjectService;
+import com.bjsj.budget.util.NumberUtils;
 import com.bjsj.budget.util.TransforUtil;
 
 import net.sf.json.JSONArray;
@@ -286,9 +287,14 @@ public class ProjectController {
 		// 将一个汇总信息
 		ReportModel summaryModel = new ReportModel();
 
+		Double tt = this.getAmount(1, CMList);
+		
+		for (ReportModel model : CMList) {
+			model.setProjectPercent(NumberUtils.degree(model.getTotalAmount()/tt));
+		}
 		summaryModel.setProject_name("汇总");
 		summaryModel.setProjectPercent(this.getAmount(0, CMList));
-		summaryModel.setTotalAmount(this.getAmount(1, CMList)); // 项目造价
+		summaryModel.setTotalAmount(tt); // 项目造价
 		summaryModel.setTransportFee(this.getAmount(2, CMList)); // 运输费造价
 		summaryModel.setMaterialFee(this.getAmount(3, CMList)); // 材料费造价
 		summaryModel.setInstallationFee(this.getAmount(4, CMList)); // 安装费造价
@@ -345,7 +351,7 @@ public class ProjectController {
 				d += model.getCsFee();
 			}
 		}
-		return d;
+		return NumberUtils.degree(d);
 	}
 	
 }
