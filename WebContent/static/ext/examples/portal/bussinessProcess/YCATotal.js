@@ -1,7 +1,7 @@
 // 用户管理
 Ext.onReady(function() {
 	Ext.tip.QuickTipManager.init();
-	// 费用代码维护
+	// 运材安汇总
 	Ext.define('Budget.app.bussinessProcess.YCATotal', {
 		extend : 'Ext.panel.Panel',
 		width: "100%",  

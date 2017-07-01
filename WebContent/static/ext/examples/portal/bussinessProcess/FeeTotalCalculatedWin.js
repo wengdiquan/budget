@@ -4,6 +4,7 @@ Ext.onReady(function() {
 	Ext.define('Budget.app.bussinessProcess.FeeTotalCalculatedWin', {
 		extend : 'Ext.window.Window',
 		title:"查询费用",
+		id : "mywinfee",
 		initComponent : function() {
           	var me = this;
   			Ext.apply(this, {
@@ -55,15 +56,14 @@ Ext.onReady(function() {
 				store : costTypeStore,
 				listeners : {
 					'itemclick' : function(item, record) {
-						if(record.get('id') == 0){
-							return;
-						}
-						
 						me.lookTypeId = record.get('id');
-						
+						var tmp = me.lookTypeId;
+						if(record.get('id') == 0){
+							tmp = "";
+						}
 						Ext.getCmp('feetotal-feevaluegridwin').getStore().load({
 							params : {
-								'lookTypeId' : me.lookTypeId
+								'lookTypeId' : tmp
 							}
 						});
 					}
@@ -159,16 +159,27 @@ Ext.onReady(function() {
 		},
 		listeners : {
 			'itemdblclick' : function(_this, record, td, cellIndex, tr, rowIndex, e, eOpts){
-				var feeTotalId = Ext.getCmp('feetotal-feedetailgrid').feeTotalId;
-				if (!feeTotalId) {
+				var data = Ext.getCmp('feetotal-feedetailgrid').getSelectionModel().getSelection();  
+				if (data.length == 0) {
 					globalObject.infoTip('请先选择一条费用汇总记录！');
 					return;
 				} else {  
-		        	var data = Ext.getCmp('feetotal-feedetailgrid').getSelectionModel().getSelection();  
+					var calculatedRadix = "";
+					if(data[0].get("calculatedRadix") == null || data[0].get("calculatedRadix") == ""){
+						calculatedRadix = record.data.code;
+					}else{
+						calculatedRadix = data[0].get("calculatedRadix") + "+" + record.data.code;
+					}
+					var radixRemark = "";
+					if(data[0].get("radixRemark") == null || data[0].get("radixRemark") == ""){
+						radixRemark = record.data.name;
+					}else{
+						radixRemark = data[0].get("radixRemark") + "+" + record.data.name;
+					}
                     var vals = {
-                    		id : feeTotalId,
-                    		calculatedRadix : data[0].get("calculatedRadix") + "+" + record.data.code ,
-                    		radixRemark : data[0].get("radixRemark") + "+" + record.data.name,
+                    		id : data[0].get("id"),
+                    		calculatedRadix : calculatedRadix ,
+                    		radixRemark : radixRemark,
                     		amount : data[0].get("amount") + record.data.tax_Single_SumPrice,
                     		cmd : "edit"
                     };
@@ -183,6 +194,7 @@ Ext.onReady(function() {
 									globalObject.msgTip('操作成功！');
 									//Ext.getCmp('feetotal-feedetailgrid').getStore().reload();
 									Ext.getCmp('feetotal-feedetailgrid').getStore().loadPage(1);
+									Ext.getCmp('mywinfee').close();
 								} else {
 									globalObject.errTip(res.msg);
 								}

@@ -16,10 +16,10 @@
 	   	inner join tm_unitproject tu on t.unitproject_id = tu.id
 		inner join tm_lookvalue tl on t.lookvalueid = tl.lookvalue_id
 		inner join tm_looktype tlt on tlt.looktype_id = tl.looktype_id 
-	    <if test="map.lookTypeId != null">
+	    <if test="map.lookTypeId != null and map.lookTypeId !=''">
 	    	and tlt.looktype_id = #{map.lookTypeId,jdbcType=INTEGER} 
 	    </if>	
-	     <if test="map.bitProjectId != null">
+	     <if test="map.bitProjectId != null and map.bitProjectId !=''">
 	    	and tu.bit_project_id = #{map.bitProjectId,jdbcType=INTEGER} 
 	    </if>
     </select>
@@ -30,10 +30,10 @@
 	   	inner join tm_unitproject tu on t.unitproject_id = tu.id
 		inner join tm_lookvalue tl on t.lookvalueid = tl.lookvalue_id
 		inner join tm_looktype tlt on tlt.looktype_id = tl.looktype_id 
-	    <if test="map.lookTypeId != null">
+	    <if test="map.lookTypeId != null and map.lookTypeId !=''">
 	    	and tlt.looktype_id = #{map.lookTypeId,jdbcType=INTEGER} 
 	    </if>
-	     <if test="map.bitProjectId != null">
+	     <if test="map.bitProjectId != null and map.bitProjectId !=''">
 	    	and tu.bit_project_id = #{map.bitProjectId,jdbcType=INTEGER} 
 	    </if>
 	</select>
