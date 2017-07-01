@@ -20,6 +20,18 @@
 		t.leaf as leaf
 	</sql>
 	
+	<insert id="insertChapter" parameterType="com.bjsj.budget.model.CategoryModelModel">
+		insert into tm_unitproject_base
+			(id, code, name, parentid, leaf)
+		values (#{id,jdbcType=INTEGER},
+			#{code,jdbcType=VARCHAR},
+			#{name,jdbcType=VARCHAR},
+			#{parentId,jdbcType=INTEGER},
+			#{leaf,jdbcType=INTEGER}
+			)
+	 </insert>
+	
+	
     <select id="getCategoryModelList" parameterType="HashMap" resultMap="CMInfoMap">
         select
 		<include refid="Base_Column_List" />
@@ -40,8 +52,18 @@
 		where 1 = 1
 		     <if test="map.parentId != null and map.parentId != ''">
 				and t.parentId = #{map.parentId,jdbcType=INTEGER}   
-		     </if>	
+		     </if>
     </select>
+    
+    <select id="queryDetailCategoryModelOne" parameterType="HashMap" resultMap="CMInfoMap">
+		select
+			<include refid="Base_Column_List" />
+		from tm_unitproject_base t where t.parentid in (select tt.id from tm_unitproject_base tt
+		where 1 = 1
+				<if test="map.parentId != null and map.parentId != ''">
+				and tt.parentId = #{map.parentId,jdbcType=INTEGER}   
+		     </if>)
+	</select>
     
     <select id="getDetailCategoryModelCount" parameterType="HashMap" resultType="Integer">
 		select 
@@ -52,6 +74,17 @@
 				and t.parentId = #{map.parentId,jdbcType=INTEGER}   
 		     </if>	
 	</select>
+	<select id="getDetailCategoryModelCountOne" parameterType="HashMap" resultType="Integer">
+		select
+			count(1)
+		from tm_unitproject_base t where t.parentid in (select tt.id from tm_unitproject_base tt
+		where 1 = 1
+				<if test="map.parentId != null and map.parentId != ''">
+				and tt.parentId = #{map.parentId,jdbcType=INTEGER}   
+		     </if>)
+	</select>
+	
+
 	
 	<sql id="Base_Column_List_YCA">
 		t.id as id,

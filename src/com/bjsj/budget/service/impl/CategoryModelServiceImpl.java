@@ -35,9 +35,15 @@ public class CategoryModelServiceImpl implements CategoryModelService{
 	public PageObject queryDetailCategoryModel(Map<String, String> queryMap,
 			PageInfo pageInfo) {
 		PageObject pageObj = new PageObject();
-		List<CategoryModelModel> orderChangeHeaders = categoryModelDao.queryDetailCategoryModel(queryMap, pageInfo);
-		pageObj.setRecords(categoryModelDao.getDetailCategoryModelCount(queryMap));
-		pageObj.setRows(orderChangeHeaders);
+		if("onelevel".equals(queryMap.get("param2"))){
+			List<CategoryModelModel> orderChangeHeaders = categoryModelDao.queryDetailCategoryModelOne(queryMap, pageInfo);
+			pageObj.setRecords(categoryModelDao.getDetailCategoryModelCountOne(queryMap));
+			pageObj.setRows(orderChangeHeaders);
+		}else{
+			List<CategoryModelModel> orderChangeHeaders = categoryModelDao.queryDetailCategoryModel(queryMap, pageInfo);
+			pageObj.setRecords(categoryModelDao.getDetailCategoryModelCount(queryMap));
+			pageObj.setRows(orderChangeHeaders);
+		}
 		return pageObj;
 	}
 
@@ -153,5 +159,10 @@ public class CategoryModelServiceImpl implements CategoryModelService{
 		TransforUtil.transFromMapToBean(map, record);
 		
 		categoryModelDao.insertCM(record);
+	}
+
+	@Override
+	public void insertChapter(CategoryModelModel record) throws Exception {
+		categoryModelDao.insertChapter(record);		
 	}
 }
