@@ -348,13 +348,15 @@ Ext.onReady(function() {
 			Ext.Ajax.request({
 				 url : appBaseUri + '/unitproject/getItemById', 
 				 params : {
-					 unitProjectId:bitRecord.get('id')
+					 unitProjectId:bitRecord.get('id'),
+					 bitProjectId:Ext.getCmp("projectbitpanel-bititemgrid").bitProjectId
 				 },
 				 method : "POST",
 				 success : function(response) {
 					 if (response.responseText != '') {
 						 var res = Ext.JSON.decode(response.responseText);
 						 var data = res.data;
+						 var rootJ = res.rootJ;
 						 grid.getSelectionModel().select(bitRecord.data.index + 1);
 						 Ext.getCmp('projectbitpanel-bitdetailgrid').getStore().reload();
 						 
@@ -368,6 +370,13 @@ Ext.onReady(function() {
 						 bitRecord.set('sumPrice', data.sumPrice);
 						 bitRecord.set('remark', data.remark);
 						 bitRecord.commit();
+						 
+						 var rootRecord = Ext.getCmp('projectbitpanel-bititemgrid').getRootNode().firstChild;
+						 rootRecord.set('singlePrice', rootJ.singlePrice);
+						 rootRecord.set('taxSinglePrice', rootJ.taxSinglePrice);
+						 rootRecord.set('price', rootJ.price);
+						 rootRecord.set('sumPrice', rootJ.sumPrice);
+						 rootRecord.commit();
 					 }
 				 },
 				 failure : function(response) {
@@ -710,6 +719,39 @@ Ext.onReady(function() {
 					stripeRows: true,
 					enableTextSelection : true,
 					getRowClass : function(record, rowIndex){
+		            },
+		            plugins: [{ 
+						ptype: "gridviewdragdrop",  
+				        ddGroup: "DrapDropGroup",
+				        dragText: "可用鼠标拖拽进行上下排序"
+		            }],
+		            listeners : {
+		            	'drop': function(node, data, overModel, dropPosition, eOpts) {  
+		            		 Ext.getCmp('projectbitpanel-bitdetailgrid').getEl().mask('正在排序，请稍后...');
+		            		Ext.Ajax.request({
+			       				 url : appBaseUri + '/unitproject/changeDetailSeq', //新增单位工程
+			       				 params : {
+			       					 opearId:data.records[0].get('id'),
+			       					 overId: overModel.get('id')
+			       				 },
+			       				 method : "POST",
+			       				 success : function(response) {
+			       					 if (response.responseText != '') {
+			       						 var res = Ext.JSON.decode(response.responseText);
+			       						 if (res.success) {
+			       							Ext.getCmp('projectbitpanel-bitdetailgrid').getStore().reload();
+			       						 } else {
+			       							 globalObject.errTip(res.msg);
+			       						 }
+			       						 
+			       						 Ext.getCmp('projectbitpanel-bitdetailgrid').getEl().unmask();
+			       					 }
+			       				 },
+			       				 failure : function(response) {
+			       					 globalObject.errTip('操作失败！');
+			       				 }
+			       			 });
+						 } 
 		            }
 				},
 			});
@@ -771,11 +813,20 @@ Ext.onReady(function() {
 			
 		},
 		deleteDetailFun:function(){
+			
+			var grid = Ext.getCmp("projectbitpanel-bititemgrid");
+			var itemRecords = grid.getSelectionModel().getSelection();
+			if(itemRecords.length != 1){
+				globalObject.messageTip("请选选择一条子目");
+				return;
+			}
+			
 			var records = Ext.getCmp('projectbitpanel-bitdetailgrid').getSelectionModel().getSelection();	 
 			if(records.length == 0){
 				globalObject.infoTip("请选择一条进行删除.");
 				return;
 			}
+			
 			globalObject.confirmTip("确认删除吗?", 
 				 function(btn){
 					 if("yes" == btn){
@@ -784,7 +835,8 @@ Ext.onReady(function() {
 							 url : appBaseUri + '/unitproject/deleteBitProjectDetail',
 							 params : {
 								 "cmd":"edit",
-								 "unitProjectDetailId":records[0].data.id
+								 "unitProjectDetailId":records[0].data.id,
+								 "unitProjectId":itemRecords[0].data.id
 							 },
 							 method : "POST",
 							 success : function(response) {
@@ -816,7 +868,8 @@ Ext.onReady(function() {
 				 url : appBaseUri + '/unitproject/getItemAndDetailById', 
 				 params : {
 					 unitProjectId:itemRecord.get('id'),
-					 unitProjectDetailId:detailRecord.get('id')
+					 unitProjectDetailId:detailRecord.get('id'),
+					 bitProjectId:Ext.getCmp("projectbitpanel-bititemgrid").bitProjectId
 				 },
 				 method : "POST",
 				 success : function(response) {

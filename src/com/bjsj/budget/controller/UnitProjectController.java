@@ -248,6 +248,31 @@ public class UnitProjectController {
 	}
 	
 	/**
+	 * 详细值，排序
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	@RequestMapping(value = "/changeDetailSeq")
+	@ResponseBody
+	public JSONObject changeDetailSeq(HttpServletRequest request, HttpServletResponse response) {
+		// 查询条件
+		Map<String, String> queryMap = TransforUtil.transRMapToMap(request.getParameterMap());
+		
+		JSONObject json = new JSONObject();
+		json.put("success", true);
+		try{
+			unitProjectService.changeDetailSeq(queryMap);
+		}catch (Exception ex) {
+			ex.printStackTrace();
+			json.put("success", false);
+			json.put("msg", "出错:" + ex.getMessage());
+		}
+		return json;
+	}
+	
+	
+	/**
 	 * 更新子目和明细
 	 * @param request
 	 * @param response
@@ -287,6 +312,23 @@ public class UnitProjectController {
 		json.put("success", true);
 		try{
 			json.put("data", JSONObject.fromObject(unitProjectService.getItemById(queryMap)));
+			
+			queryMap.remove("unitProjectDetailId");
+			queryMap.remove("unitProjectId");
+			PageInfo pageInfo = new PageInfo();
+			PageObject pageObj = unitProjectService.getBitProjectItemInfo(queryMap, pageInfo);
+			JSONObject rootJ = new JSONObject();
+			rootJ.element("name", "整个项目");
+			//不含税合价
+			rootJ.element("singlePrice", this.getTotalPrice(1, (List<UnitProject>)pageObj.getRows()));
+			//含税合价
+			rootJ.element("taxSinglePrice", this.getTotalPrice(2, (List<UnitProject>)pageObj.getRows()));
+			//不含税综合合价
+			rootJ.element("price", this.getTotalPrice(3, (List<UnitProject>)pageObj.getRows()));
+			//含税综合合价
+			rootJ.element("sumPrice", this.getTotalPrice(4, (List<UnitProject>)pageObj.getRows()));
+			json.put("rootJ", rootJ);
+			
 		}catch (Exception ex) {
 			ex.printStackTrace();
 			json.put("success", false);
@@ -351,7 +393,7 @@ public class UnitProjectController {
 	 */
 	@RequestMapping(value = "/updateDetailAndItem")
 	@ResponseBody
-	public JSONObject cc(HttpServletRequest request, HttpServletResponse response) {
+	public JSONObject updateDetailAndItem(HttpServletRequest request, HttpServletResponse response) {
 		// 查询条件
 		Map<String, String> queryMap = TransforUtil.transRMapToMap(request.getParameterMap());
 		
@@ -384,6 +426,24 @@ public class UnitProjectController {
 		try{
 			json.put("itemData", JSONObject.fromObject(unitProjectService.getItemById(queryMap)));
 			json.put("detailData", JSONObject.fromObject(unitProjectService.getDetailById(queryMap)));
+			
+			queryMap.remove("unitProjectDetailId");
+			queryMap.remove("unitProjectId");
+			PageInfo pageInfo = new PageInfo();
+			PageObject pageObj = unitProjectService.getBitProjectItemInfo(queryMap, pageInfo);
+			JSONObject rootJ = new JSONObject();
+			rootJ.element("name", "整个项目");
+			//不含税合价
+			rootJ.element("singlePrice", this.getTotalPrice(1, (List<UnitProject>)pageObj.getRows()));
+			//含税合价
+			rootJ.element("taxSinglePrice", this.getTotalPrice(2, (List<UnitProject>)pageObj.getRows()));
+			//不含税综合合价
+			rootJ.element("price", this.getTotalPrice(3, (List<UnitProject>)pageObj.getRows()));
+			//含税综合合价
+			rootJ.element("sumPrice", this.getTotalPrice(4, (List<UnitProject>)pageObj.getRows()));
+			json.put("rootJ", rootJ);
+			
+			
 		}catch (Exception ex) {
 			ex.printStackTrace();
 			json.put("success", false);

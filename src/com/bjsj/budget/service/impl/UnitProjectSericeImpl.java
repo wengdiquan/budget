@@ -614,12 +614,39 @@ public class UnitProjectSericeImpl implements UnitProjectService {
 	@Override
 	public void deleteBitProjectDetail(Map<String, String> queryMap) {
 		
-		List<UnitProjectDetail> detailList = unitProjectDetailDao.getBitProjectDetailInfo(queryMap);
-		
-		//修改上面的单价
-		
 		//删除详细值
 		unitProjectDetailDao.deleteByPrimaryKey(Integer.parseInt(queryMap.get("unitProjectDetailId")));
+		
+		UnitProject unitProjectDB = unitProjectDao.getUnitProjectById(queryMap);
+		
+		//修改子目
+		queryMap.remove("unitProjectDetailId");
+		List<UnitProjectDetail> detailList = unitProjectDetailDao.getBitProjectDetailInfo(queryMap);
+		
+		
+		//含税单价
+		BigDecimal taxSinglePrice = this.taxSinglePriceUp(detailList);
+		//不含税单价
+		BigDecimal singlePrice = this.getSinglePriceUp(taxSinglePrice);
+		
+		unitProjectDB.setTaxSinglePrice(this.toMoney(taxSinglePrice));;
+		unitProjectDB.setSinglePrice(this.toMoney(singlePrice));
+		
+		//不含税合价
+		unitProjectDB.setSingleSumPrice(this.toMoney(this.getSingleSumPriceUp(singlePrice, unitProjectDB.getDtgcl())));
+		
+		//含税合价
+		unitProjectDB.setTaxSingleSumPrice(this.toMoney(this.getTaxSingleSumPriceUp(taxSinglePrice, unitProjectDB.getDtgcl())));
+		
+		//综合单价
+		unitProjectDB.setPrice(this.toMoney(this.getPriceUp(taxSinglePrice)));
+		
+		//综合合价
+		unitProjectDB.setSumPrice(this.toMoney(this.getSumPriceUp(this.getPriceUp(taxSinglePrice), unitProjectDB.getDtgcl())));
+		
+		unitProjectDao.updateByPrimaryKey(unitProjectDB);
+		
+		
 		
 	}
 	
@@ -980,5 +1007,22 @@ public class UnitProjectSericeImpl implements UnitProjectService {
 	@Override
 	public UnitProjectDetail getDetailById(Map<String, String> queryMap) {
 		return unitProjectDetailDao.getUnitProjectDetailById(queryMap);
+	}
+	
+	@Override
+	public void changeDetailSeq(Map<String, String> queryMap) {
+		
+		queryMap.put("unitProjectDetailId", queryMap.get("opearId"));
+		UnitProjectDetail operUP = unitProjectDetailDao.getUnitProjectDetailById(queryMap);
+		
+		queryMap.put("unitProjectDetailId", queryMap.get("overId"));
+		UnitProjectDetail overUP = unitProjectDetailDao.getUnitProjectDetailById(queryMap);
+		
+		Integer temp = operUP.getSeq();
+		operUP.setSeq(overUP.getSeq());
+		overUP.setSeq(temp);
+		
+		unitProjectDetailDao.updateByPrimaryKey(overUP);
+		unitProjectDetailDao.updateByPrimaryKey(operUP);
 	}
 }

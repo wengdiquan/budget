@@ -81,4 +81,10 @@ public interface UnitProjectService {
 	 * @return
 	 */
 	UnitProjectDetail getDetailById(Map<String, String> queryMap);
+
+	/**
+	 * 详细值，排序
+	 * @param queryMap
+	 */
+	void changeDetailSeq(Map<String, String> queryMap);
 }
