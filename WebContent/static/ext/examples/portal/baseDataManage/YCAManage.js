@@ -92,7 +92,7 @@ Ext.onReady(function() {
 		}
 	});
 
-	// 费用代码维护
+	// 运材安代码维护
 	Ext.define('Budget.app.baseDataManage.YCAManage', {
 		extend : 'Ext.panel.Panel',
 		initComponent : function() {
@@ -113,7 +113,7 @@ Ext.onReady(function() {
 		extend : 'Ext.tree.Panel',
 		id : 'ycamanage-ycatypegrid',
 		region : 'west',
-		width : '15%',
+		width : '18%',
 		border : true,
 		title:"大类名称",
 		animate : true,//动画效果
@@ -141,12 +141,22 @@ Ext.onReady(function() {
 						}
 						
 						me.lookValueId = record.data.id;
-						
-						Ext.getCmp('ycamanage-ycavaluegrid').getStore().load({
-							params : {
-								'lookValueId' : me.lookValueId
-							}
-						});
+						if(record.data.depth == 1){
+							Ext.getCmp('ycamanage-ycavaluegrid').getStore().load({
+								params : {
+									'lookTypeId' : me.lookValueId,
+									"param2":"onelevel"
+								}
+							});
+						}
+						if(record.data.depth == 2){
+							Ext.getCmp('ycamanage-ycavaluegrid').getStore().load({
+								params : {
+									'lookValueId' : me.lookValueId,
+									"param2":""
+								}
+							});
+						}
 					}
 				}
 			});
@@ -164,7 +174,7 @@ Ext.onReady(function() {
 			var me = this;
 			Ext.define('YCAValueList', {
 				extend : 'Ext.data.Model',
-				idProperty : 'id',
+				idProperty : 'id_X',
 				fields : [ {
 					name : 'id',
 					type : 'int'
@@ -188,7 +198,10 @@ Ext.onReady(function() {
 					}
 				}
 			});
-			var ycaValueColumns = [ {
+			var ycaValueColumns = [ 
+			{
+					text:'', width:25,xtype:'rownumberer'
+			},{
 				text : "费用代码",
 				dataIndex : 'code',
 				width : '14%',
@@ -246,7 +259,12 @@ Ext.onReady(function() {
 				}
 			});
 			ycaValueStore.on('beforeload',function(){
-				Ext.apply(ycaValueStore.proxy.extraParams, {"lookValueId": Ext.getCmp('ycamanage-ycatypegrid').lookValueId});
+				if(Ext.getCmp('ycamanage-ycatypegrid').getSelectionModel().getSelection()[0].data.depth == 1){
+					Ext.apply(ycaValueStore.proxy.extraParams, {"lookTypeId": Ext.getCmp('ycamanage-ycatypegrid').lookValueId,"param2":"onelevel"});
+				}else if(Ext.getCmp('ycamanage-ycatypegrid').getSelectionModel().getSelection()[0].data.depth == 2){
+					Ext.apply(ycaValueStore.proxy.extraParams, {"lookValueId": Ext.getCmp('ycamanage-ycatypegrid').lookValueId,"param2":""});
+				}
+				
 			});
 			this.callParent(arguments);
 		},

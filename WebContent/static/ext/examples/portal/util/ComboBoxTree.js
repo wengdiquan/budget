@@ -1,5 +1,6 @@
 Ext.define("Ext.ux.comboboxtree", {  
     extend: "Ext.form.field.Picker",  
+    xtype: 'comboboxtree', 
     requires: ["Ext.tree.Panel"],  
     initComponent: function() {  
         var self = this;  

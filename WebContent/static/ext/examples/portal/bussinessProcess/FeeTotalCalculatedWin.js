@@ -1,36 +1,41 @@
-// 用户管理
 Ext.onReady(function() {
 	Ext.tip.QuickTipManager.init();
-	// 运材安汇总
-	Ext.define('Budget.app.bussinessProcess.YCATotal', {
-		extend : 'Ext.panel.Panel',
-		width: "100%",  
+	
+	Ext.define('Budget.app.bussinessProcess.FeeTotalCalculatedWin', {
+		extend : 'Ext.window.Window',
+		title:"查询费用",
+		id : "mywinfee",
 		initComponent : function() {
-			var me = this;
-			Ext.apply(this, {
-				layout : 'border',
-				height:  520,
-				items : [  
-	            	  Ext.create('Budget.app.bussinessProcess.YCATotal.CostTypeGrid',{
-	            		  bitProjectId:me.bitProjectId
-	            	  }), 
-					  Ext.create('Budget.app.bussinessProcess.YCATotal.CostValueGrid',{
-						  bitProjectId:me.bitProjectId
-					  })
-				 ]
-			});
-			this.callParent(arguments);
+          	var me = this;
+  			Ext.apply(this, {
+  				width : "70%",
+				height : "70%",
+				bodyPadding : '5 5',
+				modal : true,
+				layout : 'fit',
+				items : [
+					{	
+			              region:'center', 
+			              id: 'center-region-containeraa', 
+			              layout: 'border', 
+			              items : [
+			            	  			Ext.create('Budget.app.bussinessProcess.FeeTotal.FeeTypeGridWin'),
+			            	  			Ext.create('Budget.app.bussinessProcess.FeeTotal.FeeValueGridWin')
+			                       ]
+			         }
+				]
+  			});
+  			this.callParent(arguments);
 		}
 	});
 	
-	//费用大类
-	Ext.define('Budget.app.bussinessProcess.YCATotal.CostTypeGrid', {
+	Ext.define('Budget.app.bussinessProcess.FeeTotal.FeeTypeGridWin', {
 		extend : 'Ext.tree.Panel',
-		id : 'ycatotal-costtypegrid',
+		id : 'feetotal-feetypegridwin',
 		region : 'west',
 		width : '18%',
 		border : true,
-		title:"大类名称",
+		title:"费用名称",
 		animate : true,//动画效果
 		initComponent : function() {
 			var me = this;
@@ -51,15 +56,14 @@ Ext.onReady(function() {
 				store : costTypeStore,
 				listeners : {
 					'itemclick' : function(item, record) {
-						if(record.get('id') == 0){
-							return;
-						}
-						
 						me.lookTypeId = record.get('id');
-						
-						Ext.getCmp('ycatotal-costvaluegrid').getStore().load({
+						var tmp = me.lookTypeId;
+						if(record.get('id') == 0){
+							tmp = "";
+						}
+						Ext.getCmp('feetotal-feevaluegridwin').getStore().load({
 							params : {
-								'lookTypeId' : me.lookTypeId
+								'lookTypeId' : tmp
 							}
 						});
 					}
@@ -70,9 +74,9 @@ Ext.onReady(function() {
 	});
 
 	// 详细值
-	Ext.define('Budget.app.bussinessProcess.YCATotal.CostValueGrid', {
+	Ext.define('Budget.app.bussinessProcess.FeeTotal.FeeValueGridWin', {
 		extend : 'Ext.grid.Panel',
-		id : 'ycatotal-costvaluegrid',
+		id : 'feetotal-feevaluegridwin',
 		plain : true,
 		region : 'center',
 		initComponent : function() {
@@ -94,9 +98,7 @@ Ext.onReady(function() {
 				proxy : {
 					type : 'ajax',
 					url : appBaseUri + '/ycatotal/queryYCATotalInfo',
-					extraParams : {"lookTypeId": Ext.getCmp('ycatotal-costtypegrid').lookTypeId,
-						"bitProjectId" : me.bitProjectId
-					},
+					extraParams : {"lookTypeId": Ext.getCmp('feetotal-feetypegridwin').lookTypeId},
 					reader : {
 						type : 'json',
 						root : 'data',
@@ -116,67 +118,27 @@ Ext.onReady(function() {
 				text : "编码",
 				dataIndex : 'code',
 				sortable : false,
-				width : '14%'
-			}, {
-				text : "类别",
-				dataIndex : 'type',
-				sortable : false,
-				width : '5%'
+				width : '15%'
 			},{
 				text : "名称",
 				dataIndex : 'name',
 				sortable : false,
-				width : '14%'
-			},{
-				text : "单位",
-				dataIndex : 'unit',
-				sortable : false,
-				width : '5%',
-				align:'center',
-				renderer:rendenerYN
-			},{
-				text : "含税单价",
-				dataIndex : 'tax_Price',
-				sortable : false,
-				width : '10%'
-			},{
-				text : "不含税单价",
-				dataIndex : 'notax_Price',
-				sortable : false,
-				width : '10%'
-			},{
-				text : "数量",
-				dataIndex : 'amount',
-				sortable : false,
-				width : '10%'
+				width : '15%'
 			},{
 				text : "含税合价",
 				dataIndex : 'tax_Single_SumPrice',
 				sortable : false,
-				width : '10%'
+				width : '12%'
 			},{
 				text : "不含税合价",
 				dataIndex : 'single_SumPrice',
 				sortable : false,
-				width : '10%'
+				width : '12%'
 			}];
 			Ext.apply(this, {
 				store : costValueStore,
-				selModel : Ext.create('Ext.selection.CheckboxModel', {mode:'single'/*, allowDeselect:true*/}),
+				selModel : Ext.create('Ext.selection.Model'),
 				columns : costValueColumns,
-				/*tbar : [ {
-					xtype : 'button',
-					iconCls : 'icon-add',
-					text : '新增费用代码',
-					scope : this,
-					handler : me.newCodeCodeFun
-				},{
-					xtype : 'button',
-					iconCls : 'icon-edit',
-					text : '修改费用代码',
-					scope : this,
-					handler : me.editCodeCodeFun
-				}],*/
 				bbar : Ext.create('Ext.PagingToolbar', {
 					store : costValueStore,
 					displayInfo : true
@@ -195,9 +157,59 @@ Ext.onReady(function() {
 			
 			this.callParent(arguments);
 		},
+		listeners : {
+			'itemdblclick' : function(_this, record, td, cellIndex, tr, rowIndex, e, eOpts){
+				var data = Ext.getCmp('feetotal-feedetailgrid').getSelectionModel().getSelection();  
+				if (data.length == 0) {
+					globalObject.infoTip('请先选择一条费用汇总记录！');
+					return;
+				} else {  
+					var calculatedRadix = "";
+					if(data[0].get("calculatedRadix") == null || data[0].get("calculatedRadix") == ""){
+						calculatedRadix = record.data.code;
+					}else{
+						calculatedRadix = data[0].get("calculatedRadix") + "+" + record.data.code;
+					}
+					var radixRemark = "";
+					if(data[0].get("radixRemark") == null || data[0].get("radixRemark") == ""){
+						radixRemark = record.data.name;
+					}else{
+						radixRemark = data[0].get("radixRemark") + "+" + record.data.name;
+					}
+                    var vals = {
+                    		id : data[0].get("id"),
+                    		calculatedRadix : calculatedRadix ,
+                    		radixRemark : radixRemark,
+                    		amount : data[0].get("amount") + record.data.tax_Single_SumPrice,
+                    		cmd : "edit"
+                    };
+                    Ext.Ajax.request({
+						url : appBaseUri + '/feetotal/updateValue',
+						params : vals,
+						method : "POST",
+						success : function(response) {
+							if (response.responseText != '') {
+								var res = Ext.JSON.decode(response.responseText);
+								if (res.success) {
+									globalObject.msgTip('操作成功！');
+									//Ext.getCmp('feetotal-feedetailgrid').getStore().reload();
+									Ext.getCmp('feetotal-feedetailgrid').getStore().loadPage(1);
+									Ext.getCmp('mywinfee').close();
+								} else {
+									globalObject.errTip(res.msg);
+								}
+							}
+						},
+						failure : function(response) {
+							globalObject.errTip('操作失败！');
+						}
+					});
+		        }  
+			}
+		},
 		newCodeCodeFun: function(){
 			var me = this;
-			var looktypeId = Ext.getCmp('ycatotal-costtypegrid').lookTypeId;
+			var looktypeId = Ext.getCmp('feetotal-feetypegridwin').lookTypeId;
 			if (!looktypeId) {
 				globalObject.infoTip('请先选择费用大类！');
 				return;
@@ -211,13 +223,13 @@ Ext.onReady(function() {
 		},
 		editCodeCodeFun : function() {
 			var me = this;
-			var looktypeId = Ext.getCmp('ycatotal-costtypegrid').lookTypeId;
+			var looktypeId = Ext.getCmp('feetotal-feetypegridwin').lookTypeId;
 			if (!looktypeId) {
 				globalObject.infoTip('请先选择费用大类！');
 				return;
 			};
 			
-			var grid = Ext.getCmp("ycatotal-costvaluegrid");
+			var grid = Ext.getCmp("feetotal-feevaluegridwin");
 			var records = grid.getSelectionModel().getSelection()
 			if(records.length != 1){
 				globalObject.infoTip('请先需要修改的费用信息！');
@@ -242,3 +254,4 @@ Ext.onReady(function() {
 		}
 	});
 });
+

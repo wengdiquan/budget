@@ -83,10 +83,19 @@ public class CategoryModelController {
 			HttpServletResponse response){
 		try
 		{
+			CategoryModelModel record = new CategoryModelModel();
+			TransforUtil.transFromMapToBean(request.getParameterMap(), record);
 			if("edit".equals(request.getParameter("cmd"))){
 				categoryModelService.updateValue(request.getParameterMap());
 			}else if("editCM".equals(request.getParameter("cmd"))){
 				categoryModelService.insertCM(request.getParameterMap());
+			}else if("newchapter".equals(request.getParameter("cmd"))){
+				record.setParentId(0);
+				record.setLeaf(0);
+				categoryModelService.insertChapter(record);
+			}else if("newpart".equals(request.getParameter("cmd"))){
+				record.setLeaf(1);
+				categoryModelService.insertChapter(record);
 			}else{
 				categoryModelService.insertValue(request.getParameterMap());
 			}

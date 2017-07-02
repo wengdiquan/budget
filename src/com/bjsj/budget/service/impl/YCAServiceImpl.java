@@ -20,6 +20,9 @@ public class YCAServiceImpl implements YCAService{
 	@Override
 	public PageObject queryYCAInfo(Map<String, String> queryMap,PageInfo pageInfo) {
 		PageObject pageObj = new PageObject();
+		if("onelevel".equals(queryMap.get("param2"))){
+			queryMap.put("lookValueId", "");
+		}
 		List<YCAModel> orderChangeHeaders = yCADao.queryYCAInfo(queryMap, pageInfo);
 		pageObj.setRecords(yCADao.getYCAInfoCount(queryMap));
 		pageObj.setRows(orderChangeHeaders);

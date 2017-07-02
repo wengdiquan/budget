@@ -14,6 +14,9 @@ public interface CategoryModelDao extends BaseDao{
 		List<CategoryModelModel> queryDetailCategoryModel(@Param("map") Map<String, String> queryMap, @Param("page") PageInfo pageInfo);
 		int getDetailCategoryModelCount(@Param("map") Map<String, String> queryMap);
 		
+		List<CategoryModelModel> queryDetailCategoryModelOne(@Param("map") Map<String, String> queryMap, @Param("page") PageInfo pageInfo);
+		int getDetailCategoryModelCountOne(@Param("map") Map<String, String> queryMap);
+		
 		List<CategoryModelYCAModel> queryDetailYCA(@Param("map") Map<String, String> queryMap, @Param("page") PageInfo pageInfo);
 		int getDetailYCACount(@Param("map") Map<String, String> queryMap);
 		
@@ -26,6 +29,8 @@ public interface CategoryModelDao extends BaseDao{
 		int updateByPrimaryKey(CategoryModelYCAModel record);
 		
 		int updateCMByPrimaryKey(CategoryModelModel record);
+		
+		int insertChapter(CategoryModelModel record);
 		
 		
 		

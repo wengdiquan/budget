@@ -304,7 +304,7 @@ Ext.onReady(function() {
 			var me = this;
 			Ext.define('FeeValueList', {
 				extend : 'Ext.data.Model',
-				idProperty : 'id',
+				idProperty : 'id_X',
 				fields : [ {
 					name : 'id',
 					type : 'int'
@@ -446,7 +446,15 @@ Ext.onReady(function() {
 				text : "计算基数",
 				dataIndex : 'calculatedRadix',
 				sortable : false,
-				width : '20%'
+				width : '20%',
+				editor: {
+					xtype:'triggerfield',
+					triggerCls: Ext.baseCSSPrefix + 'form-search-trigger',
+					editable:false,
+					onTriggerClick:function(){
+						Ext.create("Budget.app.bussinessProcess.FeeTotalCalculatedWin").show();
+					}
+				}
 			},{
 				text : "基数说明",
 				dataIndex : 'radixRemark',
@@ -681,15 +689,14 @@ Ext.onReady(function() {
 				store : costTypeStore,
 				listeners : {
 					'itemclick' : function(item, record) {
-						if(record.get('id') == 0){
-							return;
-						}
-						
 						me.lookTypeId = record.get('id');
-						
+						var tmp = me.lookTypeId;
+						if(record.get('id') == 0){
+							tmp = "";
+						}
 						Ext.getCmp('feetotal-feevaluegrid').getStore().load({
 							params : {
-								'lookTypeId' : me.lookTypeId
+								'lookTypeId' : tmp
 							}
 						});
 					}
@@ -744,22 +751,22 @@ Ext.onReady(function() {
 				text : "编码",
 				dataIndex : 'code',
 				sortable : false,
-				width : '14%'
+				width : '15%'
 			},{
 				text : "名称",
 				dataIndex : 'name',
 				sortable : false,
-				width : '14%'
+				width : '15%'
 			},{
 				text : "含税合价",
 				dataIndex : 'tax_Single_SumPrice',
 				sortable : false,
-				width : '10%'
+				width : '12%'
 			},{
 				text : "不含税合价",
 				dataIndex : 'single_SumPrice',
 				sortable : false,
-				width : '10%'
+				width : '12%'
 			}];
 			Ext.apply(this, {
 				store : costValueStore,
@@ -785,16 +792,27 @@ Ext.onReady(function() {
 		},
 		listeners : {
 			'itemdblclick' : function(_this, record, td, cellIndex, tr, rowIndex, e, eOpts){
-				var feeTotalId = Ext.getCmp('feetotal-feedetailgrid').feeTotalId;
-				if (!feeTotalId) {
+				var data = Ext.getCmp('feetotal-feedetailgrid').getSelectionModel().getSelection();  
+				if (data.length == 0) {
 					globalObject.infoTip('请先选择一条费用汇总记录！');
 					return;
 				} else {  
-		        	var data = Ext.getCmp('feetotal-feedetailgrid').getSelectionModel().getSelection();  
+					var calculatedRadix = "";
+					if(data[0].get("calculatedRadix") == null || data[0].get("calculatedRadix") == ""){
+						calculatedRadix = record.data.code;
+					}else{
+						calculatedRadix = data[0].get("calculatedRadix") + "+" + record.data.code;
+					}
+					var radixRemark = "";
+					if(data[0].get("radixRemark") == null || data[0].get("radixRemark") == ""){
+						radixRemark = record.data.name;
+					}else{
+						radixRemark = data[0].get("radixRemark") + "+" + record.data.name;
+					}
                     var vals = {
-                    		id : feeTotalId,
-                    		calculatedRadix : data[0].get("calculatedRadix") + "+" + record.data.code ,
-                    		radixRemark : data[0].get("radixRemark") + "+" + record.data.name,
+                    		id : data[0].get("id") ,
+                    		calculatedRadix :  calculatedRadix,
+                    		radixRemark : radixRemark,
                     		amount : data[0].get("amount") + record.data.tax_Single_SumPrice,
                     		cmd : "edit"
                     };

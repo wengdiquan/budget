@@ -100,10 +100,6 @@ Ext.onReady(function() {
 								window.getEl().mask('数据保存中，请稍候...');
 								var vals = form.getValues();
 								
-								var grid = Ext.getCmp("categoryandmodelmanage-YCAGrid");
-								var records = grid.getSelectionModel().getSelection();
-								vals.lookValueId = records[0].get('lookValueId')-0 ;
-								
 								Ext.Ajax.request({
 									url : appBaseUri + '/categorymodel/saveOrUpdateValue',
 									params : vals,
@@ -236,6 +232,91 @@ Ext.onReady(function() {
 			App.baseDataManage.CategoryAndModelManage.InfoWindowCM.superclass.constructor.call(this, config);
 		}
 	});
+	//新增章
+	Ext.define('App.baseDataManage.CategoryAndModelManage.InfoWindowChapter', {
+		extend : 'Ext.window.Window',
+		constructor : function(config) {
+			config = config || {};
+			Ext.apply(config, {
+				title : '新增',
+				width : 420,
+				height : 350,
+				bodyPadding : '10 5',
+				modal : true,
+				layout : 'fit',
+				items : [ {
+					xtype : 'form',
+					fieldDefaults : {
+						labelAlign : 'left',
+						labelWidth : 90,
+						anchor : '100%'
+					},
+					items : [{
+						name : "cmd",
+						xtype : "hidden",
+						value : 'new'
+					},{
+						xtype : 'hiddenfield',
+						name : 'parentId'
+					},{
+						xtype : 'textfield',
+						name : 'name',
+						fieldLabel:'名称<font color="red">*</font>',
+						allowBlank : false
+					},{
+						xtype : 'textfield',
+						name : 'code',
+						fieldLabel:'编码<font color="red">*</font>',
+						allowBlank : false
+					}],
+					buttons : [ '->', {
+						id : 'infowindowchapter-save',
+						text : '保存',
+						iconCls : 'icon-save',
+						width : 80,
+						handler : function(btn, eventObj) {
+							var window = btn.up('window');
+							var form = window.down('form').getForm();
+							if (form.isValid()) {
+								window.getEl().mask('数据保存中，请稍候...');
+								var vals = form.getValues();
+								Ext.Ajax.request({
+									url : appBaseUri + '/categorymodel/saveOrUpdateValue',
+									params : vals ,
+									method : "POST",
+									success : function(response) {
+										if (response.responseText != '') {
+											var res = Ext.JSON.decode(response.responseText);
+											if (res.success) {
+												globalObject.msgTip('操作成功！');
+												Ext.getCmp('categoryandmodelmanage-cmgrid').getStore().reload();
+											} else {
+												globalObject.errTip(res.msg);
+											}
+										}
+									},
+									failure : function(response) {
+										globalObject.errTip('操作失败！');
+									}
+								});
+								window.getEl().unmask();
+								window.close();
+							}
+						}
+					}, {
+						id : 'infowindowchapter-cancel',
+						text : '取消',
+						iconCls : 'icon-cancel',
+						width : 80,
+						handler : function() {
+							this.up('window').close();
+						}
+					},'->']
+				} ]
+			});
+			App.baseDataManage.CategoryAndModelManage.InfoWindowChapter.superclass.constructor.call(this, config);
+		}
+	});
 
 	// 费用代码维护
 	Ext.define('Budget.app.baseDataManage.CategoryAndModelManage', {
@@ -268,7 +349,7 @@ Ext.onReady(function() {
 		extend : 'Ext.tree.Panel',
 		id : 'categoryandmodelmanage-cmgrid',
 		region : 'west',
-		width : '12%',
+		width : '15%',
 		border : true,
 		title:"模块名称",
 		animate : true,//动画效果
@@ -289,23 +370,75 @@ Ext.onReady(function() {
 			Ext.apply(this, {
 				rootVisible : false,
 				store : costTypeStore,
+				tbar:[{
+					width : 80,
+					xtype : 'button',
+					text : '新增',
+					iconCls : 'icon-add',
+					menu : [{
+						text : '新增章',
+						handler : me.newChapterFun,
+						iconCls : 'icon-room'
+					}, '-', {
+						text : '新增节',
+						handler : me.addPartFun,
+						iconCls : 'icon-wood'
+					} ]
+				}],
 				listeners : {
 					'itemclick' : function(item, record) {
 						if(record.data.id == 0){
 							return;
 						}
-						
 						me.parentId = record.data.id;
-						
-						Ext.getCmp('categoryandmodelmanage-cmdetailgrid').getStore().load({
-							params : {
-								'parentId' : me.parentId
-							}
-						});
+						if(record.data.depth == 1){
+							Ext.getCmp('categoryandmodelmanage-cmdetailgrid').getStore().load({
+								params : {
+									'parentId' :  me.parentId,
+									'param2' : 'onelevel'
+								}
+							});
+						}
+						if(record.data.depth == 2){
+							Ext.getCmp('categoryandmodelmanage-cmdetailgrid').getStore().load({
+								params : {
+									'parentId' : me.parentId,
+									'param2' : ''
+								}
+							});
+						}
 					}
 				}
 			});
 			this.callParent(arguments);
+		},
+		newChapterFun: function(){
+			var me = this;
+			var win = new App.baseDataManage.CategoryAndModelManage.InfoWindowChapter({
+				hidden : true
+			});
+			var form = win.down('form').getForm();
+			form.findField('cmd').setValue('newchapter');
+			win.show();
+		},
+		addPartFun: function(){
+			var me = this;
+			var parentId = Ext.getCmp('categoryandmodelmanage-cmgrid').parentId;
+			if (!parentId) {
+				globalObject.infoTip('请先选模块名称！');
+				return;
+			};
+			if(Ext.getCmp('categoryandmodelmanage-cmgrid').getSelectionModel().getSelection()[0].data.depth == 2){
+				globalObject.infoTip('请选择章名称！');
+				return;
+			}
+			var win = new App.baseDataManage.CategoryAndModelManage.InfoWindowChapter({
+				hidden : true
+			});
+			var form = win.down('form').getForm();
+			form.findField('parentId').setValue(parentId);
+			form.findField('cmd').setValue('newpart');
+			win.show();
 		}
 	});
 
@@ -427,7 +560,11 @@ Ext.onReady(function() {
 			});
 			
 			costValueStore.on('beforeload',function(){
-				Ext.apply(costValueStore.proxy.extraParams, {"parentId": Ext.getCmp('categoryandmodelmanage-cmgrid').parentId});
+				if(Ext.getCmp('categoryandmodelmanage-cmgrid').getSelectionModel().getSelection()[0].data.depth == 1){
+					Ext.apply(costValueStore.proxy.extraParams, {"parentId": Ext.getCmp('categoryandmodelmanage-cmgrid').parentId,'param2' : 'onelevel'});
+				}else{
+					Ext.apply(costValueStore.proxy.extraParams, {"parentId": Ext.getCmp('categoryandmodelmanage-cmgrid').parentId,'param2' : ''});
+				}
 			});
 			
 			
@@ -621,12 +758,8 @@ Ext.onReady(function() {
 			form.findField('code').setReadOnly(true);
 			form.findField('name').setReadOnly(true);
 			form.findField('unit').setReadOnly(true);
-			
-			var tree = win.down('#myActionColumn');
-			/*var node =  tree.getStore().getNodeById(gridRecord.data.lookValueId);
-			tree.getRootNode().expand();
-			tree.getSelectionModel().select(node);*/
-			tree.hide();
+			form.findField('lookValueId').setValue(gridRecord.data.lookValueId);
+			win.down('#myActionColumn').hide();
 			
 			form.loadRecord(gridRecord);
 			win.show();
