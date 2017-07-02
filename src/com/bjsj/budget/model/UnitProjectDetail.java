@@ -31,7 +31,9 @@ public class UnitProjectDetail {
 	
 	private Integer seq;
 	
-	private Integer isSuppleCost; //是不是补充费用
+	private Integer isSuppleCost; //是不是调整费
+	
+	private Integer isSupType; //是不是补充费用
 
 	public Integer getId() {
 		return id;
@@ -175,5 +177,12 @@ public class UnitProjectDetail {
 
 	public void setIsSuppleCost(Integer isSuppleCost) {
 		this.isSuppleCost = isSuppleCost;
+	}
+
+	public Integer getIsSupType() {
+		return isSupType;
+	}
+
+	public void setIsSupType(Integer isSupType) {
 	}
 }

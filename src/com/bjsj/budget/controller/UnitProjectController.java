@@ -248,7 +248,7 @@ public class UnitProjectController {
 	}
 	
 	/**
-	 * 更新字段
+	 * 更新子目和明细
 	 * @param request
 	 * @param response
 	 * @return
@@ -344,14 +344,14 @@ public class UnitProjectController {
 	}
 	
 	/**
-	 * 更新运财安值
+	 * 更新明细和子目
 	 * @param request
 	 * @param response
 	 * @return
 	 */
 	@RequestMapping(value = "/updateDetailAndItem")
 	@ResponseBody
-	public JSONObject updateDetailAndItem(HttpServletRequest request, HttpServletResponse response) {
+	public JSONObject cc(HttpServletRequest request, HttpServletResponse response) {
 		// 查询条件
 		Map<String, String> queryMap = TransforUtil.transRMapToMap(request.getParameterMap());
 		
@@ -367,7 +367,29 @@ public class UnitProjectController {
 		return json;
 	}
 	
-	
-	
+	/**
+	 * 刷新子目和明细行
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	@RequestMapping(value = "/getItemAndDetailById")
+	@ResponseBody
+	public JSONObject getItemAndDetailById(HttpServletRequest request, HttpServletResponse response){
+		// 查询条件
+		Map<String, String> queryMap = TransforUtil.transRMapToMap(request.getParameterMap());
+		
+		JSONObject json = new JSONObject();
+		json.put("success", true);
+		try{
+			json.put("itemData", JSONObject.fromObject(unitProjectService.getItemById(queryMap)));
+			json.put("detailData", JSONObject.fromObject(unitProjectService.getDetailById(queryMap)));
+		}catch (Exception ex) {
+			ex.printStackTrace();
+			json.put("success", false);
+			json.put("msg", "出错:" + ex.getMessage());
+		}
+		return json;
+	}
 	
 }

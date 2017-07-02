@@ -468,18 +468,27 @@ Ext.onReady(function() {
   	        listeners:{
   	        	beforeedit:function(editor , context , eOpts){
   	        		var records = editor.grid.getSelectionModel().getSelection();
-  	        		//不含税单价
-  	        		if(context.field == "noTaxPrice"){
+  	        		//含税单价(调整)
+  	        		if(context.field == "taxPrice"){
   	        			if(records[0].data.isSuppleCost != 0){
   	  	        			return false;
   	  	        		}
   	        		}
   	        	},
   	        	validateedit:function(editor, e, eOpts){
+  	        		
+					var records = Ext.getCmp('projectbitpanel-bititemgrid').getSelectionModel().getSelection();	 
+					if(records.length != 1){
+						globalObject.messageTip("请先选择子目");
+						return;
+					}
+  	        		
 	        		Ext.Ajax.request({
-						 url : appBaseUri + '/unitproject/updateItemAndDetail',
+						 url : appBaseUri + '/unitproject/updateDetailAndItem',
 						 params : {
+							 unitProjectId: records[0].get('id'),
 							 unitProjectDetailId:e.record.get('id'),
+							 bitProjectId:Ext.getCmp("projectbitpanel-bitdetailgrid").bitProjectId,
 							 name:e.field,
 							 value:e.value
 						 },
@@ -590,12 +599,18 @@ Ext.onReady(function() {
 				text : "名称",
 				dataIndex : 'name',
 				sortable : false,
-				width : '10%'
+				width : '10%',
+				editor:{
+			        xtype: 'textfield'
+			    }
 			}, {
 				text : "规格及型号",
 				dataIndex : 'typeInfo',
 				sortable : false,
-				width : '8%'
+				width : '8%',
+				editor:{
+			        xtype: 'textfield'
+			    }
 			}, {
 				text : "单位",
 				dataIndex : 'unit',
@@ -629,18 +644,18 @@ Ext.onReady(function() {
 				dataIndex : 'noTaxPrice',
 				sortable : false,
 				align:'right',
+				width : '8%'
+			},{
+				text : "含税单价",
+				dataIndex : 'taxPrice',
+				sortable : false,
+				align:'right',
 				width : '8%',
 				editor:{
 			        xtype: 'numberfield',
 			        allowDecimals: true,
 			        decimalPrecision: 5
 			    }
-			},{
-				text : "含税单价",
-				dataIndex : 'taxPrice',
-				sortable : false,
-				align:'right',
-				width : '8%'
 			},{
 				text : "不含税合价",
 				dataIndex : 'singleSumPrice',
@@ -675,7 +690,7 @@ Ext.onReady(function() {
 			
 			Ext.apply(this, {
 				store : bitProjectDetailStore,
-				selModel : Ext.create('Ext.selection.CheckboxModel'),
+				selModel : Ext.create('Ext.selection.CheckboxModel', {mode:'single'/*, allowDeselect:true*/}),
 				columns : bitProjectDetailColumns,
 				tbar : [ {
 					xtype : 'button',
@@ -729,11 +744,12 @@ Ext.onReady(function() {
 			//新增一条空白的
 			Ext.getCmp('projectbitpanel-bitdetailgrid').getEl().mask('数据处理中，请稍候...');
 			Ext.Ajax.request({
-				 url : appBaseUri + '/unitproject/insertDetail', //新增单位工程
+				 url : appBaseUri + '/unitproject/insertDetail', //新增详细
 				 params : {
 					 unitProjectId: itemRecords[0].get('id'),
+					 bitProjectId:Ext.getCmp("projectbitpanel-bitdetailgrid").bitProjectId,
 					 type:type,
-					 class:'add'
+					 classType:'add'
 				 },
 				 method : "POST",
 				 success : function(response) {
@@ -800,27 +816,45 @@ Ext.onReady(function() {
 				 url : appBaseUri + '/unitproject/getItemAndDetailById', 
 				 params : {
 					 unitProjectId:itemRecord.get('id'),
+					 unitProjectDetailId:detailRecord.get('id')
 				 },
 				 method : "POST",
 				 success : function(response) {
 					 if (response.responseText != '') {
 						 var res = Ext.JSON.decode(response.responseText);
-						 var data = res.data;
+						 var itemData = res.itemData;
+						 var detailData = res.detailData;
 						 itemGrid.getSelectionModel().select(itemRecord.data.index + 1);
-						 detailGrid.getSelectionModel().select(itemRecord.data.index + 1);
+						
+						 detailGrid.getStore().each(function(record){
+							 if(record.get('id') == itemRecord.get('id')){
+								 detailGrid.getSelectionModel().select(record);
+							 }
+						 })
+						
 						 
-						 itemRecord.set('content', data.content);
-						 itemRecord.set('dtgcl', data.dtgcl);
-						 itemRecord.set('singlePrice', data.singlePrice);
-						 itemRecord.set('taxSinglePrice', data.taxSinglePrice);
-						 itemRecord.set('singleSumPrice', data.singleSumPrice);
-						 itemRecord.set('taxSingleSumPrice', data.taxSingleSumPrice);
-						 itemRecord.set('price', data.price);
-						 itemRecord.set('sumPrice', data.sumPrice);
-						 itemRecord.set('remark', data.remark);
+						 itemRecord.set('name', itemData.name);
+						 itemRecord.set('content', itemData.content);
+						 itemRecord.set('dtgcl', itemData.dtgcl);
+						 itemRecord.set('singlePrice', itemData.singlePrice);
+						 itemRecord.set('taxSinglePrice', itemData.taxSinglePrice);
+						 itemRecord.set('singleSumPrice', itemData.singleSumPrice);
+						 itemRecord.set('taxSingleSumPrice', itemData.taxSingleSumPrice);
+						 itemRecord.set('price', itemData.price);
+						 itemRecord.set('sumPrice', itemData.sumPrice);
+						 itemRecord.set('remark', itemData.remark);
 						 itemRecord.commit();
 						 
-						 
+						 detailRecord.set('code', detailData.code);
+						 detailRecord.set('name', detailData.name);
+						 detailRecord.set('typeInfo', detailData.typeInfo);
+						 detailRecord.set('content', detailData.content);
+						 detailRecord.set('amount', detailData.amount);
+						 detailRecord.set('noTaxPrice', detailData.noTaxPrice);
+						 detailRecord.set('taxPrice', detailData.taxPrice);
+						 detailRecord.set('singleSumPrice', detailData.singleSumPrice);
+						 detailRecord.set('taxSingleSumPrice', detailData.taxSingleSumPrice);
+						 detailRecord.commit();
 						 
 					 }
 				 },

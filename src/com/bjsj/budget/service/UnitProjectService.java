@@ -3,6 +3,7 @@ package com.bjsj.budget.service;
 import java.util.Map;
 
 import com.bjsj.budget.model.UnitProject;
+import com.bjsj.budget.model.UnitProjectDetail;
 import com.bjsj.budget.page.PageInfo;
 import com.bjsj.budget.page.PageObject;
 
@@ -70,6 +71,14 @@ public interface UnitProjectService {
 	/**
 	 * 更新运材安的值
 	 * @param queryMap
+	 * @throws Exception 
 	 */
-	void updateDetailAndItem(Map<String, String> queryMap);
+	void updateDetailAndItem(Map<String, String> queryMap) throws Exception;
+
+	/**
+	 * 刷新明细行
+	 * @param queryMap
+	 * @return
+	 */
+	UnitProjectDetail getDetailById(Map<String, String> queryMap);
 }

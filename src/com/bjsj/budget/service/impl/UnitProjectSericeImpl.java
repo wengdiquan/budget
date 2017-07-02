@@ -2,6 +2,8 @@ package com.bjsj.budget.service.impl;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.text.DecimalFormat;
+import java.text.Format;
 import java.util.List;
 import java.util.Map;
 
@@ -20,7 +22,6 @@ import com.bjsj.budget.page.PageInfo;
 import com.bjsj.budget.page.PageObject;
 import com.bjsj.budget.service.UnitProjectService;
 import com.bjsj.budget.util.StringUtil;
-import com.sun.mail.util.QEncoderStream;
 
 @Service("unitProjectSericeImpl")
 public class UnitProjectSericeImpl implements UnitProjectService {
@@ -116,6 +117,7 @@ public class UnitProjectSericeImpl implements UnitProjectService {
 				detail.setSeq(index++);
 				detail.setUnitprojectId(u.getId()); 
 				detail.setIsSuppleCost(0);
+				detail.setIsSupType(0);
 				//保存详细数据
 				unitProjectDetailDao.insert(detail);
 			}
@@ -252,7 +254,7 @@ public class UnitProjectSericeImpl implements UnitProjectService {
 	}
 	
 	/**
-	 * 修改运材安
+	 * 修改子目和明细
 	 */
 	@Override
 	public void updateItemAndDetail(Map<String, String> queryMap) {
@@ -415,6 +417,7 @@ public class UnitProjectSericeImpl implements UnitProjectService {
 						yDetail.setSeq(detailList.size() + 1);
 						yDetail.setUnitprojectId(unitProjectDB.getId()); 
 						yDetail.setIsSuppleCost(1); //是否为费用调整
+						yDetail.setIsSupType(0); //是否补充费用
 						unitProjectDetailDao.insert(yDetail);
 					}
 					
@@ -443,6 +446,7 @@ public class UnitProjectSericeImpl implements UnitProjectService {
 						cDetail.setSeq(detailList.size() + 2);
 						cDetail.setUnitprojectId(unitProjectDB.getId()); 
 						cDetail.setIsSuppleCost(1); //是否为费用调整
+						cDetail.setIsSupType(0); //是否补充费用
 						unitProjectDetailDao.insert(cDetail);
 					}
 				//修改
@@ -471,6 +475,7 @@ public class UnitProjectSericeImpl implements UnitProjectService {
 						aDetail.setSeq(detailList.size() + 3);
 						aDetail.setUnitprojectId(unitProjectDB.getId()); 
 						aDetail.setIsSuppleCost(1); //是否为费用调整
+						aDetail.setIsSupType(0); //是否补充费用
 						unitProjectDetailDao.insert(aDetail);
 					}
 				//修改
@@ -552,9 +557,8 @@ public class UnitProjectSericeImpl implements UnitProjectService {
 	
 	@Override
 	public void insertDetail(Map<String, String> queryMap) {
-		String className = queryMap.get("class");
+		String className = queryMap.get("classType");
 		String type = queryMap.get("type");
-		
 		
 		String typeName = "";
 		if("安".equals(type)){
@@ -565,12 +569,31 @@ public class UnitProjectSericeImpl implements UnitProjectService {
 			typeName = "运输";
 		}
 		
-		//插入
+		//获取最大值（已经使用的最大值）
+		queryMap.put("code", "");
+		Integer nextValue = unitProjectDetailDao.getNextValue(queryMap);
+		
+		Format f1 = new DecimalFormat("000");
+		String nextStr = f1.format(nextValue);
+		
+		//新增
 		if("add".equals(className)){
 			UnitProjectDetail upd = new UnitProjectDetail();
 			upd.setUnitprojectId(Integer.parseInt(queryMap.get("unitProjectId")));
-			upd.setCode("补充" + typeName + "001");
+			upd.setCode("补充" + typeName + nextStr);
 			upd.setType(type);
+			upd.setName(null);
+			upd.setTypeInfo(null);
+			upd.setUnit("工日");
+			upd.setContent(0d);
+			upd.setAmount(0d);
+			upd.setSingleSumPrice(0d);
+			upd.setTaxSingleSumPrice(0d);
+			upd.setNoTaxPrice(0d);
+			upd.setTaxPrice(0d);
+			upd.setOrigCount(0d);
+			upd.setIsSuppleCost(0);
+			upd.setIsSupType(1);
 			List<UnitProjectDetail> detailList = unitProjectDetailDao.getBitProjectDetailInfo(queryMap);
 			upd.setSeq(detailList.get(detailList.size() -1).getSeq() + 1);
 			unitProjectDetailDao.insert(upd);
@@ -580,7 +603,7 @@ public class UnitProjectSericeImpl implements UnitProjectService {
 		if("insert".equals(className)){
 			UnitProjectDetail upd = new UnitProjectDetail();
 			upd.setUnitprojectId(Integer.parseInt(queryMap.get("unitProjectId")));
-			upd.setCode("补充" + typeName + "001");
+			upd.setCode("补充" + typeName + nextStr);
 			upd.setType(type);
 			List<UnitProjectDetail> detailList = unitProjectDetailDao.getBitProjectDetailInfo(queryMap);
 			upd.setSeq(detailList.get(detailList.size() -1).getSeq() + 1);
@@ -600,10 +623,232 @@ public class UnitProjectSericeImpl implements UnitProjectService {
 		
 	}
 	
+	/**
+	 * 修改明细和子目
+	 */
 	@Override
-	public void updateDetailAndItem(Map<String, String> queryMap) {
+	public void updateDetailAndItem(Map<String, String> queryMap) throws Exception{
+		String unitProjectId = queryMap.get("unitProjectId");
+		UnitProject unitProjectDB = unitProjectDao.getUnitProjectById(queryMap);
+		
+		UnitProjectDetail detailDB = unitProjectDetailDao.getUnitProjectDetailById(queryMap);
+		
+		String name = queryMap.get("name");
+		String value = queryMap.get("value");
+		
+		//修改类型
+		if("name".equals(name)){
+			if(!detailDB.equals(name)){
+				detailDB.setName(value);
+				unitProjectDetailDao.updateByPrimaryKey(detailDB);
+			}
+			return;
+		}
+		
+		//修改规格及型号
+		if("typeInfo".equals(name)){
+			detailDB.setTypeInfo(value);
+			unitProjectDetailDao.updateByPrimaryKey(detailDB);
+			return;
+		}
+		
+		//修改含量
+		if("content".equals(name)){
+			
+			Double v = Double.parseDouble(value);
+			
+			if(this.doubleCompare(v, detailDB.getContent())){
+				return;
+			}
+			
+			Double contentDB = detailDB.getContent();
+			Double changeDB = contentDB;
+			if(this.doubleCompare(contentDB, 0d)){
+				changeDB = 1d;
+			}
+			
+			//倍数
+			BigDecimal mutiDecimal = this.divive(v, changeDB); 
+			
+			detailDB.setContent(v);
+			
+			//数量修改
+			detailDB.setAmount(this.multiply(detailDB.getAmount(), mutiDecimal.doubleValue()).doubleValue());
+			
+			Double noTaxPrice = detailDB.getNoTaxPrice();
+			Double taxPrice =detailDB.getTaxPrice();
+			//修改不含税合价
+			detailDB.setSingleSumPrice(this.toMoney(this.multiply(noTaxPrice, detailDB.getAmount())));
+			//修改含税合价
+			detailDB.setTaxSingleSumPrice(this.toMoney(this.multiply(taxPrice, detailDB.getAmount())));
+			unitProjectDetailDao.updateByPrimaryKey(detailDB);
+			
+			//修改子目
+			queryMap.remove("unitProjectDetailId");
+			List<UnitProjectDetail> detailList = unitProjectDetailDao.getBitProjectDetailInfo(queryMap);
+			
+			//含税单价
+			BigDecimal taxSinglePrice = this.taxSinglePriceUp(detailList);
+			//不含税单价
+			BigDecimal singlePrice = this.getSinglePriceUp(taxSinglePrice);
+			
+			unitProjectDB.setTaxSinglePrice(this.toMoney(taxSinglePrice));;
+			unitProjectDB.setSinglePrice(this.toMoney(singlePrice));
+			
+			//不含税合价
+			unitProjectDB.setSingleSumPrice(this.toMoney(this.getSingleSumPriceUp(singlePrice, unitProjectDB.getDtgcl())));
+			
+			//含税合价
+			unitProjectDB.setTaxSingleSumPrice(this.toMoney(this.getTaxSingleSumPriceUp(taxSinglePrice, unitProjectDB.getDtgcl())));
+			
+			//综合单价
+			unitProjectDB.setPrice(this.toMoney(this.getPriceUp(taxSinglePrice)));
+			
+			//综合合价
+			unitProjectDB.setSumPrice(this.toMoney(this.getSumPriceUp(this.getPriceUp(taxSinglePrice), unitProjectDB.getDtgcl())));
+			
+			unitProjectDao.updateByPrimaryKey(unitProjectDB);
+			
+			return;
+		}
+		
+		//修改数量
+		if("amount".equals(name)){
+			
+			Double v = Double.parseDouble(value);
+			
+			if(this.doubleCompare(v, detailDB.getAmount())){
+				return;
+			}
+			
+			Double amountDB = detailDB.getAmount();
+			Double changeDB = amountDB;
+			if(this.doubleCompare(amountDB, 0d)){
+				changeDB = 1d;
+			}
+			
+			//倍数
+			BigDecimal mutiDecimal = this.divive(v, changeDB); 
+			
+			//修改含量
+			detailDB.setContent(this.multiply(v, mutiDecimal.doubleValue()).doubleValue());
+			
+			//修改数量
+			detailDB.setAmount(v);
+			
+			Double noTaxPrice = detailDB.getNoTaxPrice();
+			Double taxPrice = detailDB.getTaxPrice();
+			//修改不含税合价
+			detailDB.setSingleSumPrice(this.toMoney(this.multiply(noTaxPrice, detailDB.getAmount())));
+			//修改含税合价
+			detailDB.setTaxSingleSumPrice(this.toMoney(this.multiply(taxPrice, detailDB.getAmount())));
+			unitProjectDetailDao.updateByPrimaryKey(detailDB);
+			
+			//修改子目
+			queryMap.remove("unitProjectDetailId");
+			List<UnitProjectDetail> detailList = unitProjectDetailDao.getBitProjectDetailInfo(queryMap);
+
+			//含税单价
+			BigDecimal taxSinglePrice = this.taxSinglePriceUp(detailList);
+			//不含税单价
+			BigDecimal singlePrice = this.getSinglePriceUp(taxSinglePrice);
+			
+			unitProjectDB.setTaxSinglePrice(this.toMoney(taxSinglePrice));;
+			unitProjectDB.setSinglePrice(this.toMoney(singlePrice));
+			
+			//不含税合价
+			unitProjectDB.setSingleSumPrice(this.toMoney(this.getSingleSumPriceUp(singlePrice, unitProjectDB.getDtgcl())));
+			
+			//含税合价
+			unitProjectDB.setTaxSingleSumPrice(this.toMoney(this.getTaxSingleSumPriceUp(taxSinglePrice, unitProjectDB.getDtgcl())));
+			
+			//综合单价
+			unitProjectDB.setPrice(this.toMoney(this.getPriceUp(taxSinglePrice)));
+			
+			//综合合价
+			unitProjectDB.setSumPrice(this.toMoney(this.getSumPriceUp(this.getPriceUp(taxSinglePrice), unitProjectDB.getDtgcl())));
+			unitProjectDao.updateByPrimaryKey(unitProjectDB);
+		
+			return;
+		}
+		
+		//修改市场价
+		if("taxPrice".equals(name)){
+			
+			Double v = Double.parseDouble(value);
+			
+			if(this.doubleCompare(v, detailDB.getTaxPrice())){
+				return;
+			}
+			
+			//修改编号
+			if(detailDB.getCode().indexOf("@") != -1){
+				queryMap.put("code", detailDB.getCode().substring(0, detailDB.getCode().indexOf("@")));
+			}else{
+				queryMap.put("code", detailDB.getCode());
+				Integer count = unitProjectDetailDao.getNextValue(queryMap);
+				detailDB.setCode(detailDB.getCode() + "@" + count);
+			}
+			
+			//含税单价
+			BigDecimal taxPrice = BigDecimal.valueOf(v);
+			detailDB.setTaxPrice(this.toMoney(taxPrice));
+			
+			//不含税单价
+			BigDecimal noTaxPrice = this.getNoTaxPriceDown(taxPrice);
+			detailDB.setNoTaxPrice(this.toMoney(noTaxPrice));
+			
+			//含税合价
+			detailDB.setTaxSingleSumPrice(this.toMoney(this.multiply(taxPrice.doubleValue(), detailDB.getAmount())));
+			
+			//不含税合价
+			detailDB.setSingleSumPrice(this.toMoney(this.multiply(noTaxPrice.doubleValue(), detailDB.getAmount())));
+			
+			unitProjectDetailDao.updateByPrimaryKey(detailDB);
+			
+			//修改子目
+			queryMap.remove("unitProjectDetailId");
+			List<UnitProjectDetail> detailList = unitProjectDetailDao.getBitProjectDetailInfo(queryMap);
+
+			//含税单价
+			BigDecimal taxSinglePrice = this.taxSinglePriceUp(detailList);
+			//不含税单价
+			BigDecimal singlePrice = this.getSinglePriceUp(taxSinglePrice);
+			
+			unitProjectDB.setTaxSinglePrice(this.toMoney(taxSinglePrice));;
+			unitProjectDB.setSinglePrice(this.toMoney(singlePrice));
+			
+			//不含税合价
+			unitProjectDB.setSingleSumPrice(this.toMoney(this.getSingleSumPriceUp(singlePrice, unitProjectDB.getDtgcl())));
+			
+			//含税合价
+			unitProjectDB.setTaxSingleSumPrice(this.toMoney(this.getTaxSingleSumPriceUp(taxSinglePrice, unitProjectDB.getDtgcl())));
+			
+			//综合单价
+			unitProjectDB.setPrice(this.toMoney(this.getPriceUp(taxSinglePrice)));
+			
+			//综合合价
+			unitProjectDB.setSumPrice(this.toMoney(this.getSumPriceUp(this.getPriceUp(taxSinglePrice), unitProjectDB.getDtgcl())));
+			unitProjectDao.updateByPrimaryKey(unitProjectDB);
+			return;
+		}
+	}
+	
+	/**
+	 * 不含税价改变  bitProjectId, unitProjectId, unitProjectDetailId, value 
+	 * 
+	 *  bitProjectId  单位工程id（可为空）
+	 *  unitProjectId  子目id（可为空）
+	 *  unitProjectDetailId 详细Id （可为空）
+	 *  value 值 
+	 * @param unitProjectId
+	 */
+	public void changeMarkMoney(Map<String, String> queryMap){
+		
 		
 	}
+	
+	
 	
 	/**
 	 * 上面板含税单价
@@ -644,6 +889,11 @@ public class UnitProjectSericeImpl implements UnitProjectService {
 	private BigDecimal getSinglePriceUp(BigDecimal taxSinglePrice){
 		return taxSinglePrice.divide(BigDecimal.valueOf(1 + Constant.PER_CENT), 5, RoundingMode.HALF_DOWN);
 	}
+	
+	private BigDecimal getNoTaxPriceDown(BigDecimal taxPrice){
+		return taxPrice.divide(BigDecimal.valueOf(1 + Constant.PER_CENT), 5, RoundingMode.HALF_DOWN);
+	}
+	
 	
 	/**
 	 * 上面版综合单价  （含税单价  + 利润（目前不存在））
@@ -725,5 +975,10 @@ public class UnitProjectSericeImpl implements UnitProjectService {
 			singelPrice = singelPrice.add(BigDecimal.valueOf(detail.getContent()).multiply(BigDecimal.valueOf(detail.getTaxPrice())));
 		}
 		return singelPrice;
+	}
+	
+	@Override
+	public UnitProjectDetail getDetailById(Map<String, String> queryMap) {
+		return unitProjectDetailDao.getUnitProjectDetailById(queryMap);
 	}
 }
