@@ -7,7 +7,7 @@ Ext.onReady(function() {
 			Ext.apply(config, {
 				title : '费用小类',
 				width : 350,
-				height : 280,
+				height : 180,
 				bodyPadding : '10 5',
 				modal : true,
 				layout : 'fit',
@@ -63,7 +63,7 @@ Ext.onReady(function() {
 											var res = Ext.JSON.decode(response.responseText);
 											if (res.success) {
 												globalObject.msgTip('操作成功！');
-												Ext.getCmp('ycamanage-ycavaluegrid').getStore().reload();
+												Ext.getCmp('ycamanage-ycavaluegrid').getStore().loadPage(1);
 											} else {
 												globalObject.errTip(res.msg);
 											}
@@ -174,7 +174,7 @@ Ext.onReady(function() {
 			var ycaValueStore = Ext.create('Ext.data.Store', {
 				model : 'YCAValueList',
 				autoLoad : false,
-				remoteSort : true,
+				remoteSort : false,
 				pageSize : globalPageSize,
 				proxy : {
 					type : 'ajax',
@@ -236,7 +236,7 @@ Ext.onReady(function() {
 				}),
 				viewConfig:{
 					loadingText : '正在查询数据，请耐心稍候...',
-					stripeRows:false,
+					stripeRows:true,
 					enableTextSelection : true,
 					getRowClass : function(record, rowIndex){
 						if(record.get('enableFlag') == '0'){
@@ -254,7 +254,7 @@ Ext.onReady(function() {
 			var me = this;
 			var lookValueId = Ext.getCmp('ycamanage-ycatypegrid').lookValueId;
 			if (!lookValueId) {
-				globalObject.infoTip('请先选择费用小类！');
+				globalObject.infoTip('请先选择大类！');
 				return;
 			};
 			var win = new App.baseDataManage.YCAManage.InfoWindow({

@@ -168,7 +168,6 @@ Ext.onReady(function() {
 			var me = this;
 			Ext.define('CostValueList', {
 				extend : 'Ext.data.Model',
-				idProperty : 'lookvalue_id',
 				fields : [ {
 					name : 'lookvalueId',
 					type : 'int'
@@ -178,7 +177,7 @@ Ext.onReady(function() {
 			var costValueStore = Ext.create('Ext.data.Store', {
 				model : 'CostValueList',
 				autoLoad : true,
-				remoteSort : true,
+				remoteSort : false,
 				pageSize : globalPageSize,
 				proxy : {
 					type : 'ajax',
@@ -245,7 +244,7 @@ Ext.onReady(function() {
 				}),
 				viewConfig:{
 					loadingText : '正在查询数据，请耐心稍候...',
-					stripeRows:false,
+					stripeRows: true,
 					enableTextSelection : true,
 					getRowClass : function(record, rowIndex){
 						if(record.get('enableFlag') == '0'){
