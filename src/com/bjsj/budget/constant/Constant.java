@@ -13,4 +13,7 @@ public class Constant {
 	public static final Integer CLFLAG = 2;//材料费
 	public static final Integer AZFLAG = 3;//安装费
 	public static final Integer CSFLAG = 4;//措施费
+	
+	
+	public static final Double PER_CENT = 0.17; //费率
 }

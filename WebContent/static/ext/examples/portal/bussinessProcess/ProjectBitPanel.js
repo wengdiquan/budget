@@ -42,6 +42,30 @@ Ext.onReady(function() {
   	        		if(records[0].data.id == undefined){
   	        			return false;
   	        		}
+  	        	},
+  	        	validateedit:function(editor, e, eOpts){
+	        		Ext.Ajax.request({
+						 url : appBaseUri + '/unitproject/updateItemAndDetail', //新增单位工程的子目
+						 params : {
+							 unitProjectId: e.record.get('id'),
+							 name: e.field,
+							 value:e.value
+						 },
+						 method : "POST",
+						 success : function(response) {
+							 if (response.responseText != '') {
+								 var res = Ext.JSON.decode(response.responseText);
+								 if (res.success) {
+									 editor.grid.reloadAndSelect(e.record, editor.grid);
+								 } else {
+									 globalObject.errTip(res.msg);
+								 }
+							 }
+						 },
+						 failure : function(response) {
+							 globalObject.errTip('操作失败！');
+						 }
+					 });
   	        	}
   	        }
   	    }],
@@ -158,7 +182,10 @@ Ext.onReady(function() {
 				text : "名称",
 				dataIndex : 'name',
 				sortable : false,
-				width : '12%'
+				width : '12%',
+				editor:{
+			        xtype: 'textfield'
+			    }
 			}, {
 				text : "单位",
 				dataIndex : 'unit',
@@ -174,36 +201,7 @@ Ext.onReady(function() {
 				editor:{
 			        xtype: 'numberfield',
 			        allowDecimals: true,
-			        decimalPrecision: 5,
-			        listeners :{
-			        	'blur': function(_this){
-			        		var grid = Ext.getCmp("projectbitpanel-bititemgrid");
-			    			var bitRecord = grid.getSelectionModel().getSelection()[0];
-			        		Ext.Ajax.request({
-								 url : appBaseUri + '/unitproject/updateItemAndDetail', //新增单位工程的子目
-								 params : {
-									 unitProjectId:bitRecord.get('id'),
-									 name:"content",
-									 value:_this.getValue()
-								 },
-								 method : "POST",
-								 success : function(response) {
-									 if (response.responseText != '') {
-										 var res = Ext.JSON.decode(response.responseText);
-										 if (res.success) {
-											 me.reloadAndSelect();
-										 } else {
-											 globalObject.errTip(res.msg);
-										 }
-									 }
-								 },
-								 failure : function(response) {
-									 globalObject.errTip('操作失败！');
-								 }
-							 });
-			        		
-			        	}
-			        }
+			        decimalPrecision: 5
 			    }
 			},{
 				text : "工程量",
@@ -214,77 +212,14 @@ Ext.onReady(function() {
 				editor:{
 			        xtype: 'numberfield',
 			        allowDecimals: true,
-			        decimalPrecision: 5,
-			        listeners :{
-			        	'blur': function(_this){
-			        		var grid = Ext.getCmp("projectbitpanel-bititemgrid");
-			    			var bitRecord = grid.getSelectionModel().getSelection()[0];
-			        		Ext.Ajax.request({
-								 url : appBaseUri + '/unitproject/updateItemAndDetail', //新增单位工程的子目
-								 params : {
-									 unitProjectId:bitRecord.get('id'),
-									 name:"dtgcl",
-									 value:_this.getValue()
-								 },
-								 method : "POST",
-								 success : function(response) {
-									 if (response.responseText != '') {
-										 var res = Ext.JSON.decode(response.responseText);
-										 if (res.success) {
-											 me.reloadAndSelect();
-										 } else {
-											 globalObject.errTip(res.msg);
-										 }
-									 }
-								 },
-								 failure : function(response) {
-									 globalObject.errTip('操作失败！');
-								 }
-							 });
-			        		
-			        	}
-			        }
+			        decimalPrecision: 5
 			    }
 			},{
 				text : "不含税单价",
 				dataIndex : 'singlePrice',
 				width : '8%',
 				sortable : false,
-				align:'right',
-				editor:{
-			        xtype: 'numberfield',
-			        allowDecimals: true,
-			        decimalPrecision: 5,
-			        listeners :{
-			        	'blur': function(_this){
-			        		var grid = Ext.getCmp("projectbitpanel-bititemgrid");
-			    			var bitRecord = grid.getSelectionModel().getSelection()[0];
-			        		Ext.Ajax.request({
-								 url : appBaseUri + '/unitproject/updateItemAndDetail', //新增单位工程的子目
-								 params : {
-									 unitProjectId:bitRecord.get('id'),
-									 name:"notax",
-									 value:_this.getValue()
-								 },
-								 method : "POST",
-								 success : function(response) {
-									 if (response.responseText != '') {
-										 var res = Ext.JSON.decode(response.responseText);
-										 if (res.success) {
-											 me.reloadAndSelect();
-										 } else {
-											 globalObject.errTip(res.msg);
-										 }
-									 }
-								 },
-								 failure : function(response) {
-									 globalObject.errTip('操作失败！');
-								 }
-							 });
-			        		
-			        	}
-			        }
-			    }
+				align:'right'
 			},{
 				text : "含税单价",
 				dataIndex : 'taxSinglePrice',
@@ -294,35 +229,7 @@ Ext.onReady(function() {
 				editor:{
 			        xtype: 'numberfield',
 			        allowDecimals: true,
-			        decimalPrecision: 5,
-			        listeners :{
-			        	'blur': function(_this){
-			        		var grid = Ext.getCmp("projectbitpanel-bititemgrid");
-			    			var bitRecord = grid.getSelectionModel().getSelection()[0];
-			        		Ext.Ajax.request({
-								 url : appBaseUri + '/unitproject/updateItemAndDetail', //新增单位工程的子目
-								 params : {
-									 unitProjectId:bitRecord.get('id'),
-									 name:"tax",
-									 value:_this.getValue()
-								 },
-								 method : "POST",
-								 success : function(response) {
-									 if (response.responseText != '') {
-										 var res = Ext.JSON.decode(response.responseText);
-										 if (res.success) {
-											 me.reloadAndSelect();
-										 } else {
-											 globalObject.errTip(res.msg);
-										 }
-									 }
-								 },
-								 failure : function(response) {
-									 globalObject.errTip('操作失败！');
-								 }
-							 });
-			        	}
-			        }
+			        decimalPrecision: 5
 			    }
 			},{
 				text : "不含税合价",
@@ -354,36 +261,7 @@ Ext.onReady(function() {
 				sortable : false,
 				width : '12%',
 				editor:{
-			        xtype: 'textfield',
-			        listeners :{
-			        	'blur': function(_this){
-			        		var grid = Ext.getCmp("projectbitpanel-bititemgrid");
-			    			var bitRecord = grid.getSelectionModel().getSelection()[0];
-			        		Ext.Ajax.request({
-								 url : appBaseUri + '/unitproject/updateItemAndDetail', //新增单位工程的子目
-								 params : {
-									 unitProjectId:bitRecord.get('id'),
-									 name:"remark",
-									 value:_this.getValue()
-								 },
-								 method : "POST",
-								 success : function(response) {
-									 if (response.responseText != '') {
-										 var res = Ext.JSON.decode(response.responseText);
-										 if (res.success) {
-											 me.reloadAndSelect();
-										 } else {
-											 globalObject.errTip(res.msg);
-										 }
-									 }
-								 },
-								 failure : function(response) {
-									 globalObject.errTip('操作失败！');
-								 }
-							 });
-			        		
-			        	}
-			        }
+			        xtype: 'textfield'
 			    }
 			}];
 			
@@ -466,10 +344,7 @@ Ext.onReady(function() {
 			
 			this.callParent(arguments);
 		},
-		reloadAndSelect:function(i){
-			var grid = Ext.getCmp("projectbitpanel-bititemgrid");
-			var bitRecord = grid.getSelectionModel().getSelection()[0];
-			
+		reloadAndSelect:function(bitRecord, grid){
 			Ext.Ajax.request({
 				 url : appBaseUri + '/unitproject/getItemById', 
 				 params : {
@@ -493,7 +368,6 @@ Ext.onReady(function() {
 						 bitRecord.set('sumPrice', data.sumPrice);
 						 bitRecord.set('remark', data.remark);
 						 bitRecord.commit();
-						 
 					 }
 				 },
 				 failure : function(response) {
@@ -600,6 +474,31 @@ Ext.onReady(function() {
   	  	        			return false;
   	  	        		}
   	        		}
+  	        	},
+  	        	validateedit:function(editor, e, eOpts){
+	        		Ext.Ajax.request({
+						 url : appBaseUri + '/unitproject/updateItemAndDetail',
+						 params : {
+							 unitProjectDetailId:e.record.get('id'),
+							 name:e.field,
+							 value:e.value
+						 },
+						 method : "POST",
+						 success : function(response) {
+							 if (response.responseText != '') {
+								 var res = Ext.JSON.decode(response.responseText);
+								 if (res.success) {
+									 //刷新item并且刷新detail面板
+									 editor.grid.refleshItemAndDetail(e.record, editor.grid);
+								 } else {
+									 globalObject.errTip(res.msg);
+								 }
+							 }
+						 },
+						 failure : function(response) {
+							 globalObject.errTip('操作失败！');
+						 }
+					 });
   	        	}
   	        }
   	    }],
@@ -712,35 +611,7 @@ Ext.onReady(function() {
 				editor:{
 			        xtype: 'numberfield',
 			        allowDecimals: true,
-			        decimalPrecision: 5,
-			        listeners :{
-			        	'blur': function(_this){
-			        		var grid = Ext.getCmp("projectbitpanel-bitdetailgrid");
-			    			var bitRecord = grid.getSelectionModel().getSelection()[0];
-			        		Ext.Ajax.request({
-								 url : appBaseUri + '/unitproject/updateDetailAndItem',
-								 params : {
-									 unitProjectDetailId:bitRecord.get('id'),
-									 name:"content",
-									 value:_this.getValue()
-								 },
-								 method : "POST",
-								 success : function(response) {
-									 if (response.responseText != '') {
-										 var res = Ext.JSON.decode(response.responseText);
-										 if (res.success) {
-											 me.reloadAndSelect();
-										 } else {
-											 globalObject.errTip(res.msg);
-										 }
-									 }
-								 },
-								 failure : function(response) {
-									 globalObject.errTip('操作失败！');
-								 }
-							 });
-			        	}
-			        }
+			        decimalPrecision: 5
 			    }
 			},{
 				text : "数量",
@@ -751,35 +622,7 @@ Ext.onReady(function() {
 				editor:{
 			        xtype: 'numberfield',
 			        allowDecimals: true,
-			        decimalPrecision: 5,
-			        listeners :{
-			        	'blur': function(_this){
-			        		var grid = Ext.getCmp("projectbitpanel-bitdetailgrid");
-			    			var bitRecord = grid.getSelectionModel().getSelection()[0];
-			        		Ext.Ajax.request({
-								 url : appBaseUri + '/unitproject/updateDetailAndItem',
-								 params : {
-									 unitProjectDetailId:bitRecord.get('id'),
-									 name:"amount",
-									 value:_this.getValue()
-								 },
-								 method : "POST",
-								 success : function(response) {
-									 if (response.responseText != '') {
-										 var res = Ext.JSON.decode(response.responseText);
-										 if (res.success) {
-											 me.reloadAndSelect();
-										 } else {
-											 globalObject.errTip(res.msg);
-										 }
-									 }
-								 },
-								 failure : function(response) {
-									 globalObject.errTip('操作失败！');
-								 }
-							 });
-			        	}
-			        }
+			        decimalPrecision: 5
 			    }
 			},{
 				text : "不含税单价",
@@ -790,35 +633,7 @@ Ext.onReady(function() {
 				editor:{
 			        xtype: 'numberfield',
 			        allowDecimals: true,
-			        decimalPrecision: 5,
-			        listeners :{
-			        	'blur': function(_this){
-			        		var grid = Ext.getCmp("projectbitpanel-bitdetailgrid");
-			    			var bitRecord = grid.getSelectionModel().getSelection()[0];
-			        		Ext.Ajax.request({
-								 url : appBaseUri + '/unitproject/updateDetailAndItem',
-								 params : {
-									 unitProjectDetailId:bitRecord.get('id'),
-									 name:"noTaxPrice",
-									 value:_this.getValue()
-								 },
-								 method : "POST",
-								 success : function(response) {
-									 if (response.responseText != '') {
-										 var res = Ext.JSON.decode(response.responseText);
-										 if (res.success) {
-											 me.reloadAndSelect();
-										 } else {
-											 globalObject.errTip(res.msg);
-										 }
-									 }
-								 },
-								 failure : function(response) {
-									 globalObject.errTip('操作失败！');
-								 }
-							 });
-			        	}
-			        }
+			        decimalPrecision: 5
 			    }
 			},{
 				text : "含税单价",
@@ -827,14 +642,14 @@ Ext.onReady(function() {
 				align:'right',
 				width : '8%'
 			},{
-				text : "含税合价",
-				dataIndex : 'taxSingleSumPrice',
+				text : "不含税合价",
+				dataIndex : 'singleSumPrice',
 				sortable : false,
 				align:'right',
 				width : '8%'
 			},{
-				text : "不含税合价",
-				dataIndex : 'singleSumPrice',
+				text : "含税合价",
+				dataIndex : 'taxSingleSumPrice',
 				sortable : false,
 				align:'right',
 				width : '8%'
@@ -856,7 +671,6 @@ Ext.onReady(function() {
 				text : "isSuppleCost",
 				dataIndex : 'isSuppleCost',
 				hidden:true
-				
 			}];
 			
 			Ext.apply(this, {
@@ -882,7 +696,7 @@ Ext.onReady(function() {
 					enableTextSelection : true,
 					getRowClass : function(record, rowIndex){
 		            }
-				}
+				},
 			});
 			
 			this.callParent(arguments);
@@ -941,15 +755,14 @@ Ext.onReady(function() {
 			
 		},
 		deleteDetailFun:function(){
+			var records = Ext.getCmp('projectbitpanel-bitdetailgrid').getSelectionModel().getSelection();	 
+			if(records.length == 0){
+				globalObject.infoTip("请选择一条进行删除.");
+				return;
+			}
 			globalObject.confirmTip("确认删除吗?", 
 				 function(btn){
 					 if("yes" == btn){
-						 var records = Ext.getCmp('projectbitpanel-bitdetailgrid').getSelectionModel().getSelection();	 
-						 if(records.length == 0){
-							 globalObject.infoTip("请选择一条进行删除.");
-							 return;
-						 }
-						 
 						Ext.getCmp('projectbitpanel-bitdetailgrid').getEl().mask('数据处理中，请稍候...');
 						 Ext.Ajax.request({
 							 url : appBaseUri + '/unitproject/deleteBitProjectDetail',
@@ -962,7 +775,9 @@ Ext.onReady(function() {
 								 if (response.responseText != '') {
 									 var res = Ext.JSON.decode(response.responseText);
 									 if (res.success) {
-										 Ext.getCmp('projectbitpanel-bititemgrid').reloadAndSelect();
+										var itemGrid = Ext.getCmp("projectbitpanel-bititemgrid");
+										var itemRecord = itemGrid.getSelectionModel().getSelection()[0];
+										 Ext.getCmp('projectbitpanel-bititemgrid').reloadAndSelect(itemRecord, itemGrid);
 									 } else {
 										 globalObject.errTip(res.msg);
 									 }
@@ -977,33 +792,35 @@ Ext.onReady(function() {
 					 }
 			 	});
 		},
-		reloadAndDetailSelect:function(i){
-			var grid = Ext.getCmp("projectbitpanel-bititemgrid");
-			var bitRecord = grid.getSelectionModel().getSelection()[0];
+		refleshItemAndDetail:function(detailRecord, detailGrid){
+			var itemGrid = Ext.getCmp("projectbitpanel-bititemgrid");
+			var itemRecord = itemGrid.getSelectionModel().getSelection()[0];
 			
 			Ext.Ajax.request({
-				 url : appBaseUri + '/unitproject/getItemById', 
+				 url : appBaseUri + '/unitproject/getItemAndDetailById', 
 				 params : {
-					 unitProjectId:bitRecord.get('id')
+					 unitProjectId:itemRecord.get('id'),
 				 },
 				 method : "POST",
 				 success : function(response) {
 					 if (response.responseText != '') {
 						 var res = Ext.JSON.decode(response.responseText);
 						 var data = res.data;
-						 grid.getSelectionModel().select(bitRecord.data.index + 1);
-						 Ext.getCmp('projectbitpanel-bitdetailgrid').getStore().reload();
+						 itemGrid.getSelectionModel().select(itemRecord.data.index + 1);
+						 detailGrid.getSelectionModel().select(itemRecord.data.index + 1);
 						 
-						 bitRecord.set('content', data.content);
-						 bitRecord.set('dtgcl', data.dtgcl);
-						 bitRecord.set('singlePrice', data.singlePrice);
-						 bitRecord.set('taxSinglePrice', data.taxSinglePrice);
-						 bitRecord.set('singleSumPrice', data.singleSumPrice);
-						 bitRecord.set('taxSingleSumPrice', data.taxSingleSumPrice);
-						 bitRecord.set('price', data.price);
-						 bitRecord.set('sumPrice', data.sumPrice);
-						 bitRecord.set('remark', data.remark);
-						 bitRecord.commit();
+						 itemRecord.set('content', data.content);
+						 itemRecord.set('dtgcl', data.dtgcl);
+						 itemRecord.set('singlePrice', data.singlePrice);
+						 itemRecord.set('taxSinglePrice', data.taxSinglePrice);
+						 itemRecord.set('singleSumPrice', data.singleSumPrice);
+						 itemRecord.set('taxSingleSumPrice', data.taxSingleSumPrice);
+						 itemRecord.set('price', data.price);
+						 itemRecord.set('sumPrice', data.sumPrice);
+						 itemRecord.set('remark', data.remark);
+						 itemRecord.commit();
+						 
+						 
 						 
 					 }
 				 },
