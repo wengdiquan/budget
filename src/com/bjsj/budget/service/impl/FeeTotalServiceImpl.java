@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.bjsj.budget.dao.FeeTotalDao;
 import com.bjsj.budget.model.FeeTemplateModel;
 import com.bjsj.budget.model.FeeTotalModel;
+import com.bjsj.budget.model.YCATotalModel;
 import com.bjsj.budget.page.PageInfo;
 import com.bjsj.budget.page.PageObject;
 import com.bjsj.budget.service.FeeTotalService;
@@ -30,6 +31,42 @@ public class FeeTotalServiceImpl implements FeeTotalService{
 
 	@Override
 	public void updateValue(FeeTotalModel record) throws Exception {
+		feeTotalDao.updateByPrimaryKey(record);
+	}
+	
+	@Override
+	public void updateValueRadix(FeeTotalModel record) throws Exception {
+		//to-do  tm_unitproject_detail  判断编码，最后一个编码
+		//可以删光 计算基数，基数说明 和 金额跟着改
+		if(record.getCalculatedRadix()!= null && !"".equals(record.getCalculatedRadix())){
+			String caRa = record.getCalculatedRadix();
+			if(caRa.endsWith("+")){
+				throw new Exception("非法表达式：" + caRa); 
+			}
+			String[] strA = record.getCalculatedRadix().split("\\+");
+			String radixRemark = "";
+			Double amount = (double) 0;
+			YCATotalModel model = new YCATotalModel();
+			HashMap map = new HashMap();
+			for(int i = 0; i<strA.length; i++){
+				if("".equals(strA[i]) || strA[i] == null){
+					continue;
+				}
+				map.put("code", strA[i]);
+				model = feeTotalDao.selectByPrimaryKeyYCA(map);
+				if(model == null){
+					throw new Exception("非法表达式：" + caRa); 
+				}
+				radixRemark = radixRemark + "+" + model.getName();
+				amount = amount + model.getTax_Single_SumPrice();
+			}
+			record.setRadixRemark(radixRemark.substring(1));
+			record.setAmount(amount);
+		}else{
+			record.setCalculatedRadix("");
+			record.setRadixRemark("");
+			record.setAmount((double)0);
+		}
 		feeTotalDao.updateByPrimaryKey(record);
 	}
 

@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Param;
 import com.bjsj.budget.model.CategoryModelModel;
 import com.bjsj.budget.model.FeeTemplateModel;
 import com.bjsj.budget.model.FeeTotalModel;
+import com.bjsj.budget.model.YCATotalModel;
 import com.bjsj.budget.page.PageInfo;
 
 public interface FeeTotalDao extends BaseDao{
@@ -24,5 +25,7 @@ public interface FeeTotalDao extends BaseDao{
 	int insertTemplateTable(FeeTemplateModel record);
 	
 	FeeTemplateModel selectByPrimaryKey(@Param("map") Map<String, String> queryMap);
+	
+	YCATotalModel selectByPrimaryKeyYCA(@Param("map") Map<String, String> queryMap);
 	
 }

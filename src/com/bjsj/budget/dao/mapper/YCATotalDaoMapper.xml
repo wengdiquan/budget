@@ -4,14 +4,16 @@
 
 	<resultMap id="YCATotalInfoMap" type="com.bjsj.budget.model.YCATotalModel">
 	</resultMap>
+	<resultMap id="UnitProjectMap" type="com.bjsj.budget.model.UnitProject" ></resultMap>
 	<sql id="Base_Column_List">
-		t.id, t.code, t.type, t.name, t.unit, t.tax_Price,
-		t.notax_Price, t.amount, t.tax_Single_SumPrice, t.single_SumPrice
+		t.code, t.type, t.name, t.unit
 	</sql>
 	
     <select id="queryYCATotalInfo" parameterType="HashMap" resultMap="YCATotalInfoMap">
    	 	select 
-	   		<include refid="Base_Column_List" /> 
+	   		<include refid="Base_Column_List" />,t.tax_Price,t.notax_Price, 
+	   		convert(sum(t.amount),decimal(14,2)) as amount, convert(sum(t.tax_Single_SumPrice),decimal(14,2))
+	   		as tax_Single_SumPrice, convert(sum(t.single_SumPrice),decimal(14,2)) as single_SumPrice
 	   	from tm_unitproject_detail t
 	   	inner join tm_unitproject tu on t.unitproject_id = tu.id
 		inner join tm_lookvalue tl on t.lookvalueid = tl.lookvalue_id
@@ -22,20 +24,119 @@
 	     <if test="map.bitProjectId != null and map.bitProjectId !=''">
 	    	and tu.bit_project_id = #{map.bitProjectId,jdbcType=INTEGER} 
 	    </if>
+	    group by t.code, t.type, t.name, t.unit, t.tax_Price,t.notax_Price
     </select>
     <select id="getYCATotalInfoCount" parameterType="HashMap" resultType="Integer">
 		select 
 	   		count(1) 
+	   	from (
+	   		select 
+	   		<include refid="Base_Column_List" />,t.tax_Price,t.notax_Price, 
+	   		convert(sum(t.amount),decimal(14,2)) as amount, convert(sum(t.tax_Single_SumPrice),decimal(14,2))
+	   		as tax_Single_SumPrice, convert(sum(t.single_SumPrice),decimal(14,2)) as single_SumPrice
 	   	from tm_unitproject_detail t
 	   	inner join tm_unitproject tu on t.unitproject_id = tu.id
 		inner join tm_lookvalue tl on t.lookvalueid = tl.lookvalue_id
 		inner join tm_looktype tlt on tlt.looktype_id = tl.looktype_id 
 	    <if test="map.lookTypeId != null and map.lookTypeId !=''">
 	    	and tlt.looktype_id = #{map.lookTypeId,jdbcType=INTEGER} 
-	    </if>
+	    </if>	
 	     <if test="map.bitProjectId != null and map.bitProjectId !=''">
 	    	and tu.bit_project_id = #{map.bitProjectId,jdbcType=INTEGER} 
 	    </if>
+	    group by t.code, t.type, t.name, t.unit, t.tax_Price,t.notax_Price
+	   	)t
 	</select>
+	
+	<select id="getYCATotalList" parameterType="HashMap" resultMap="YCATotalInfoMap">
+	    select 
+	    	<include refid="Base_Column_List" />,t.tax_Single_SumPrice,t.notax_Price,t.tax_Price,t.single_SumPrice,t.amount
+	    from tm_unitproject_detail t
+	    where 1 = 1  
+	     <if test="map.code != null and map.code != ''">
+			and t.code = #{map.code,jdbcType=VARCHAR}   
+	    </if>	
+	   	<if test="map.bitProjectId != null and map.bitProjectId != ''">
+			and t.unitproject_id in( select id FROM tm_unitproject where bit_project_id = #{map.bitProjectId,jdbcType=INTEGER})  
+	    </if>
+	</select>
+	<sql id="Base_Column_ListUnit">
+		t.id as id, 
+		t.code as code, 
+		t.type as type,
+		t.name as name, 
+		t.unit as unit,
+		t.content as content,
+		t.dtgcl as dtgcl, 
+		t.single_price as singlePrice, 
+		t.tax_single_price as taxSinglePrice,
+		t.single_sumprice as singleSumPrice,
+		t.tax_single_sumprice as taxSingleSumPrice,
+		t.price as price,
+		t.sumprice as sumPrice, 
+		t.remark as remark,
+		t.parentid as parentid, 
+		t.leaf as leaf,
+		t.bit_project_id as bitProjectId,
+		t.lookvalue_id as lookValueId,
+		t.seq as seq
+	</sql>
+	<select id="getUnitProjectList" parameterType="HashMap" resultMap="UnitProjectMap">
+		select
+			<include refid="Base_Column_ListUnit"/>
+		from tm_unitproject t 
+		inner join tm_unitproject_detail b on t.id = b.unitproject_id
+		where t.bit_project_id = #{map.bitProjectId,jdbcType=INTEGER}
+		and b.code = #{map.code,jdbcType=VARCHAR} 
+	</select>
+	
+	<update id="updateByPrimaryKey" parameterType="com.bjsj.budget.model.YCATotalModel">
+		update
+		tm_unitproject_detail
+		<trim prefix="set" suffixOverrides=",">
+			<if test="name != null" >
+		    	 name = #{name,jdbcType=VARCHAR},
+		    </if>
+		    <if test="tax_Single_SumPrice != null" >
+		    	 tax_Single_SumPrice = #{tax_Single_SumPrice,jdbcType=DOUBLE},
+		    </if>
+		    <if test="notax_Price != null" >
+		    	 notax_Price = #{notax_Price,jdbcType=DOUBLE},
+		    </if>
+		    <if test="single_SumPrice != null" >
+		    	 single_SumPrice = #{single_SumPrice,jdbcType=DOUBLE},
+		    </if>
+		    <if test="tax_Price != null" >
+		    	 tax_Price = #{tax_Price,jdbcType=DOUBLE},
+		    </if>
+		</trim>
+		where code = #{code,jdbcType=VARCHAR}
+		and unitproject_id in( select id FROM tm_unitproject where bit_project_id = #{bitProjectId,jdbcType=INTEGER})
+	</update>
+	
+	<update id="updateUnitByPrimaryKey" parameterType="com.bjsj.budget.model.UnitProject">
+		update tm_unitproject
+		<trim prefix="set" suffixOverrides=",">
+			<if test="singlePrice != null" >
+		    	 single_price = #{singlePrice,jdbcType=DOUBLE},
+		    </if>
+		    <if test="taxSinglePrice != null" >
+		    	tax_single_price = #{taxSinglePrice,jdbcType=DOUBLE},
+		    </if>
+		    <if test="singleSumPrice != null" >
+		    	single_sumprice = #{singleSumPrice,jdbcType=DOUBLE},
+		    </if>
+		    <if test="taxSingleSumPrice != null" >
+		    	tax_single_sumprice = #{taxSingleSumPrice,jdbcType=DOUBLE},
+		    </if>
+		    <if test="price != null" >
+		    	price = #{price,jdbcType=DOUBLE},
+		    </if>
+		    <if test="sumPrice != null" >
+		    	sumprice = #{sumPrice,jdbcType=DOUBLE},
+		    </if>
+		</trim>
+		where id = #{id,jdbcType=INTEGER}
+	</update>
     
 </mapper>

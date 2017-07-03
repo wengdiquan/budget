@@ -111,7 +111,22 @@ public class FeeTotalController {
 			TransforUtil.transFromMapToBean(request.getParameterMap(), record);
 			feeTotalService.updateValue(record);
 		}catch (Exception ex) {
-			return "{success:false,msg:" + ex.getMessage() + "}";
+			return "{success:false,msg:'" + ex.getMessage() + "'}";
+		}
+		return "{success:true}";
+	}
+	
+	@RequestMapping(value = "/updateValueRadix")
+	@ResponseBody
+	public String updateValueRadix ( HttpServletRequest request,HttpServletResponse response){
+		FeeTotalModel record = new FeeTotalModel();
+		
+		try
+		{
+			TransforUtil.transFromMapToBean(request.getParameterMap(), record);
+			feeTotalService.updateValueRadix(record);
+		}catch (Exception ex) {
+			return "{success:false,msg:'" + ex.getMessage() + "'}";
 		}
 		return "{success:true}";
 	}

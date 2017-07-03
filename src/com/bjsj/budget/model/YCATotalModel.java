@@ -12,6 +12,7 @@ public class YCATotalModel {
 	private Double amount;
 	private Double tax_Single_SumPrice;
 	private Double single_SumPrice;
+	private Integer bitProjectId;
 	
 	public Integer getId() {
 		return id;
@@ -73,6 +74,11 @@ public class YCATotalModel {
 	public void setSingle_SumPrice(Double single_SumPrice) {
 		this.single_SumPrice = single_SumPrice;
 	}
-	
+	public Integer getBitProjectId() {
+		return bitProjectId;
+	}
+	public void setBitProjectId(Integer bitProjectId) {
+		this.bitProjectId = bitProjectId;
+	}
 
 }
