@@ -29,6 +29,13 @@ public interface FeeTotalService {
 	 * @throws Exception
 	 */
 	public void updateValue(FeeTotalModel record) throws Exception;
+	
+	/**
+	 * 修改 费用汇总
+	 * @param record
+	 * @throws Exception
+	 */
+	public void updateValueRadix(FeeTotalModel record) throws Exception;
 
 	/**
 	 * 插入费用模板

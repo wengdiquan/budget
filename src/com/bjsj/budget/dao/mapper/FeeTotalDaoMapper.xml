@@ -6,6 +6,8 @@
 	</resultMap>
 	<resultMap id="FeeTemplateMap" type="com.bjsj.budget.model.FeeTemplateModel">
 	</resultMap>
+	<resultMap id="YCATotalInfoMap" type="com.bjsj.budget.model.YCATotalModel">
+	</resultMap>
 	
 	<sql id="Base_Column_List">
 		t.id, t.seq, t.feeCode, t.name, t.calculatedRadix, t.radixRemark,
@@ -115,6 +117,16 @@
 	    <if test="map.name != null and map.name != ''">
 			and t.name = #{map.name,jdbcType=VARCHAR}   
 		</if>	
+	</select>
+	
+	<select id="selectByPrimaryKeyYCA" parameterType="HashMap" resultMap="YCATotalInfoMap">
+		select t.code, t.name, sum(t.tax_Single_SumPrice) as tax_Single_SumPrice
+	    from tm_unitproject_detail t 
+	    where 1 = 1 
+	    <if test="map.code != null and map.code != ''">
+			and t.code = #{map.code,jdbcType=VARCHAR}   
+		</if>
+		group by t.code, t.name
 	</select>
     
 </mapper>
