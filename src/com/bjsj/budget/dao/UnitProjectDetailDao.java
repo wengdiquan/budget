@@ -26,4 +26,18 @@ public interface UnitProjectDetailDao extends BaseDao {
 	 * 根据子目删除所有details
 	 * @param queryMap
 	 */
-	void deleteByUnitProjectId(Map<String, String> queryMap);}
+	void deleteByUnitProjectId(Map<String, String> queryMap);
+	
+	/**
+	 * 根据Id 获取 明细
+	 * @param queryMap
+	 * @return
+	 */
+	UnitProjectDetail getUnitProjectDetailById(Map<String, String> queryMap);
+	
+	/**
+	 * 获取编号
+	 * @param queryMap
+	 * @return 
+	 */
+	Integer getNextValue(Map<String, String> queryMap);}

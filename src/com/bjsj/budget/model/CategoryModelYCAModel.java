@@ -10,7 +10,7 @@ public class CategoryModelYCAModel {
 	private Double content;
 	private Double amount;
 	private Double noPrice;
-	private Double price;
+	private Double price;  //含税单价
 	private Double rate;
 	private Double sumPrice;
 	private Double sumNoPrice;
