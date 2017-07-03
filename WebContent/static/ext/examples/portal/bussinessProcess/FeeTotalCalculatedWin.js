@@ -13,16 +13,19 @@ Ext.onReady(function() {
 				bodyPadding : '5 5',
 				modal : true,
 				layout : 'fit',
-				items : [
-					{	
-			              region:'center', 
-			              id: 'center-region-containeraa', 
-			              layout: 'border', 
-			              items : [
-			            	  			Ext.create('Budget.app.bussinessProcess.FeeTotal.FeeTypeGridWin'),
-			            	  			Ext.create('Budget.app.bussinessProcess.FeeTotal.FeeValueGridWin')
-			                       ]
-			         }
+				items : [{	
+		              region:'center', 
+		              id: 'center-region-containeraa', 
+		              layout: 'border', 
+		              items : [
+            	  			Ext.create('Budget.app.bussinessProcess.FeeTotal.FeeTypeGridWin', {
+            	  				"bitProjectId" : me.bitProjectId
+            	  			}),
+            	  			Ext.create('Budget.app.bussinessProcess.FeeTotal.FeeValueGridWin', {
+            	  				"bitProjectId" : me.bitProjectId
+            	  			})
+                       ]
+		         }
 				]
   			});
   			this.callParent(arguments);
@@ -98,7 +101,9 @@ Ext.onReady(function() {
 				proxy : {
 					type : 'ajax',
 					url : appBaseUri + '/ycatotal/queryYCATotalInfo',
-					extraParams : {"lookTypeId": Ext.getCmp('feetotal-feetypegridwin').lookTypeId},
+					extraParams : {"lookTypeId": Ext.getCmp('feetotal-feetypegridwin').lookTypeId,
+						"bitProjectId" : me.bitProjectId},
+					}
 					reader : {
 						type : 'json',
 						root : 'data',

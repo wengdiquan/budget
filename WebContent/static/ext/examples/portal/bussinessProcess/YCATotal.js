@@ -11,10 +11,12 @@ Ext.onReady(function() {
 				height:  520,
 				items : [  
 	            	  Ext.create('Budget.app.bussinessProcess.YCATotal.CostTypeGrid',{
-	            		  bitProjectId:me.bitProjectId
+	            		  bitProjectId:me.bitProjectId,
+	            		  itemId: "ycatotal-costtypegrid-itemid"
 	            	  }), 
 					  Ext.create('Budget.app.bussinessProcess.YCATotal.CostValueGrid',{
-						  bitProjectId:me.bitProjectId
+						  bitProjectId:me.bitProjectId,
+						  itemId: "ycatotal-costvaluegrid-itemid"
 					  })
 				 ]
 			});

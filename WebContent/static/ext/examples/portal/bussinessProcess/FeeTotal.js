@@ -1,4 +1,3 @@
-// 用户管理
 Ext.onReady(function() {
 	Ext.tip.QuickTipManager.init();
 	Ext.define('App.bussinessProcess.FeeTotal.InfoWindow', {
@@ -258,21 +257,26 @@ Ext.onReady(function() {
 	// 费用汇总
 	Ext.define('Budget.app.bussinessProcess.FeeTotal', {
 		extend : 'Ext.panel.Panel',
+		width: "100%", 
 		initComponent : function() {
 			var me = this;
 			Ext.apply(this, {
 				layout: 'border',
+				height:  520,
 				items : [ 
-						            	  Ext.create('Budget.app.bussinessProcess.FeeTotal.FeeDetailGrid'),
-						            	  {	
-								              region:'center', 
-								              id: 'center-region-container11', 
-								              layout: 'border', 
-								              items : [
-								            	  			Ext.create('Budget.app.bussinessProcess.FeeTotal.FeeTypeGrid'),
-								            	  			Ext.create('Budget.app.bussinessProcess.FeeTotal.FeeValueGrid')
-								                       ]
-								         }
+	            	  Ext.create('Budget.app.bussinessProcess.FeeTotal.FeeDetailGrid'),{	
+			              region:'center', 
+			              id: 'center-region-container11', 
+			              layout: 'border', 
+			              items : [
+	            	  			Ext.create('Budget.app.bussinessProcess.FeeTotal.FeeTypeGrid', {
+	            	  				 bitProjectId:me.bitProjectId
+	            	  			}),
+	            	  			Ext.create('Budget.app.bussinessProcess.FeeTotal.FeeValueGrid', {
+	            	  				 bitProjectId:me.bitProjectId
+	            	  			})
+	                       ]
+			         }
 				    ]
 			});
 			this.callParent(arguments);
@@ -449,7 +453,9 @@ Ext.onReady(function() {
 					triggerCls: Ext.baseCSSPrefix + 'form-search-trigger',
 					editable:true,
 					onTriggerClick:function(){
-						Ext.create("Budget.app.bussinessProcess.FeeTotalCalculatedWin").show();
+						Ext.create("Budget.app.bussinessProcess.FeeTotalCalculatedWin",{
+							"bitProjectId" : me.bitProjectId
+						}).show();
 					},
 					listeners :{
 				        	'blur': function(_this){
@@ -757,7 +763,9 @@ Ext.onReady(function() {
 				proxy : {
 					type : 'ajax',
 					url : appBaseUri + '/ycatotal/queryYCATotalInfo',
-					extraParams : {"lookTypeId": Ext.getCmp('feetotal-feetypegrid').lookTypeId},
+					extraParams : {"lookTypeId": Ext.getCmp('feetotal-feetypegrid').lookTypeId,
+						"bitProjectId" : me.bitProjectId
+					},
 					reader : {
 						type : 'json',
 						root : 'data',

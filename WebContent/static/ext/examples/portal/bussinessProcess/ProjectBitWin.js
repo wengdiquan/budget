@@ -46,7 +46,7 @@ Ext.onReady(function() {
                 }, {  
                     title: '费用汇总',  
                     items:[
-                    	Ext.create("Budget.app.bussinessProcess.ProjectCostTotalPanel", {
+                    	Ext.create("Budget.app.bussinessProcess.FeeTotal", {
                     		bitProjectId:me.bitProjectId
                     	})
                     ], 
@@ -62,7 +62,28 @@ Ext.onReady(function() {
                     itemId: 'report'  
                 }]
   			});
-        	
+  			
+  			
+  			this.on('tabChange', function(tabPanel, newCard, oldCard, eOpts){
+  				
+  				//运财安汇总
+  				if("ycatotal" == newCard.itemId){
+  					Ext.getCmp('ycatotal-costvaluegrid').getStore().loadPage(1);
+  				}
+  				//分部分项
+  				if("bitproject" == newCard.itemId){
+  					Ext.getCmp('projectbitpanel-bititemgrid').getStore().load();
+  					Ext.getCmp('projectbitpanel-bitdetailgrid').getStore().removeAll();
+  				}
+  				
+  				//费用汇总
+  				if("costtotal" == newCard.itemId){
+  					Ext.getCmp('feetotal-feevaluegrid').getStore().loadPage(1);
+  					Ext.getCmp('feetotal-feedetailgrid').getStore().loadPage(1);
+  				}
+  				
+  			})
+  			
 			this.callParent(arguments);
 		}
 	});
