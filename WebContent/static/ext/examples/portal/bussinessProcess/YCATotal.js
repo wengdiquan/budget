@@ -1,4 +1,3 @@
-// 用户管理
 Ext.onReady(function() {
 	Ext.tip.QuickTipManager.init();
 	// 运材安汇总
