@@ -168,7 +168,8 @@ Ext.onReady(function() {
 					onTriggerClick:function(){
 						Ext.create("Budget.app.bussinessProcess.ProjectItemWin", {
 							bitItemGrid:Ext.getCmp("projectbitpanel-bititemgrid"),
-							bitProjectId:me.bitProjectId
+							bitProjectId:me.bitProjectId,
+							showDing:true
 						}).show();
 					}
 				}
@@ -434,7 +435,7 @@ Ext.onReady(function() {
 						 return;
 					 }
 					 
-					Ext.getCmp('projectbitpanel-bititemgrid').getEl().mask('数据处理中，请稍候...');
+					 Ext.getCmp('projectbitpanel-bititemgrid').getEl().mask('数据处理中，请稍候...');
 					 Ext.Ajax.request({
 						 url : appBaseUri + '/unitproject/deleteBitProjectItem',
 						 params : {
@@ -609,9 +610,18 @@ Ext.onReady(function() {
 				dataIndex : 'name',
 				sortable : false,
 				width : '10%',
-				editor:{
-			        xtype: 'textfield'
-			    }
+				editor: {
+					xtype:'triggerfield',
+					triggerCls: Ext.baseCSSPrefix + 'form-search-trigger',
+					editable:false,
+					onTriggerClick:function(){
+						Ext.create("Budget.app.bussinessProcess.ProjectItemWin", {
+							bitDetailGrid:Ext.getCmp("projectbitpanel-bitdetailgrid"),
+							bitProjectId:me.bitProjectId,
+							showDing:false
+						}).show();
+					}
+				}
 			}, {
 				text : "规格及型号",
 				dataIndex : 'typeInfo',
@@ -877,6 +887,7 @@ Ext.onReady(function() {
 						 var res = Ext.JSON.decode(response.responseText);
 						 var itemData = res.itemData;
 						 var detailData = res.detailData;
+						 var rootJ = res.rootJ;
 						 itemGrid.getSelectionModel().select(itemRecord.data.index + 1);
 						
 						 detailGrid.getStore().each(function(record){
@@ -908,6 +919,13 @@ Ext.onReady(function() {
 						 detailRecord.set('singleSumPrice', detailData.singleSumPrice);
 						 detailRecord.set('taxSingleSumPrice', detailData.taxSingleSumPrice);
 						 detailRecord.commit();
+						 
+						 var rootRecord = Ext.getCmp('projectbitpanel-bititemgrid').getRootNode().firstChild;
+						 rootRecord.set('singlePrice', rootJ.singlePrice);
+						 rootRecord.set('taxSinglePrice', rootJ.taxSinglePrice);
+						 rootRecord.set('price', rootJ.price);
+						 rootRecord.set('sumPrice', rootJ.sumPrice);
+						 rootRecord.commit();
 						 
 					 }
 				 },

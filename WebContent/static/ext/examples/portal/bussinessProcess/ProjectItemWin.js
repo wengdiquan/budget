@@ -16,7 +16,8 @@ Ext.onReady(function() {
 				layout : 'fit',
 				items : [Ext.create("Budget.app.bussinessProcess.ProjectItemWin.TabPanel", {
 						bitProjectId: me.bitProjectId,
-						bitItemGrid: me.bitItemGrid
+						bitItemGrid: me.bitItemGrid,
+						showDing:me.showDing
 					})
 				]
   			});
@@ -28,11 +29,13 @@ Ext.onReady(function() {
 		extend : 'Ext.tab.Panel',
         initComponent : function() {
           	var me = this;
+          	
   			Ext.apply(this, {
-  				layout:'fit',
+  				activeTab: me.showDing ? 0 : 1 ,
   				items:[{  
                     title: '定额',  
                     layout : 'border',
+                    hidden:!me.showDing,
                     items:[
                     	 Ext.create('Budget.app.bussinessProcess.ProjectItemWin.TabPanel.CMGrid',{
                     		 bitItemGrid:me.bitItemGrid,
@@ -60,7 +63,7 @@ Ext.onReady(function() {
                     itemId: 'yca'
                 }]
   			});
-        	
+  			
 			this.callParent(arguments);
 		}
 	});
