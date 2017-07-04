@@ -52,7 +52,17 @@ public class YCATotalController {
 		try
 		{
 			TransforUtil.transFromMapToBean(request.getParameterMap(), record);
-			yCATotalService.updateValue(record);
+			Map<String, String> queryMap = TransforUtil.transRMapToMap(request.getParameterMap());
+			String fieldName = queryMap.get("fieldName");
+			String value = queryMap.get("value");
+			if("name".equals(fieldName)){
+				record.setName(value);
+				yCATotalService.updateValue(record);
+			}
+			if("tax_Price".equals(fieldName)){
+				record.setTax_Price(Double.parseDouble(value));
+				yCATotalService.updateAmountValue(request.getParameterMap());
+			}
 		}catch (Exception ex) {
 			return "{success:false,msg:" + ex.getMessage() + "}";
 		}

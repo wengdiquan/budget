@@ -194,7 +194,6 @@ Ext.onReady(function() {
 				proxy : {
 					type : 'ajax',
 					url : appBaseUri + '/feetotal/queryFeeTemplate',
-					extraParams : {"templetId": 1},
 					reader : {
 						type : 'json',
 						root : 'data',
@@ -323,7 +322,6 @@ Ext.onReady(function() {
 				proxy : {
 					type : 'ajax',
 					url : appBaseUri + '/feetotal/queryFeeTotalInfo',
-					extraParams : {"templetId": 1},
 					reader : {
 						type : 'json',
 						root : 'data',

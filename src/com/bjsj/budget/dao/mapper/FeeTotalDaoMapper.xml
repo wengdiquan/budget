@@ -18,9 +18,13 @@
    	 	select 
 	   		<include refid="Base_Column_List" /> 
 	   	from tm_fee_total t where 1 =1 
-	    <if test="map.templetId != null">
+	   	<if test="map.templetId != null">
 	    	and t.templetId = #{map.templetId,jdbcType=INTEGER} 
 	    </if>	
+	    <if test="map.templetId == null">
+	    	and t.templetId = (select id from tm_fee_total_template where flag='00')
+	    </if>	
+	    	
     </select>
     <select id="getFeeTotalInfoCount" parameterType="HashMap" resultType="Integer">
 		select 
@@ -28,6 +32,9 @@
 	   	from tm_fee_total t where 1 =1 
 	    <if test="map.templetId != null">
 	    	and t.templetId = #{map.templetId,jdbcType=INTEGER} 
+	    </if>	
+	     <if test="map.templetId == null">
+	    	and t.templetId = (select id from tm_fee_total_template where flag='00')
 	    </if>	
 	</select>
 	
@@ -104,9 +111,9 @@
 	</insert>
 	
 	  <insert id="insertTemplateTable" parameterType="com.bjsj.budget.model.FeeTemplateModel">
-		 insert into tm_fee_total_template (id, name)
+		 insert into tm_fee_total_template (id, name, flag)
         values
-            (#{id,jdbcType=INTEGER},  #{name,jdbcType=VARCHAR})
+            (#{id,jdbcType=INTEGER},  #{name,jdbcType=VARCHAR}, '01')
 	</insert>
 	
 	<select id="selectByPrimaryKey" parameterType="HashMap" resultMap="FeeTemplateMap">

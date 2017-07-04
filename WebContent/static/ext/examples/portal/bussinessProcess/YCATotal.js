@@ -85,6 +85,34 @@ Ext.onReady(function() {
   	        		if(records[0].data.id == undefined){
   	        			return false;
   	        		}
+  	        	},
+  	        	validateedit:function(editor, e, eOpts){
+  	        		var tt = Ext.getCmp('ycatotal-costvaluegrid').bitProjectId;
+	        		Ext.Ajax.request({
+	        			 url : appBaseUri + '/ycatotal/saveOrUpdateValue', 
+						 params : {
+							 code :e.record.get('code'),
+							 bitProjectId : tt,
+							 fieldName : e.field,
+							 value : e.value
+						 },
+						 method : "POST",
+						 success : function(response) {
+							 if (response.responseText != '') {
+								 var res = Ext.JSON.decode(response.responseText);
+								 if (res.success) {
+									 //editor.grid.reloadAndSelect(e.record, editor.grid);
+									 Ext.getCmp('ycatotal-costvaluegrid').getStore().loadPage(1);
+								 } else {
+									 globalObject.errTip(res.msg);
+									 Ext.getCmp('ycatotal-costvaluegrid').getStore().loadPage(1);
+								 }
+							 }
+						 },
+						 failure : function(response) {
+							 globalObject.errTip('操作失败！');
+						 }
+					 });
   	        	}
   	        }
   	    }],
@@ -141,37 +169,7 @@ Ext.onReady(function() {
 				sortable : false,
 				width : '14%',
 				editor:{
-			        xtype: 'textfield',
-			        listeners :{
-			        	'blur': function(_this){
-			        		var grid = Ext.getCmp("ycatotal-costvaluegrid");
-			    			var bitRecord = grid.getSelectionModel().getSelection()[0];
-			        		Ext.Ajax.request({
-								 url : appBaseUri + '/ycatotal/saveOrUpdateValue', 
-								 params : {
-									 code :bitRecord.get('code'),
-									 bitProjectId : me.bitProjectId,
-									 name :_this.getValue()
-								 },
-								 method : "POST",
-								 success : function(response) {
-									 if (response.responseText != '') {
-										 var res = Ext.JSON.decode(response.responseText);
-										 if (res.success) {
-											 Ext.getCmp('ycatotal-costvaluegrid').getStore().loadPage(1);
-										 } else {
-											 globalObject.errTip(res.msg);
-											 Ext.getCmp('ycatotal-costvaluegrid').getStore().loadPage(1);
-										 }
-									 }
-								 },
-								 failure : function(response) {
-									 globalObject.errTip('操作失败！');
-								 }
-							 });
-			        		
-			        	}
-			        }
+			        xtype: 'textfield'
 			    }
 			},{
 				text : "单位",
@@ -188,37 +186,7 @@ Ext.onReady(function() {
 				editor:{
 			        xtype: 'numberfield',
 			        allowDecimals: true,
-			        decimalPrecision: 5,
-			        listeners :{
-			        	'blur': function(_this){
-			        		var grid = Ext.getCmp("ycatotal-costvaluegrid");
-			    			var bitRecord = grid.getSelectionModel().getSelection()[0];
-			        		Ext.Ajax.request({
-								 url : appBaseUri + '/ycatotal/updateValue', 
-								 params : {
-									 code :bitRecord.get('code'),
-									 bitProjectId : me.bitProjectId,
-									 tax_Price :_this.getValue()
-								 },
-								 method : "POST",
-								 success : function(response) {
-									 if (response.responseText != '') {
-										 var res = Ext.JSON.decode(response.responseText);
-										 if (res.success) {
-											 Ext.getCmp('ycatotal-costvaluegrid').getStore().loadPage(1);
-										 } else {
-											 globalObject.errTip(res.msg);
-											 Ext.getCmp('ycatotal-costvaluegrid').getStore().loadPage(1);
-										 }
-									 }
-								 },
-								 failure : function(response) {
-									 globalObject.errTip('操作失败！');
-								 }
-							 });
-			        		
-			        	}
-			        }
+			        decimalPrecision: 5
 			    }
 			},{
 				text : "不含税单价",

@@ -42,6 +42,10 @@ public class YCATotalServiceImpl implements YCATotalService{
 		TransforUtil.transFromMapToBean(map, record);
 		
 		Map<String, String> queryMap = TransforUtil.transRMapToMap(map);
+		
+		String value = queryMap.get("value");
+		record.setTax_Price(Double.parseDouble(value));
+		
 		YCATotalModel ycamodel = yCATotalDao.getYCATotalList(queryMap).get(0);
 		Double oldTax_Price = ycamodel.getTax_Price();//含税单价
 		Double oldNoTax_Price = ycamodel.getNotax_Price();//不含税单价
