@@ -48,6 +48,7 @@ public class FeeTotalServiceImpl implements FeeTotalService{
 			Double amount = (double) 0;
 			YCATotalModel model = new YCATotalModel();
 			HashMap map = new HashMap();
+			map.put("bitProjectId", record.getBitProjectId());
 			for(int i = 0; i<strA.length; i++){
 				if("".equals(strA[i]) || strA[i] == null){
 					continue;

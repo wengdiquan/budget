@@ -133,6 +133,10 @@
 	    <if test="map.code != null and map.code != ''">
 			and t.code = #{map.code,jdbcType=VARCHAR}   
 		</if>
+		<if test="map.bitProjectId != null and map.bitProjectId != ''">
+			and t.unitproject_id in (select id from tm_unitproject where bit_project_id = #{map.bitProjectId,jdbcType=INTEGER})    
+		</if>
+		
 		group by t.code, t.name
 	</select>
     

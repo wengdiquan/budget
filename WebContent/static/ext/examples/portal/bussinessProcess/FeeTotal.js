@@ -263,7 +263,9 @@ Ext.onReady(function() {
 				layout: 'border',
 				height:  520,
 				items : [ 
-	            	  Ext.create('Budget.app.bussinessProcess.FeeTotal.FeeDetailGrid'),{	
+	            	  Ext.create('Budget.app.bussinessProcess.FeeTotal.FeeDetailGrid', {
+     	  				 bitProjectId:me.bitProjectId
+      	  				}),{	
 			              region:'center', 
 			              id: 'center-region-container11', 
 			              layout: 'border', 
@@ -300,6 +302,33 @@ Ext.onReady(function() {
   	        		if(records[0].data.id == undefined){
   	        			return false;
   	        		}
+  	        	},
+  	        	validateedit:function(editor, e, eOpts){
+  	        		var bitProjectId = Ext.getCmp('feetotal-feedetailgrid').bitProjectId;
+	        		Ext.Ajax.request({
+	        			 url : appBaseUri + '/feetotal/updateValue', 
+						 params : {
+							 id :e.record.get('id'),
+							 fieldName : e.field,
+							 value : e.value,
+							 bitProjectId : bitProjectId
+						 },
+						 method : "POST",
+						 success : function(response) {
+							 if (response.responseText != '') {
+								 var res = Ext.JSON.decode(response.responseText);
+								 if (res.success) {
+									 Ext.getCmp('feetotal-feedetailgrid').getStore().loadPage(1);
+								 } else {
+									 globalObject.errTip(res.msg);
+									 Ext.getCmp('feetotal-feedetailgrid').getStore().loadPage(1);
+								 }
+							 }
+						 },
+						 failure : function(response) {
+							 globalObject.errTip('操作失败！');
+						 }
+					 });
   	        	}
   	        }
   	    }],
@@ -336,36 +365,7 @@ Ext.onReady(function() {
 				width : '7%',
 				hidden : false,
 				editor:{
-			        xtype: 'textfield',
-			        listeners :{
-			        	'blur': function(_this){
-			        		var grid = Ext.getCmp("feetotal-feedetailgrid");
-			    			var bitRecord = grid.getSelectionModel().getSelection()[0];
-			        		Ext.Ajax.request({
-								 url : appBaseUri + '/feetotal/updateValue', 
-								 params : {
-									 id : bitRecord.get('id'),
-									 seq : _this.getValue()
-								 },
-								 method : "POST",
-								 success : function(response) {
-									 if (response.responseText != '') {
-										 var res = Ext.JSON.decode(response.responseText);
-										 if (res.success) {
-											 Ext.getCmp('feetotal-feedetailgrid').getStore().loadPage(1);
-										 } else {
-											 globalObject.errTip(res.msg);
-											 Ext.getCmp('feetotal-feedetailgrid').getStore().loadPage(1);
-										 }
-									 }
-								 },
-								 failure : function(response) {
-									 globalObject.errTip('操作失败！');
-								 }
-							 });
-			        		
-			        	}
-			        }
+			        xtype: 'textfield'
 			    }
 			},{
 				text : "费用代号",
@@ -373,36 +373,7 @@ Ext.onReady(function() {
 				sortable : false,
 				width : '7%',
 				editor:{
-			        xtype: 'textfield',
-			        listeners :{
-			        	'blur': function(_this){
-			        		var grid = Ext.getCmp("feetotal-feedetailgrid");
-			    			var bitRecord = grid.getSelectionModel().getSelection()[0];
-			        		Ext.Ajax.request({
-								 url : appBaseUri + '/feetotal/updateValue', 
-								 params : {
-									 id : bitRecord.get('id'),
-									 feeCode : _this.getValue()
-								 },
-								 method : "POST",
-								 success : function(response) {
-									 if (response.responseText != '') {
-										 var res = Ext.JSON.decode(response.responseText);
-										 if (res.success) {
-											 Ext.getCmp('feetotal-feedetailgrid').getStore().loadPage(1);
-										 } else {
-											 globalObject.errTip(res.msg);
-											 Ext.getCmp('feetotal-feedetailgrid').getStore().loadPage(1);
-										 }
-									 }
-								 },
-								 failure : function(response) {
-									 globalObject.errTip('操作失败！');
-								 }
-							 });
-			        		
-			        	}
-			        }
+			        xtype: 'textfield'
 			    }
 			}, {
 				text : "名称",
@@ -410,36 +381,7 @@ Ext.onReady(function() {
 				sortable : false,
 				width : '20%',
 				editor:{
-			        xtype: 'textfield',
-			        listeners :{
-			        	'blur': function(_this){
-			        		var grid = Ext.getCmp("feetotal-feedetailgrid");
-			    			var bitRecord = grid.getSelectionModel().getSelection()[0];
-			        		Ext.Ajax.request({
-								 url : appBaseUri + '/feetotal/updateValue', 
-								 params : {
-									 id : bitRecord.get('id'),
-									 name : _this.getValue()
-								 },
-								 method : "POST",
-								 success : function(response) {
-									 if (response.responseText != '') {
-										 var res = Ext.JSON.decode(response.responseText);
-										 if (res.success) {
-											 Ext.getCmp('feetotal-feedetailgrid').getStore().loadPage(1);
-										 } else {
-											 globalObject.errTip(res.msg);
-											 Ext.getCmp('feetotal-feedetailgrid').getStore().loadPage(1);
-										 }
-									 }
-								 },
-								 failure : function(response) {
-									 globalObject.errTip('操作失败！');
-								 }
-							 });
-			        		
-			        	}
-			        }
+			        xtype: 'textfield'
 			    }
 			},{
 				text : "计算基数",
@@ -454,36 +396,7 @@ Ext.onReady(function() {
 						Ext.create("Budget.app.bussinessProcess.FeeTotalCalculatedWin",{
 							"bitProjectId" : me.bitProjectId
 						}).show();
-					},
-					listeners :{
-				        	'blur': function(_this){
-				        		var grid = Ext.getCmp("feetotal-feedetailgrid");
-				    			var bitRecord = grid.getSelectionModel().getSelection()[0];
-				        		Ext.Ajax.request({
-									 url : appBaseUri + '/feetotal/updateValueRadix', 
-									 params : {
-										 id : bitRecord.get('id'),
-										 calculatedRadix : _this.getValue()
-									 },
-									 method : "POST",
-									 success : function(response) {
-										 if (response.responseText != '') {
-											 var res = Ext.JSON.decode(response.responseText);
-											 if (res.success) {
-												 Ext.getCmp('feetotal-feedetailgrid').getStore().loadPage(1);
-											 } else {
-												 globalObject.errTip(res.msg);
-												 Ext.getCmp('feetotal-feedetailgrid').getStore().loadPage(1);
-											 }
-										 }
-									 },
-									 failure : function(response) {
-										 globalObject.errTip('操作失败！');
-									 }
-								 });
-				        		
-				        	}
-				        }
+					}
 				}
 			},{
 				text : "基数说明",
@@ -498,36 +411,7 @@ Ext.onReady(function() {
 				editor:{
 			        xtype: 'numberfield',
 			        allowDecimals: true,
-			        decimalPrecision: 5,
-			        listeners :{
-			        	'blur': function(_this){
-			        		var grid = Ext.getCmp("feetotal-feedetailgrid");
-			    			var bitRecord = grid.getSelectionModel().getSelection()[0];
-			        		Ext.Ajax.request({
-								 url : appBaseUri + '/feetotal/updateValue', 
-								 params : {
-									 id : bitRecord.get('id'),
-									 rate : _this.getValue()
-								 },
-								 method : "POST",
-								 success : function(response) {
-									 if (response.responseText != '') {
-										 var res = Ext.JSON.decode(response.responseText);
-										 if (res.success) {
-											 Ext.getCmp('feetotal-feedetailgrid').getStore().loadPage(1);
-										 } else {
-											 globalObject.errTip(res.msg);
-											 Ext.getCmp('feetotal-feedetailgrid').getStore().loadPage(1);
-										 }
-									 }
-								 },
-								 failure : function(response) {
-									 globalObject.errTip('操作失败！');
-								 }
-							 });
-			        		
-			        	}
-			        }
+			        decimalPrecision: 5
 			    }
 			},{
 				text : "金额",
@@ -540,36 +424,7 @@ Ext.onReady(function() {
 				sortable : false,
 				width : '10%',
 				editor:{
-			        xtype: 'textfield',
-			        listeners :{
-			        	'blur': function(_this){
-			        		var grid = Ext.getCmp("feetotal-feedetailgrid");
-			    			var bitRecord = grid.getSelectionModel().getSelection()[0];
-			        		Ext.Ajax.request({
-								 url : appBaseUri + '/feetotal/updateValue', 
-								 params : {
-									 id : bitRecord.get('id'),
-									 remark : _this.getValue()
-								 },
-								 method : "POST",
-								 success : function(response) {
-									 if (response.responseText != '') {
-										 var res = Ext.JSON.decode(response.responseText);
-										 if (res.success) {
-											 Ext.getCmp('feetotal-feedetailgrid').getStore().loadPage(1);
-										 } else {
-											 globalObject.errTip(res.msg);
-											 Ext.getCmp('feetotal-feedetailgrid').getStore().loadPage(1);
-										 }
-									 }
-								 },
-								 failure : function(response) {
-									 globalObject.errTip('操作失败！');
-								 }
-							 });
-			        		
-			        	}
-			        }
+			        xtype: 'textfield'
 			    }
 			},{
 				text : "id",
@@ -846,7 +701,7 @@ Ext.onReady(function() {
                     		calculatedRadix :  calculatedRadix,
                     		radixRemark : radixRemark,
                     		amount : data[0].get("amount") + record.data.tax_Single_SumPrice,
-                    		cmd : "edit"
+                    		cmd : "editdb"
                     };
                     Ext.Ajax.request({
 						url : appBaseUri + '/feetotal/updateValue',

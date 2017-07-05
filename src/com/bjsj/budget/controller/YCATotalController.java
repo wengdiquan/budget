@@ -60,7 +60,6 @@ public class YCATotalController {
 				yCATotalService.updateValue(record);
 			}
 			if("tax_Price".equals(fieldName)){
-				record.setTax_Price(Double.parseDouble(value));
 				yCATotalService.updateAmountValue(request.getParameterMap());
 			}
 		}catch (Exception ex) {

@@ -11,6 +11,7 @@ public class FeeTotalModel {
 	private Double amount;
 	private String remark;
 	private Integer templetId;
+	private Integer bitProjectId;
 	public Integer getId() {
 		return id;
 	}
@@ -70,6 +71,12 @@ public class FeeTotalModel {
 	}
 	public void setTempletId(Integer templetId) {
 		this.templetId = templetId;
+	}
+	public Integer getBitProjectId() {
+		return bitProjectId;
+	}
+	public void setBitProjectId(Integer bitProjectId) {
+		this.bitProjectId = bitProjectId;
 	}
 	
 }

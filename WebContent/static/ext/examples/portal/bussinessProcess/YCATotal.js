@@ -101,7 +101,6 @@ Ext.onReady(function() {
 							 if (response.responseText != '') {
 								 var res = Ext.JSON.decode(response.responseText);
 								 if (res.success) {
-									 //editor.grid.reloadAndSelect(e.record, editor.grid);
 									 Ext.getCmp('ycatotal-costvaluegrid').getStore().loadPage(1);
 								 } else {
 									 globalObject.errTip(res.msg);

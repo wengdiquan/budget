@@ -46,7 +46,8 @@ public class YCATotalServiceImpl implements YCATotalService{
 		String value = queryMap.get("value");
 		record.setTax_Price(Double.parseDouble(value));
 		
-		YCATotalModel ycamodel = yCATotalDao.getYCATotalList(queryMap).get(0);
+		List<YCATotalModel> ycamodelList = yCATotalDao.getYCATotalList(queryMap);
+		YCATotalModel ycamodel = ycamodelList.get(0);
 		Double oldTax_Price = ycamodel.getTax_Price();//含税单价
 		Double oldNoTax_Price = ycamodel.getNotax_Price();//不含税单价
 		
@@ -60,13 +61,17 @@ public class YCATotalServiceImpl implements YCATotalService{
 		record.setSingle_SumPrice(Single_SumPrice);
 		yCATotalDao.updateByPrimaryKey(record);
 		
-		//UnitProject upVO = unitProjectDao.getUnitProjectById(queryMap);
-		List<UnitProject> list = yCATotalDao.getUnitProjectList(queryMap);
-		for(UnitProject upVO : list){
+		/*修改 子目清单数据（tm_unitproject），需要根据tm_unitproject_detail中的UnitProject_id，反找对应的子目清单
+		 的具体某一条，进行修改相关价格*/
+		HashMap mapUnit = new HashMap();
+		for(YCATotalModel vo : ycamodelList){
 			//含税单价= 综合单价 = sum(含税单价*含量) = (用原金额 + 改变的金额 就可以了)
 			//含税合价 = 综合合价  = sum（含税单价*数量）= (用原金额 + 改变的金额 就可以了)
 			//不含税单价= sum(不含税单价*含量) = (用原金额 + 改变的金额 就可以了)
 			//不含税合价 = sum（不含税单价*数量）= (用原金额 + 改变的金额 就可以了)
+			
+			mapUnit.put("unitproject_id", vo.getUnitProject_id());
+			UnitProject upVO = yCATotalDao.getUnitProject(mapUnit);
 			
 			Double chajia = NumberUtils.degree(record.getTax_Price()* upVO.getContent()) - 
 					NumberUtils.degree(oldTax_Price * upVO.getContent());
@@ -80,17 +85,16 @@ public class YCATotalServiceImpl implements YCATotalService{
 			UnitProject finalUP = new UnitProject();
 			finalUP.setId(upVO.getId());
 			finalUP.setTaxSinglePrice(upVO.getTaxSinglePrice() + chajia);//含税单价
-			finalUP.setPrice(upVO.getTaxSinglePrice());//综合单价
+			finalUP.setPrice(upVO.getTaxSinglePrice() + chajia);//综合单价
 			
 			finalUP.setSumPrice(upVO.getSumPrice() + chajiaH);//综合合价
-			finalUP.setTaxSingleSumPrice(upVO.getSumPrice());//含税合价
+			finalUP.setTaxSingleSumPrice(upVO.getSumPrice() + chajiaH);//含税合价
 			
 			finalUP.setSinglePrice(upVO.getSinglePrice() + chajiaBHD);// 不含税单价
 			finalUP.setSingleSumPrice(upVO.getSingleSumPrice() + chajiaBHH);// 不含税合价
 			
 			yCATotalDao.updateUnitByPrimaryKey(finalUP);
 		}
-		
 	}
 
 }

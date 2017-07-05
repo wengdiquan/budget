@@ -109,7 +109,40 @@ public class FeeTotalController {
 		try
 		{
 			TransforUtil.transFromMapToBean(request.getParameterMap(), record);
-			feeTotalService.updateValue(record);
+			Map<String, String> queryMap = TransforUtil.transRMapToMap(request.getParameterMap());
+			if("editdb".equals(queryMap.get("cmd"))){
+				feeTotalService.updateValue(record);
+			}
+			String fieldName = queryMap.get("fieldName");
+			String value = queryMap.get("value");
+			if("seq".equals(fieldName)){
+				record.setSeq(value);
+				feeTotalService.updateValue(record);
+			}
+			if("feeCode".equals(fieldName)){
+				record.setFeeCode(value);
+				feeTotalService.updateValue(record);
+			}
+			if("name".equals(fieldName)){
+				record.setName(value);
+				feeTotalService.updateValue(record);
+			}
+			if("calculatedRadix".equals(fieldName)){
+				record.setCalculatedRadix(value);
+				feeTotalService.updateValueRadix(record);
+			}
+			if("rate".equals(fieldName)){
+				if(null == value || "".equals(value)){
+					return "{success:true}";
+				}
+				record.setRate(Double.valueOf(value));
+				feeTotalService.updateValue(record);
+			}
+			if("remark".equals(fieldName)){
+				record.setRemark(value);
+				feeTotalService.updateValue(record);
+			}
+			
 		}catch (Exception ex) {
 			return "{success:false,msg:'" + ex.getMessage() + "'}";
 		}

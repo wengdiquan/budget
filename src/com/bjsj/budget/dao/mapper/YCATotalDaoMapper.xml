@@ -50,7 +50,8 @@
 	
 	<select id="getYCATotalList" parameterType="HashMap" resultMap="YCATotalInfoMap">
 	    select 
-	    	<include refid="Base_Column_List" />,t.tax_Single_SumPrice,t.notax_Price,t.tax_Price,t.single_SumPrice,t.amount
+	    	<include refid="Base_Column_List" />,t.tax_Single_SumPrice,t.notax_Price,
+	    	t.tax_Price,t.single_SumPrice,t.amount,t.unitProject_id
 	    from tm_unitproject_detail t
 	    where 1 = 1  
 	     <if test="map.code != null and map.code != ''">
@@ -81,13 +82,11 @@
 		t.lookvalue_id as lookValueId,
 		t.seq as seq
 	</sql>
-	<select id="getUnitProjectList" parameterType="HashMap" resultMap="UnitProjectMap">
+	<select id="getUnitProject" parameterType="HashMap" resultType="com.bjsj.budget.model.UnitProject">
 		select
 			<include refid="Base_Column_ListUnit"/>
 		from tm_unitproject t 
-		inner join tm_unitproject_detail b on t.id = b.unitproject_id
-		where t.bit_project_id = #{map.bitProjectId,jdbcType=INTEGER}
-		and b.code = #{map.code,jdbcType=VARCHAR} 
+		where t.id = #{map.unitproject_id,jdbcType=INTEGER}
 	</select>
 	
 	<update id="updateByPrimaryKey" parameterType="com.bjsj.budget.model.YCATotalModel">
