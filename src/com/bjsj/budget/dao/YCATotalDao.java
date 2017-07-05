@@ -17,6 +17,6 @@ public interface YCATotalDao extends BaseDao{
 	int updateUnitByPrimaryKey(UnitProject record);
 	
 	List<YCATotalModel> getYCATotalList(@Param("map")Map<String, String> queryMap);
-	List<UnitProject> getUnitProjectList(@Param("map")Map<String, String> queryMap);
+	UnitProject getUnitProject(@Param("map")Map<String, String> queryMap);
 	
 }

@@ -260,13 +260,13 @@ Ext.onReady(function() {
 						name : 'parentId'
 					},{
 						xtype : 'textfield',
-						name : 'name',
-						fieldLabel:'名称<font color="red">*</font>',
+						name : 'code',
+						fieldLabel:'编码<font color="red">*</font>',
 						allowBlank : false
 					},{
 						xtype : 'textfield',
-						name : 'code',
-						fieldLabel:'编码<font color="red">*</font>',
+						name : 'name',
+						fieldLabel:'名称<font color="red">*</font>',
 						allowBlank : false
 					}],
 					buttons : [ '->', {

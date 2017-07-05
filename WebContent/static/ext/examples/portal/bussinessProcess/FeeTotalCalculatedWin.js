@@ -186,7 +186,7 @@ Ext.onReady(function() {
                     		calculatedRadix : calculatedRadix ,
                     		radixRemark : radixRemark,
                     		amount : data[0].get("amount") + record.data.tax_Single_SumPrice,
-                    		cmd : "edit"
+                    		cmd : "editdb"
                     };
                     Ext.Ajax.request({
 						url : appBaseUri + '/feetotal/updateValue',

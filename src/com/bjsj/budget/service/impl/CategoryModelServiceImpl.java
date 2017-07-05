@@ -78,11 +78,11 @@ public class CategoryModelServiceImpl implements CategoryModelService{
 		LookValue lvVO = lookValueDao.selectByPrimaryKey(record.getLookValueId());
 		
 		if(Constant.YSFLAG == lvVO.getLookTypeId()){
-			cmVO.setTransportFee(cmVO.getTransportFee() + record.getSumNoPrice());
+			cmVO.setTransportFee(NumberUtils.degree(cmVO.getTransportFee() + record.getSumNoPrice()));
 		}else if(Constant.CLFLAG == lvVO.getLookTypeId()){
-			cmVO.setMaterialFee(cmVO.getMaterialFee() + record.getSumNoPrice());
+			cmVO.setMaterialFee(NumberUtils.degree(cmVO.getMaterialFee() + record.getSumNoPrice()));
 		}else if(Constant.AZFLAG == lvVO.getLookTypeId()){
-			cmVO.setInstallationFee(cmVO.getInstallationFee() + record.getSumNoPrice());
+			cmVO.setInstallationFee(NumberUtils.degree(cmVO.getInstallationFee() + record.getSumNoPrice()));
 		}
 		categoryModelDao.updateCMByPrimaryKey(cmVO);
 		

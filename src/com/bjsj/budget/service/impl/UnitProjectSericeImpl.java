@@ -680,7 +680,12 @@ public class UnitProjectSericeImpl implements UnitProjectService {
 			upd.setIsSuppleCost(0);
 			upd.setIsSupType(1);
 			List<UnitProjectDetail> detailList = unitProjectDetailDao.getBitProjectDetailInfo(queryMap);
-			upd.setSeq(detailList.get(detailList.size() -1).getSeq() + 1);
+			if("defaultV".equals(queryMap.get("specialD"))){
+				upd.setSeq(1);
+			}else{
+				upd.setSeq(detailList.get(detailList.size() -1).getSeq() + 1);
+			}
+			
 			unitProjectDetailDao.insert(upd);
 		}
 		
