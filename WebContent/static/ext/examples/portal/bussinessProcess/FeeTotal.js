@@ -1,4 +1,5 @@
 Ext.onReady(function() {
+	
 	Ext.tip.QuickTipManager.init();
 	Ext.define('App.bussinessProcess.FeeTotal.InfoWindow', {
 		extend : 'Ext.window.Window',

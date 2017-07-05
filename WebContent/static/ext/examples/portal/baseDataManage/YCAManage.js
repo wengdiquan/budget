@@ -7,7 +7,7 @@ Ext.onReady(function() {
 			Ext.apply(config, {
 				title : '费用小类',
 				width : 350,
-				height : 180,
+				height : 280,
 				bodyPadding : '10 5',
 				modal : true,
 				layout : 'fit',
@@ -32,16 +32,27 @@ Ext.onReady(function() {
 						xtype : 'textfield',
 						name : 'code',
 						allowBlank : false,
-						fieldLabel:'费用代码<font color="red">*</font>'
+						fieldLabel:'编码<font color="red">*</font>'
 					},{
 						xtype : 'textfield',
 						name : 'name',
-						fieldLabel:'费用名称<font color="red">*</font>',
+						fieldLabel:'名称<font color="red">*</font>',
 						allowBlank : false
-					},{
-						xtype : 'textfield',
+					},
+					new Ext.create('Unit.ComboBox',{
 						name : 'unit',
 						fieldLabel:'单位<font color="red">*</font>'
+					}),{
+						xtype : 'numberfield',
+						name : 'price',
+						fieldLabel:'含税单价<font color="red">*</font>',
+						allowBlank : false
+					},{
+						xtype : 'numberfield',
+						name : 'rate',
+						decimalPrecision: 5,
+						fieldLabel:'税率<font color="red">*</font>',
+						allowBlank : false
 					}],
 					buttons : [ '->', {
 						id : 'infowindow-save',

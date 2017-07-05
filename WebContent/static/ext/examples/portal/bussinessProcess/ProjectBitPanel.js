@@ -1,9 +1,11 @@
 //分部分项
 Ext.onReady(function() {
+	
+	var screenSize = getPageSize();
 	Ext.tip.QuickTipManager.init();
 	Ext.define('Budget.app.bussinessProcess.ProjectBitPanel', {
 		extend : 'Ext.panel.Panel',
-		width: "100%",  
+		anchor:'100% 100%',   
 	    defaults: {  
            collapsible: true, // 支持该区域的展开和折叠  
         },
@@ -11,7 +13,7 @@ Ext.onReady(function() {
 			var me = this;
 			Ext.apply(this, {
 				layout : 'border',
-				height:  500,
+				height: screenSize[1],
 				items : [
 					Ext.create("Budget.app.bussinessProcess.ProjectBitPanel.BitItemGrid", {
 						bitProjectId:me.bitProjectId,
@@ -29,7 +31,7 @@ Ext.onReady(function() {
 	Ext.define('Budget.app.bussinessProcess.ProjectBitPanel.BitItemGrid', {
 		extend : 'Ext.tree.Panel',
 		region : 'north',
-		height : '50%',
+		height : '57%',
 		header: false,
 		rootVisible: false,
 		plugins:[{
@@ -468,8 +470,7 @@ Ext.onReady(function() {
 	//详细
 	Ext.define('Budget.app.bussinessProcess.ProjectBitPanel.BitDetailGrid', {
 		extend : 'Ext.grid.Panel',
-		region : 'south',
-		height : '50%',
+		region : 'center',
 		header: false,
 		plugins:[{
   	        ptype: 'cellediting',

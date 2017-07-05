@@ -63,8 +63,10 @@ public class UnitProjectSericeImpl implements UnitProjectService {
 			u.setType("定");
 			u.setName(cgmModel.getName());
 			u.setUnit(cgmModel.getUnit());
-			u.setContent(1d);//含量
-			u.setDtgcl(1d);//单体工程量为默认为1
+			u.setContent(0d);//含量
+			u.setDtgcl(0d);//单体工程量为默认为1
+			//工程量改为0 TODO 7/4号修改
+			
 			
 			List<CategoryModelYCAModel> ycaModelList = categoryModelDao.getDetailYCA(cgmModel.getId());
 			//含税单价
@@ -75,10 +77,10 @@ public class UnitProjectSericeImpl implements UnitProjectService {
 			
 			u.setSinglePrice(this.toMoney(singlePrice)); //不含税单价
 			u.setTaxSinglePrice(this.toMoney(taxSinglePrice)); //含税单价
-			u.setSingleSumPrice(this.toMoney(this.getSingleSumPriceUp(singlePrice, 1d))); //不含税合价
-			u.setTaxSingleSumPrice(this.toMoney(this.getTaxSingleSumPriceUp(taxSinglePrice, 1d))); //含税合价
+			u.setSingleSumPrice(this.toMoney(this.getSingleSumPriceUp(singlePrice, u.getDtgcl()))); //不含税合价
+			u.setTaxSingleSumPrice(this.toMoney(this.getTaxSingleSumPriceUp(taxSinglePrice, u.getDtgcl()))); //含税合价
 			u.setPrice(this.toMoney(this.getPriceUp(taxSinglePrice))); //综合单价 == 含税单价 + 利润（目前没有）
-			u.setSumPrice(this.toMoney(this.getSumPriceUp(this.getPriceUp(taxSinglePrice), 1d))); //综合合价 = 综合单价 × 数量
+			u.setSumPrice(this.toMoney(this.getSumPriceUp(this.getPriceUp(taxSinglePrice), u.getDtgcl()))); //综合合价 = 综合单价 × 数量
 			u.setRemark(null);
 			u.setBitProjectId(Integer.parseInt(queryMap.get("bitProjectId")));
 			u.setLookValueId(null);
@@ -111,7 +113,7 @@ public class UnitProjectSericeImpl implements UnitProjectService {
 				detail.setTaxPrice(ycaModel.getPrice());  //含税单价
 				
 				//修改数量
-				detail.setAmount(this.multiply(1d, detail.getContent()).doubleValue()); //数量
+				detail.setAmount(this.multiply(u.getDtgcl(), detail.getContent()).doubleValue()); //数量
 				detail.setSingleSumPrice(this.toMoney(this.singleSumPriceDown(ycaModel.getNoPrice(), detail.getAmount())));  //不含税合价
 				detail.setTaxSingleSumPrice(this.toMoney(this.singleTaxSumPriceDown(ycaModel.getPrice(), detail.getAmount()))); //含税合价
 				
@@ -379,6 +381,12 @@ public class UnitProjectSericeImpl implements UnitProjectService {
 				//差值(之前含税单价×含量)
 				BigDecimal  subV = BigDecimal.ZERO; //差值
 				
+				
+				Double dtgcl = unitProjectDB.getDtgcl();
+				if(this.doubleCompare(dtgcl, 0d)){
+					dtgcl = 1d;
+				}
+				
 				for(UnitProjectDetail detail : detailList){
 					
 					if(detail.getIsSuppleCost()  == 1){
@@ -386,11 +394,11 @@ public class UnitProjectSericeImpl implements UnitProjectService {
 					}
 					subV = subV.add(this.multiply(detail.getContent(), detail.getTaxPrice()));
 					if("运".equals(detail.getType())){
-						ybc = ybc.add(BigDecimal.valueOf(detail.getTaxSingleSumPrice()));
+						ybc = ybc.add(this.multiply(detail.getContent() * dtgcl, detail.getTaxPrice()));
 					}if("材".equals(detail.getType())){
-						cbc = cbc.add(BigDecimal.valueOf(detail.getTaxSingleSumPrice()));
+						cbc = cbc.add(this.multiply(detail.getContent() * dtgcl, detail.getTaxPrice()));
 					}if("安".equals(detail.getType())){
-						abc = abc.add(BigDecimal.valueOf(detail.getTaxSingleSumPrice()));
+						abc = abc.add(this.multiply(detail.getContent() * dtgcl, detail.getTaxPrice()));
 					}
 				}
 				
