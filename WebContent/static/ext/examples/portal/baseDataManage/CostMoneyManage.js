@@ -7,6 +7,7 @@ Ext.onReady(function() {
 			config = config || {};
 			Ext.apply(config, {
 				title : '费用小类',
+				id : 'wincostmoney',
 				width : 350,
 				height : 280,
 				bodyPadding : '10 5',
@@ -31,14 +32,14 @@ Ext.onReady(function() {
 						name : 'lookTypeId'
 					},{
 						xtype : 'textfield',
-						name : 'lookvalueName',
-						fieldLabel:'费用名称<font color="red">*</font>',
-						allowBlank : false
-					},{
-						xtype : 'textfield',
 						name : 'lookvalueCode',
 						allowBlank : false,
 						fieldLabel:'费用代码<font color="red">*</font>'
+					},{
+						xtype : 'textfield',
+						name : 'lookvalueName',
+						fieldLabel:'费用名称<font color="red">*</font>',
+						allowBlank : false
 					},{
 						xtype : 'textarea',
 						name : 'remark',
@@ -69,6 +70,7 @@ Ext.onReady(function() {
 											var res = Ext.JSON.decode(response.responseText);
 											if (res.success) {
 												globalObject.msgTip('操作成功！');
+												Ext.getCmp('wincostmoney').close();
 												Ext.getCmp('costmoneymanage-costvaluegrid').getStore().reload();
 											} else {
 												globalObject.errTip(res.msg);
@@ -80,7 +82,7 @@ Ext.onReady(function() {
 									}
 								});
 								window.getEl().unmask();
-								window.close();
+								//window.close();
 							}
 						}
 					}, {
