@@ -787,8 +787,14 @@ Ext.onReady(function() {
 			
 			//最后一个类型
 			var type = "";
+			var specialD = "";
 			if(records.length == 0){
-				type = lastRecord.get('type')
+				if(lastRecord == undefined){
+					type = "材";
+					specialD = "defaultV";
+				}else{
+					type = lastRecord.get('type')
+				}
 			}else{
 				type = records[0].get('type');
 			}
@@ -801,6 +807,7 @@ Ext.onReady(function() {
 					 unitProjectId: itemRecords[0].get('id'),
 					 bitProjectId:Ext.getCmp("projectbitpanel-bitdetailgrid").bitProjectId,
 					 type:type,
+					 specialD : specialD,
 					 classType:'add'
 				 },
 				 method : "POST",
