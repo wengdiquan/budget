@@ -20,8 +20,6 @@ public interface CategoryModelDao extends BaseDao{
 		List<CategoryModelYCAModel> queryDetailYCA(@Param("map") Map<String, String> queryMap, @Param("page") PageInfo pageInfo);
 		int getDetailYCACount(@Param("map") Map<String, String> queryMap);
 		
-		
-		
 		int insertCMYCASpecial(CategoryModelYCAModel record);
 		int insertCMYCA(CategoryModelYCAModel record);
 		int insertCM(CategoryModelModel record);
@@ -31,7 +29,6 @@ public interface CategoryModelDao extends BaseDao{
 		int updateCMByPrimaryKey(CategoryModelModel record);
 		
 		int insertChapter(CategoryModelModel record);
-		
 		
 		
 		CategoryModelYCAModel selectByPrimaryKey(@Param("map") Map<String, String> queryMap);
@@ -50,6 +47,7 @@ public interface CategoryModelDao extends BaseDao{
 		 * @param code
 		 */
 		CategoryModelYCAModel getDetailInfoByCode(String code);
+
 		
 		//List<HashMap> getLookTypeList(@Param("map")Map<String, String> queryMap);
 

@@ -11,6 +11,7 @@
 		<result column="remark" jdbcType="VARCHAR" property="remark" />
 		<result column="seq" jdbcType="DOUBLE" property="seq" />
 		<result column="enable_flag" jdbcType="INTEGER" property="enableFlag" />
+		<result column="looktype_id" jdbcType="INTEGER" property="lookTypeId"/>
 	</resultMap>
 	<sql id="Base_Column_List">
 		t.id as ID,
@@ -20,7 +21,8 @@
 		t.unit as unit,
 		t.no_price as noPrice,
 		t.price as price,
-		t.rate as rate
+		t.rate as rate,
+		t.type as type
 	</sql>
 	
     <select id="queryYCAInfo" parameterType="HashMap" resultMap="YCAInfoMap">
@@ -51,7 +53,7 @@
 	</select>
     <insert id="insertYCA" parameterType="com.bjsj.budget.model.YCAModel">
 		insert into tm_yca_detail
-			(id, lookvalue_id, code, name, unit, no_price, price, rate)
+			(id, lookvalue_id, code, name, unit, no_price, price, rate, type)
 		values (#{id,jdbcType=INTEGER},
 			#{lookvalue_id,jdbcType=VARCHAR},
 			#{code,jdbcType=VARCHAR},
@@ -59,7 +61,8 @@
 			#{unit,jdbcType=VARCHAR},
 			#{noPrice,jdbcType=DOUBLE},
 			#{price,jdbcType=DOUBLE},
-			#{rate,jdbcType=DOUBLE}
+			#{rate,jdbcType=DOUBLE},
+			#{type,jdbcType=VARCHAR}
 			)
 	</insert>
 	<select id="getYCACount" parameterType="com.bjsj.budget.model.YCAModel" resultType="Integer">
@@ -103,4 +106,17 @@
 	    where tt.enable_flag = 1
 	    order by looktype_id 
 	</select>
+	
+	<select id="getYCAModelById" resultType="com.bjsj.budget.model.YCAModel" parameterType="HashMap">
+		select
+			<include refid="Base_Column_List" />
+		from tm_yca_detail t 
+		where 1 = 1
+	   <if test="ycaModelId != null and ycaModelId != ''">
+			and t.id = #{ycaModelId,jdbcType=INTEGER}   
+	   </if>
+	</select>
+	
+	
+	
 </mapper>

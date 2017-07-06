@@ -97,7 +97,7 @@ public class CategoryModelController {
 				record.setLeaf(1);
 				categoryModelService.insertChapter(record);
 			}else{
-				categoryModelService.insertValue(request.getParameterMap());
+				categoryModelService.insertValue(request.getParameterMap(), request.getParameter("ycaModelId"));
 			}
 			
 		}catch (Exception ex) {

@@ -37,5 +37,12 @@ public class NumberUtils {
 	public static double divive(Double v1, Double v2){
 		return BigDecimal.valueOf(v1).divide(BigDecimal.valueOf(v2), 5, RoundingMode.HALF_DOWN).doubleValue(); 
 	}
+	
+	public static double ifNull2Zero(Double v){
+		if(v == null){
+			return 0d;
+		}
+		return v;
+	}
 
 }

@@ -5,7 +5,8 @@ public class CategoryModelModel {
 	private String code;
 	private String name;
 	private String unit;
-	private Double price;
+	private Double price;   //含税单价
+	private Double noPrice; //不含税单价
 	private Double transportFee;
 	private Double materialFee;
 	private Double installationFee;
@@ -71,5 +72,10 @@ public class CategoryModelModel {
 	public void setParentId(Integer parentId) {
 		this.parentId = parentId;
 	}
-
+	public Double getNoPrice() {
+		return noPrice;
+	}
+	public void setNoPrice(Double noPrice) {
+		this.noPrice = noPrice;
+	}
 }

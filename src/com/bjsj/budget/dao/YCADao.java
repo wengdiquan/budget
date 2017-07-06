@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.annotations.Param;
 
+import com.bjsj.budget.model.CategoryModelYCAModel;
 import com.bjsj.budget.model.LookValue;
 import com.bjsj.budget.model.YCAModel;
 import com.bjsj.budget.page.PageInfo;
@@ -17,4 +18,10 @@ public interface YCADao extends BaseDao{
 	int updateByPrimaryKey(YCAModel record);
 	List<LookValue> getLookValueList(@Param("map")Map<String, String> queryMap);
 	List<HashMap> getLookTypeList(@Param("map")Map<String, String> queryMap);
+	
+	/**
+	 * @param i
+	 * @return
+	 */
+	YCAModel getYCAModelById(Map<String, Object> queryMap);
 }

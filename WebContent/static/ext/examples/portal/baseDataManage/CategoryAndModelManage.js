@@ -1,15 +1,15 @@
-// 用户管理
 Ext.onReady(function() {
 	Ext.tip.QuickTipManager.init();
 	
+	//运材安维护关联子目
 	Ext.define('App.baseDataManage.CategoryAndModelManage.InfoWindow', {
 		extend : 'Ext.window.Window',
 		constructor : function(config) {
 			config = config || {};
 			Ext.apply(config, {
 				title : '运材安维护',
-				width : 420,
-				height : 350,
+				width : 360,
+				height : 160,
 				bodyPadding : '10 5',
 				modal : true,
 				layout : 'fit',
@@ -31,6 +31,26 @@ Ext.onReady(function() {
 						xtype : 'hiddenfield',
 						name : 'id'
 					},{
+						xtype : 'hiddenfield',
+						name : 'ycaModelId'
+					},{
+						xtype:'triggerfield',
+						fieldLabel: '运材安选择<font color="red">*</font>',
+						name : 'ycaName',
+						triggerCls: Ext.baseCSSPrefix + 'form-search-trigger',
+						editable:false,
+						onTriggerClick:function(){
+							var form = Ext.getCmp('categoryandmodelmanage-infowindow').down('form').getForm();
+							var field = form.findField('ycaName');
+							var yacModelField = form.findField('ycaModelId');
+							Ext.create("Budget.app.baseDataManage.YCAManageWin", {
+								height:420,
+								width:980,
+								lookValueField:field,
+								yacModelField:yacModelField
+							}).show();
+						}
+					},/*{
 						xtype: 'treecombox', 
 						name : 'lookValueId',
 						itemId: 'myActionColumn',
@@ -63,13 +83,13 @@ Ext.onReady(function() {
 						name : 'unit',
 						fieldLabel:'单位<font color="red">*</font>',
 						allowBlank : false
-					},{
+					},*/{
 						xtype : 'numberfield',
 						name : 'content',
-						allowDecimals: false,
+						decimalPrecision: 5,
 						fieldLabel:'含量<font color="red">*</font>',
 						allowBlank : false
-					},{
+					}/*,{
 						xtype : 'numberfield',
 						name : 'amount',
 						decimalPrecision: 5,
@@ -87,7 +107,7 @@ Ext.onReady(function() {
 						decimalPrecision: 5,
 						fieldLabel:'税率<font color="red">*</font>',
 						allowBlank : false
-					}],
+					}*/],
 					buttons : [ '->', {
 						id : 'infowindow-save',
 						text : '保存',
@@ -145,7 +165,7 @@ Ext.onReady(function() {
 			config = config || {};
 			Ext.apply(config, {
 				title : '子目新增',
-				width : 420,
+				width : 380,
 				height : 220,
 				bodyPadding : '10 5',
 				modal : true,
@@ -177,12 +197,12 @@ Ext.onReady(function() {
 						name : 'name',
 						fieldLabel:'子目名称<font color="red">*</font>',
 						allowBlank : false
-					},{
-						xtype : 'textfield',
+					},new Ext.create('Unit.ComboBox',{
 						name : 'unit',
+						allowBlank : false,
 						fieldLabel:'计量单位<font color="red">*</font>',
-						allowBlank : false
-					}],
+						emptyText:"请输入或选择单位"
+					})],
 					buttons : [ '->', {
 						id : 'infowindow-save',
 						text : '保存',
@@ -194,6 +214,7 @@ Ext.onReady(function() {
 							if (form.isValid()) {
 								window.getEl().mask('数据保存中，请稍候...');
 								var vals = form.getValues();
+								vals.unit = form.findField('unit').getRawValue();
 								Ext.Ajax.request({
 									url : appBaseUri + '/categorymodel/saveOrUpdateValue',
 									params : vals,
@@ -239,8 +260,8 @@ Ext.onReady(function() {
 			config = config || {};
 			Ext.apply(config, {
 				title : '新增',
-				width : 420,
-				height : 350,
+				width : 300,
+				height : 160,
 				bodyPadding : '10 5',
 				modal : true,
 				layout : 'fit',
@@ -248,7 +269,7 @@ Ext.onReady(function() {
 					xtype : 'form',
 					fieldDefaults : {
 						labelAlign : 'left',
-						labelWidth : 90,
+						labelWidth : 70,
 						anchor : '100%'
 					},
 					items : [{
@@ -334,9 +355,9 @@ Ext.onReady(function() {
 				              id: 'center-region-container', 
 				              layout: 'border', 
 				              items : [
-				                       	  Ext.create('Budget.app.baseDataManage.CategoryAndModelManage.CMDetailGrid'),
-										  Ext.create('Budget.app.baseDataManage.CategoryAndModelManage.YCAGrid')
-				                       ]
+		                       	  Ext.create('Budget.app.baseDataManage.CategoryAndModelManage.CMDetailGrid'),
+								  Ext.create('Budget.app.baseDataManage.CategoryAndModelManage.YCAGrid')
+		                      ]
 				          }
 					    ]
 			});
@@ -349,9 +370,9 @@ Ext.onReady(function() {
 		extend : 'Ext.tree.Panel',
 		id : 'categoryandmodelmanage-cmgrid',
 		region : 'west',
-		width : '15%',
+		width : '18%',
 		border : true,
-		title:"模块名称",
+		header: false,
 		animate : true,//动画效果
 		initComponent : function() {
 			var me = this;
@@ -407,6 +428,7 @@ Ext.onReady(function() {
 								}
 							});
 						}
+						Ext.getCmp('categoryandmodelmanage-YCAGrid').getStore().removeAll();
 					}
 				}
 			});
@@ -457,7 +479,7 @@ Ext.onReady(function() {
 				fields : [ {
 					name : 'looktype_id',
 					type : 'int'
-				}, 'code', 'name', 'unit', 'price','transportFee','materialFee','installationFee',]
+				}, 'code', 'name', 'unit', 'price','transportFee','materialFee','installationFee', 'noPrice'] 
 			});
 			
 			var costValueStore = Ext.create('Ext.data.Store', {
@@ -491,13 +513,21 @@ Ext.onReady(function() {
 				text : "计量单位",
 				dataIndex : 'unit',
 				sortable : false,
-				width : '10%'
+				width : '10%',
+				align:"center"
 			},{
-				text : "单价",
+				text : "不含税单价",
+				dataIndex : 'noPrice',
+				sortable : false,
+				width : '10%',
+				align:"right"
+			},{
+				text : "含税单价",
 				dataIndex : 'price',
 				sortable : false,
-				width : '10%'
-			},{
+				width : '10%',
+				align:"right"
+			},/*{
 				text : "运费",
 				dataIndex : 'transportFee',
 				sortable : false,
@@ -512,7 +542,7 @@ Ext.onReady(function() {
 				dataIndex : 'installationFee',
 				sortable : false,
 				width : '10%'
-			},{
+			},*/{
 				text : "id",
 				dataIndex : 'id',
 				hidden : true
@@ -593,7 +623,7 @@ Ext.onReady(function() {
 		id : 'categoryandmodelmanage-YCAGrid',
 		plain : true,
 		region : 'south',
-		height : '50%',
+		height : '40%',
 		border:true,
 		initComponent : function() {
 			var me = this;
@@ -610,7 +640,7 @@ Ext.onReady(function() {
 				model : 'YCAGridList',
 				autoLoad : false,
 				remoteSort : true,
-				pageSize : globalPageSize,
+				pageSize : 10000, //加载全部
 				proxy : {
 					type : 'ajax',
 					url : appBaseUri + '/categorymodel/queryDetailYCA',
@@ -623,11 +653,17 @@ Ext.onReady(function() {
 					}
 				}
 			});
-			var costValueColumns = [ {
+			var costValueColumns = [{
+				text : "编号",
+				dataIndex : 'code',
+				hidden:true
+			},{
 				text : "编号",
 				dataIndex : 'code',
 				width : '12%',
-				hidden : false
+				renderer:function(v){
+					return v.substring(v.indexOf('-') +1 );
+				}
 			},{
 				text : "名称",
 				dataIndex : 'name',
@@ -637,42 +673,46 @@ Ext.onReady(function() {
 				text : "单位",
 				dataIndex : 'unit',
 				sortable : false,
-				width : '7%'
+				width : '7%',
+				align:"center"
 			},{
 				text : "含量",
 				dataIndex : 'content',
 				sortable : false,
-				width : '7%'
+				width : '7%',
+				align:"right"
 			},{
 				text : "数量",
 				dataIndex : 'amount',
 				sortable : false,
-				width : '7%'
+				width : '10%',
+				hidden : true
 			},{
 				text : "不含税单价",
 				dataIndex : 'noPrice',
 				sortable : false,
-				width : '7%'
+				width : '12%',
+				align:"right"
 			},{
 				text : "含税单价",
 				dataIndex : 'price',
 				sortable : false,
-				width : '7%'
+				width : '12%',
+				align:"right"
 			},{
 				text : "税率",
 				dataIndex : 'rate',
 				sortable : false,
-				width : '7%'
+				width : '12%',
+				align:"right"
 			},{
 				text : "不含税合价",
 				dataIndex : 'sumNoPrice',
-				sortable : false,
-				width : '10%'
+				hidden : true
 			},{
 				text : "含税合价",
 				dataIndex : 'sumPrice',
-				sortable : false,
-				width : '10%'
+				hidden : true
 			},{
 				text : "id",
 				dataIndex : 'id',
@@ -699,10 +739,10 @@ Ext.onReady(function() {
 					scope : this,
 					handler : me.editCodeCodeFun
 				}],
-				bbar : Ext.create('Ext.PagingToolbar', {
+				/*bbar : Ext.create('Ext.PagingToolbar', {
 					store : YCAGridStore,
 					displayInfo : true
-				}),
+				}),*/
 				viewConfig:{
 					loadingText : '正在查询数据，请耐心稍候...',
 					stripeRows:false,
@@ -725,7 +765,8 @@ Ext.onReady(function() {
 				return;
 			};
 			var win = new App.baseDataManage.CategoryAndModelManage.InfoWindow({
-				hidden : true
+				hidden : true,
+				id:"categoryandmodelmanage-infowindow"
 			});
 			var form = win.down('form').getForm();
 			form.findField('unitProject_Id').setValue(unitProject_Id);
@@ -755,11 +796,8 @@ Ext.onReady(function() {
 			var form = win.down('form').getForm();
 			form.findField('unitProject_Id').setValue(unitProject_Id);
 			form.findField('cmd').setValue('edit');
-			form.findField('code').setReadOnly(true);
-			form.findField('name').setReadOnly(true);
-			form.findField('unit').setReadOnly(true);
-			form.findField('lookValueId').setValue(gridRecord.data.lookValueId);
-			win.down('#myActionColumn').hide();
+			form.findField('ycaName').setReadOnly(true);
+			form.findField('ycaName').setValue(gridRecord.data.code);
 			
 			form.loadRecord(gridRecord);
 			win.show();

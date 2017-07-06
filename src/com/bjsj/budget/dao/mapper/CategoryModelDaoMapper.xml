@@ -12,7 +12,9 @@
 		t.code as code,
 		t.name as name,
 		t.unit as unit,
-		(t.transportfee + t.materialfee + t.installationfee) as price,
+		<!-- (t.transportfee + t.materialfee + t.installationfee) as price, -->
+		t.price as price,
+		t.no_price as noPrice,
 		t.transportfee as transportFee,
 		t.materialfee as materialFee,
 		t.installationfee as installationFee,
@@ -234,7 +236,9 @@
 		set 
 		transportFee = #{transportFee,jdbcType=DOUBLE},
 		materialFee = #{materialFee,jdbcType=DOUBLE},
-		installationFee = #{installationFee,jdbcType=DOUBLE}
+		installationFee = #{installationFee,jdbcType=DOUBLE},
+		price = #{price,jdbcType=DOUBLE},
+		no_price = #{noPrice,jdbcType=DOUBLE}
 		where id = #{id,jdbcType=INTEGER}
 	</update> 
 	
@@ -262,6 +266,5 @@
 		inner join tm_looktype lt on lv.looktype_id = lt.looktype_id
 		where t.code = #{code,jdbcType=VARCHAR}
     </select>
-    
     
 </mapper>

@@ -71,6 +71,7 @@ public class YCAController {
 				if(lookValue.size() > 0){
 					LookValue tt = lookValue.get(0);
 					String code = record.getCode();
+					record.setType(TransforUtil.transYCAByType(tt.getLookTypeId()));
 					record.setCode(tt.getLookvalueCode() + "-" + code);
 					record.setNoPrice(NumberUtils.degree(NumberUtils.divive(record.getPrice(), 1 + NumberUtils.divive(record.getRate(), 100d))));
 					yCAService.insertValue(record);

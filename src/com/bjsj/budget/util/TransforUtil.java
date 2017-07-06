@@ -9,6 +9,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import com.bjsj.budget.constant.Constant;
+
 /**
  * 转换工具类
  * 
@@ -167,5 +169,17 @@ public class TransforUtil {
 				"on".equalsIgnoreCase(value) || 
 				"Y".equalsIgnoreCase(value))?"true":"false";
 	}
+	
+	public static String transYCAByType(Integer i){
+		if(i == Constant.YSFLAG){
+			return "运";
+		}else if(i == Constant.CLFLAG){
+			return "材";
+		}else if(i == Constant.AZFLAG){
+			return "安";
+		}
+		return "";
+	}
+	
 
 }

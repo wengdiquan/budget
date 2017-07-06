@@ -38,9 +38,10 @@ public interface CategoryModelService {
 	
 	/**
 	 * 新增模块 YCA
+	 * @param ycaModelId 
 	 * @param record
 	 */
-	public void insertValue(Map<String, String[]> map) throws Exception;
+	public void insertValue(Map<String, String[]> map, String ycaModelId) throws Exception;
 	
 	/**
 	 * 新增模块 

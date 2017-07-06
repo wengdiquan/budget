@@ -7,7 +7,7 @@ Ext.onReady(function() {
 			Ext.apply(config, {
 				title : '费用小类',
 				width : 350,
-				height : 280,
+				height : 250,
 				bodyPadding : '10 5',
 				modal : true,
 				layout : 'fit',
@@ -195,7 +195,7 @@ Ext.onReady(function() {
 				fields : [ {
 					name : 'id',
 					type : 'int'
-				}, 'code', 'name', 'unit', 'category',
+				}, 'code', 'name', 'unit', 'category','type',
 				{
 					name : 'noPrice',
 					type : 'double'
@@ -249,6 +249,12 @@ Ext.onReady(function() {
 				dataIndex : 'name',
 				sortable : false,
 				width : '30%'
+			},{
+				text : "类别",
+				dataIndex : 'type',
+				sortable : false,
+				width : '8%',
+				align:"center"
 			}, {
 				text : "单位",
 				dataIndex : 'unit',
