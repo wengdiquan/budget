@@ -290,7 +290,7 @@ public class ProjectController {
 		Double tt = this.getAmount(1, CMList);
 		
 		for (ReportModel model : CMList) {
-			model.setProjectPercent(NumberUtils.degree(model.getTotalAmount()/tt));
+			model.setProjectPercent(NumberUtils.degree((model.getTotalAmount()/tt*100)));
 		}
 		summaryModel.setProject_name("汇总");
 		summaryModel.setProjectPercent(this.getAmount(0, CMList));

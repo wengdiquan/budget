@@ -175,8 +175,7 @@ Ext.onReady(function() {
 				dataIndex : 'unit',
 				sortable : false,
 				width : '5%',
-				align:'center',
-				renderer:rendenerYN
+				align:'center'
 			},{
 				text : "含税单价",
 				dataIndex : 'tax_Price',
