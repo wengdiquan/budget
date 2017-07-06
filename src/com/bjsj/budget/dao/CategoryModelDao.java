@@ -47,7 +47,7 @@ public interface CategoryModelDao extends BaseDao{
 		 * @param code
 		 */
 		CategoryModelYCAModel getDetailInfoByCode(String code);
-
+		
 		
 		//List<HashMap> getLookTypeList(@Param("map")Map<String, String> queryMap);
 

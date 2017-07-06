@@ -4,10 +4,10 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.Format;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.logging.log4j.core.config.yaml.YamlConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,10 +15,12 @@ import com.bjsj.budget.constant.Constant;
 import com.bjsj.budget.dao.CategoryModelDao;
 import com.bjsj.budget.dao.UnitProjectDao;
 import com.bjsj.budget.dao.UnitProjectDetailDao;
+import com.bjsj.budget.dao.YCADao;
 import com.bjsj.budget.model.CategoryModelModel;
 import com.bjsj.budget.model.CategoryModelYCAModel;
 import com.bjsj.budget.model.UnitProject;
 import com.bjsj.budget.model.UnitProjectDetail;
+import com.bjsj.budget.model.YCAModel;
 import com.bjsj.budget.page.PageInfo;
 import com.bjsj.budget.page.PageObject;
 import com.bjsj.budget.service.UnitProjectService;
@@ -35,6 +37,9 @@ public class UnitProjectSericeImpl implements UnitProjectService {
 	
 	@Autowired
 	private UnitProjectDetailDao unitProjectDetailDao;
+	
+	@Autowired
+	private YCADao yCADao;
 	
 	//新增单项工程
 	@Override
@@ -117,7 +122,7 @@ public class UnitProjectSericeImpl implements UnitProjectService {
 				detail.setSingleSumPrice(this.toMoney(this.singleSumPriceDown(ycaModel.getNoPrice(), detail.getAmount())));  //不含税合价
 				detail.setTaxSingleSumPrice(this.toMoney(this.singleTaxSumPriceDown(ycaModel.getPrice(), detail.getAmount()))); //含税合价
 				
-				detail.setOrigCount(detail.getAmount());// 原始数量
+				detail.setOrigCount(ycaModel.getContent());// 原始数量
 				detail.setLookValueId(ycaModel.getLookValueId());
 				detail.setSeq(index++);
 				detail.setUnitprojectId(u.getId()); 
@@ -128,7 +133,12 @@ public class UnitProjectSericeImpl implements UnitProjectService {
 			}
 		}else if("YCA".equals(type)){
 			//运材安新增(替换)
-			CategoryModelYCAModel ycaModel = categoryModelDao.selectByPrimaryKey(queryMap);
+			
+			Map<String, Object> qMap = new HashMap<String, Object>();
+			qMap.put("ycaModelId", queryMap.get("ycaId"));
+			YCAModel model = yCADao.getYCAModelById(qMap);
+			
+			//CategoryModelYCAModel ycaModel = categoryModelDao.selectByPrimaryKey(queryMap);
 			
 			if("1".equals(times)){
 				//查询出来seq。然后删除调用，在新增一条
@@ -140,23 +150,23 @@ public class UnitProjectSericeImpl implements UnitProjectService {
 				u.setSeq(maxSeq + 1); //排序
 			}
 			
-			u.setCode(ycaModel.getCode());
-			u.setType(ycaModel.getLookTypeName().substring(0, 1));
-			u.setName(ycaModel.getName());
-			u.setUnit(ycaModel.getUnit());
+			u.setCode(model.getCode());
+			u.setType(model.getType());
+			u.setName(model.getName());
+			u.setUnit(model.getUnit());
 			u.setContent(0d);//含量
 			u.setDtgcl(0d);
-			u.setSinglePrice(BigDecimal.valueOf(ycaModel.getPrice())
+			u.setSinglePrice(BigDecimal.valueOf(model.getPrice())
 					.divide(BigDecimal.valueOf(1 + Constant.PER_CENT), 5, RoundingMode.HALF_DOWN)
 					.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue()); //不含税单价
-			u.setTaxSinglePrice(ycaModel.getPrice()); //含税单价
+			u.setTaxSinglePrice(model.getPrice()); //含税单价
 			u.setSingleSumPrice(0d); //不含税合价
 			u.setTaxSingleSumPrice(0d); //含税合价
-			u.setPrice(ycaModel.getPrice()); //综合单价
+			u.setPrice(model.getPrice()); //综合单价
 			u.setSumPrice(0d); //综合合价
 			u.setRemark(null);
 			u.setBitProjectId(Integer.parseInt(queryMap.get("bitProjectId")));
-			u.setLookValueId(ycaModel.getLookValueId());
+			u.setLookValueId(model.getLookvalue_id());
 			if("1".equals(times)){
 				//更新定额(第一次是更新)
 				unitProjectDao.updateByPrimaryKey(u);
@@ -333,9 +343,13 @@ public class UnitProjectSericeImpl implements UnitProjectService {
 				
 				unitProjectDao.updateByPrimaryKey(unitProjectDB);
 			}else{
+				//修改的是yca
+				Map<String, Object> qMap = new HashMap<String, Object>();
+				qMap.put("code", unitProjectDB.getCode());
+				YCAModel model = yCADao.getYCAModelById(qMap);
 				
 				//获取原始的detail
-				CategoryModelYCAModel ycaModel = categoryModelDao.getDetailInfoByCode(unitProjectDB.getCode());
+				//CategoryModelYCAModel ycaModel = categoryModelDao.getDetailInfoByCode(unitProjectDB.getCode());
 				
 				BigDecimal  taxSinglePrice = BigDecimal.valueOf(unitProjectDB.getTaxSinglePrice());
 				//等于1的话
@@ -689,15 +703,47 @@ public class UnitProjectSericeImpl implements UnitProjectService {
 			unitProjectDetailDao.insert(upd);
 		}
 		
-		//插入 暂不支持 TODO
+		//新增
 		if("insert".equals(className)){
-			UnitProjectDetail upd = new UnitProjectDetail();
-			upd.setUnitprojectId(Integer.parseInt(queryMap.get("unitProjectId")));
-			upd.setCode("补充" + typeName + nextStr);
-			upd.setType(type);
-			List<UnitProjectDetail> detailList = unitProjectDetailDao.getBitProjectDetailInfo(queryMap);
-			upd.setSeq(detailList.get(detailList.size() -1).getSeq() + 1);
-			unitProjectDetailDao.insert(upd);
+			
+			String times = queryMap.get("times");
+			UnitProjectDetail ud = new UnitProjectDetail();
+			if("1".equals(times)){
+				//查询出来seq。然后删除调用，在新增一条
+				ud = unitProjectDetailDao.getUnitProjectDetailById(queryMap);
+			}else{
+				//新增一条新的（在最后面新增）
+				Integer maxSeq = unitProjectDetailDao.getMaxSeqByMap(queryMap);
+				ud.setSeq(maxSeq + 1); //排序
+			}
+			
+			Map<String, Object> qMap = new HashMap<String, Object>();
+			qMap.put("ycaModelId", queryMap.get("ycaId"));
+			YCAModel ycaModel = yCADao.getYCAModelById(qMap);
+			
+			ud.setUnitprojectId(Integer.parseInt(queryMap.get("unitProjectId")));
+			ud.setCode(ycaModel.getCode());
+			ud.setType(ycaModel.getType());
+			ud.setName(ycaModel.getName());
+			ud.setTypeInfo(null);
+			ud.setUnit(ycaModel.getUnit());
+			ud.setContent(0d); //含量为0
+			ud.setAmount(0d); //数量为0
+			ud.setSingleSumPrice(this.toMoney(this.multiply(ycaModel.getNoPrice(), ud.getAmount())));
+			ud.setTaxSingleSumPrice(this.toMoney(this.multiply(ycaModel.getPrice(), ud.getAmount())));
+			ud.setTaxPrice(ycaModel.getPrice());
+			ud.setNoTaxPrice(ycaModel.getNoPrice());
+			ud.setOrigCount(0d);
+			ud.setLookValueId(ycaModel.getLookvalue_id());
+			ud.setIsSuppleCost(0);
+			ud.setIsSupType(0);
+			if("1".equals(times)){
+				//更新(第一次是更新)
+				unitProjectDetailDao.updateByPrimaryKey(ud);
+			}else{
+				//保存定额
+				unitProjectDetailDao.insert(ud);
+			}
 		}
 	}
 	
@@ -842,13 +888,7 @@ public class UnitProjectSericeImpl implements UnitProjectService {
 			}
 			
 			Double amountDB = detailDB.getAmount();
-			Double changeDB = amountDB;
-			if(this.doubleCompare(amountDB, 0d)){
-				changeDB = 1d;
-			}
 			
-			//倍数
-			BigDecimal mutiDecimal = this.divive(v, changeDB); 
 			
 			//修改含量（数量除了工程量）
 			detailDB.setContent(this.divive(v, unitProjectDB.getDtgcl()).doubleValue());
@@ -859,9 +899,9 @@ public class UnitProjectSericeImpl implements UnitProjectService {
 			Double noTaxPrice = detailDB.getNoTaxPrice();
 			Double taxPrice = detailDB.getTaxPrice();
 			//修改不含税合价
-			detailDB.setSingleSumPrice(this.toMoney(this.multiply(detailDB.getSingleSumPrice(), mutiDecimal.doubleValue())));
+			detailDB.setSingleSumPrice(this.toMoney(this.multiply(noTaxPrice, v)));
 			//修改含税合价
-			detailDB.setTaxSingleSumPrice(this.toMoney(this.multiply(detailDB.getTaxSingleSumPrice(), mutiDecimal.doubleValue())));
+			detailDB.setTaxSingleSumPrice(this.toMoney(this.multiply(taxPrice, v)));
 			unitProjectDetailDao.updateByPrimaryKey(detailDB);
 			
 			//修改子目

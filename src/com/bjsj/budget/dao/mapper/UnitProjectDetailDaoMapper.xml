@@ -10,7 +10,7 @@
 		t.type as type,
 		t.name as name, 
 		t.type_info as typeInfo,
-		t.unit as unit, 
+		t.unit as unit,
 		t.content as content,
 		t.amount as amount,
 		t.single_sumprice as singleSumPrice,
@@ -105,5 +105,10 @@
 		select nextval(CONCAT(#{bitProjectId,jdbcType=INTEGER}, #{code,jdbcType=VARCHAR}))
 	</select>
 	
-	
+	<select id="getMaxSeqByMap" parameterType="HashMap" resultType="Integer">
+        select
+			max(t.seq)
+		from  tm_unitproject_detail t 
+		where t.unitproject_id = #{unitProjectId,jdbcType=INTEGER}   
+    </select>
 </mapper>

@@ -112,9 +112,12 @@
 			<include refid="Base_Column_List" />
 		from tm_yca_detail t 
 		where 1 = 1
-	   <if test="ycaModelId != null and ycaModelId != ''">
+	    <if test="ycaModelId != null and ycaModelId != ''">
 			and t.id = #{ycaModelId,jdbcType=INTEGER}   
-	   </if>
+	    </if>
+	    <if test="code != null and code != ''">
+			and t.code = #{code,jdbcType=VARCHAR}   
+	    </if>
 	</select>
 	
 	

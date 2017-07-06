@@ -40,4 +40,11 @@ public interface UnitProjectDetailDao extends BaseDao {
 	 * @param queryMap
 	 * @return 
 	 */
-	Integer getNextValue(Map<String, String> queryMap);}
+	Integer getNextValue(Map<String, String> queryMap);
+	
+	/**
+	 * 查询最大到Seq
+	 * @param queryMap
+	 * @return
+	 */
+	Integer getMaxSeqByMap(Map<String, String> queryMap);}

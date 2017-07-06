@@ -32,6 +32,7 @@ Ext.onReady(function() {
 		extend : 'Ext.tree.Panel',
 		region : 'north',
 		height : '57%',
+		autoScroll : true,
 		header: false,
 		rootVisible: false,
 		plugins:[{
@@ -472,6 +473,7 @@ Ext.onReady(function() {
 		extend : 'Ext.grid.Panel',
 		region : 'center',
 		header: false,
+		autoScroll : true,
 		plugins:[{
   	        ptype: 'cellediting',
   	        clicksToEdit: 1,
@@ -617,6 +619,7 @@ Ext.onReady(function() {
 					editable:false,
 					onTriggerClick:function(){
 						Ext.create("Budget.app.bussinessProcess.ProjectItemWin", {
+							bitItemGrid:Ext.getCmp("projectbitpanel-bititemgrid"),
 							bitDetailGrid:Ext.getCmp("projectbitpanel-bitdetailgrid"),
 							bitProjectId:me.bitProjectId,
 							showDing:false
