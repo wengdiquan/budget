@@ -32,27 +32,32 @@ Ext.onReady(function() {
 						xtype : 'textfield',
 						name : 'code',
 						allowBlank : false,
-						fieldLabel:'编码<font color="red">*</font>'
+						fieldLabel:'编码<font color="red">*</font>',
+						emptyText:"输入唯一的编号"
 					},{
 						xtype : 'textfield',
 						name : 'name',
 						fieldLabel:'名称<font color="red">*</font>',
-						allowBlank : false
+						allowBlank : false,
+						emptyText:"请输入名称"
 					},
 					new Ext.create('Unit.ComboBox',{
 						name : 'unit',
-						fieldLabel:'单位<font color="red">*</font>'
+						fieldLabel:'单位<font color="red">*</font>',
+						emptyText:"请输入或选择单位"
 					}),{
 						xtype : 'numberfield',
 						name : 'price',
 						fieldLabel:'含税单价<font color="red">*</font>',
-						allowBlank : false
+						allowBlank : false,
+						emptyText:"请输入含税单价"
 					},{
 						xtype : 'numberfield',
 						name : 'rate',
 						decimalPrecision: 5,
 						fieldLabel:'税率<font color="red">*</font>',
-						allowBlank : false
+						allowBlank : false,
+						emptyText:"请输入税率"
 					}],
 					buttons : [ '->', {
 						id : 'infowindow-save',
@@ -65,15 +70,18 @@ Ext.onReady(function() {
 							if (form.isValid()) {
 								window.getEl().mask('数据保存中，请稍候...');
 								var vals = form.getValues();
+								vals.unit = form.findField('unit').getRawValue();
 								Ext.Ajax.request({
 									url : appBaseUri + '/yca/saveOrUpdateValue',
 									params : vals,
 									method : "POST",
 									success : function(response) {
+										window.getEl().unmask();
 										if (response.responseText != '') {
 											var res = Ext.JSON.decode(response.responseText);
 											if (res.success) {
-												globalObject.msgTip('操作成功！');
+												window.close();
+												globalObject.messageTip('操作成功');
 												Ext.getCmp('ycamanage-ycavaluegrid').getStore().loadPage(1);
 											} else {
 												globalObject.errTip(res.msg);
@@ -84,8 +92,6 @@ Ext.onReady(function() {
 										globalObject.errTip('操作失败！');
 									}
 								});
-								window.getEl().unmask();
-								window.close();
 							}
 						}
 					}, {
@@ -126,7 +132,7 @@ Ext.onReady(function() {
 		region : 'west',
 		width : '18%',
 		border : true,
-		title:"大类名称",
+		title:"大类",
 		animate : true,//动画效果
 		initComponent : function() {
 			var me = this;
@@ -189,7 +195,19 @@ Ext.onReady(function() {
 				fields : [ {
 					name : 'id',
 					type : 'int'
-				}, 'code', 'name', 'unit', 'category']
+				}, 'code', 'name', 'unit', 'category',
+				{
+					name : 'noPrice',
+					type : 'double'
+				},
+				{
+					name : 'price',
+					type : 'double'
+				},
+				{
+					name : 'rate',
+					type : 'double'
+				}]
 			});
 			
 			var ycaValueStore = Ext.create('Ext.data.Store', {
@@ -213,12 +231,21 @@ Ext.onReady(function() {
 			{
 					text:'', width:25,xtype:'rownumberer'
 			},{
-				text : "费用代码",
+				text : "编码",
 				dataIndex : 'code',
 				width : '14%',
-				hidden : false
+				hidden : true
 			},{
-				text : "费用名称",
+				text : "编码",
+				dataIndex : 'code',
+				width : '14%',
+				hidden : false,
+				align:'right',
+				renderer:function(v){
+					return v.substring(v.indexOf('-') +1 );
+				}
+			},{
+				text : "名称",
 				dataIndex : 'name',
 				sortable : false,
 				width : '30%'
@@ -226,12 +253,31 @@ Ext.onReady(function() {
 				text : "单位",
 				dataIndex : 'unit',
 				sortable : false,
-				width : '14%'
+				align:'center',
+				width : '8%'
+			},{
+				text : "不含税单价",
+				dataIndex : 'noPrice',
+				sortable : false,
+				width : '12%',
+				align:'right'
+			},{
+				text : "含税单价",
+				dataIndex : 'price',
+				sortable : false,
+				width : '12%',
+				align:'right'
+			},{
+				text : "税率",
+				dataIndex : 'rate',
+				sortable : false,
+				width : '12%',
+				align:'right'
 			},{
 				text : "种类",
 				dataIndex : 'category',
 				sortable : false,
-				width : '14%'
+				hidden:true
 			},{
 				text : "looktype_id",
 				dataIndex : 'looktype_id',
@@ -318,6 +364,7 @@ Ext.onReady(function() {
 			form.findField('cmd').setValue('edit');
 			form.findField('code').setReadOnly(true);
 			form.loadRecord(gridRecord);
+			form.findField('code').setValue(gridRecord.get('code').substring(gridRecord.get('code').indexOf('-') +1 ));
 			win.show();
 		}
 	});

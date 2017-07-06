@@ -17,7 +17,10 @@
 		t.lookvalue_id as lookvalue_id,
 		t.code as code,
 		t.name as name,
-		t.unit as unit
+		t.unit as unit,
+		t.no_price as noPrice,
+		t.price as price,
+		t.rate as rate
 	</sql>
 	
     <select id="queryYCAInfo" parameterType="HashMap" resultMap="YCAInfoMap">
@@ -48,12 +51,15 @@
 	</select>
     <insert id="insertYCA" parameterType="com.bjsj.budget.model.YCAModel">
 		insert into tm_yca_detail
-			(id, lookvalue_id, code, name, unit)
+			(id, lookvalue_id, code, name, unit, no_price, price, rate)
 		values (#{id,jdbcType=INTEGER},
 			#{lookvalue_id,jdbcType=VARCHAR},
 			#{code,jdbcType=VARCHAR},
 			#{name,jdbcType=VARCHAR},
-			#{unit,jdbcType=INTEGER}
+			#{unit,jdbcType=VARCHAR},
+			#{noPrice,jdbcType=DOUBLE},
+			#{price,jdbcType=DOUBLE},
+			#{rate,jdbcType=DOUBLE}
 			)
 	</insert>
 	<select id="getYCACount" parameterType="com.bjsj.budget.model.YCAModel" resultType="Integer">
@@ -66,7 +72,10 @@
 		update
 		tm_yca_detail
 		set name = #{name,jdbcType=VARCHAR},
-		unit = #{unit,jdbcType=VARCHAR}
+		unit = #{unit,jdbcType=VARCHAR},
+		no_price = #{noPrice,jdbcType=DOUBLE},
+		price = #{price,jdbcType=DOUBLE},
+		rate = #{rate,jdbcType=DOUBLE}
 		where id = #{id,jdbcType=INTEGER}
 	</update>
 	<sql id="Base_Column_ListLook">

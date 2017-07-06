@@ -11,6 +11,10 @@ public class YCAModel {
 	private String name;
 	private String unit;
 
+	private Double noPrice; //不含税价
+	private Double price;   //含税价
+	private Double rate;    //税率
+	
 	
 	public String getLookvalue_code() {
 		return lookvalue_code;
@@ -66,5 +70,29 @@ public class YCAModel {
 	public void setLookvalue_id(Integer lookvalue_id) {
 		this.lookvalue_id = lookvalue_id;
 	}
-	
+	public Double getNoPrice() {
+		return noPrice;
+	}
+	public void setNoPrice(Double noPrice) {
+		this.noPrice = noPrice;
+	}
+	public Double getPrice() {
+		return price;
+	}
+	public void setPrice(Double price) {
+		this.price = price;
+	}
+	public Double getRate() {
+		return rate;
+	}
+	public void setRate(Double rate) {
+		this.rate = rate;
+	}
+	@Override
+	public String toString() {
+		return "YCAModel [looktype_id=" + looktype_id + ", lookvalue_id=" + lookvalue_id + ", lookvalue_code="
+				+ lookvalue_code + ", looktypeName=" + looktypeName + ", id=" + id + ", category=" + category
+				+ ", code=" + code + ", name=" + name + ", unit=" + unit + ", noPrice=" + noPrice + ", price=" + price
+				+ ", rate=" + rate + "]";
+	}
 }

@@ -18,6 +18,7 @@ import com.bjsj.budget.page.PageInfo;
 import com.bjsj.budget.page.PageObject;
 import com.bjsj.budget.service.YCAService;
 import com.bjsj.budget.util.ListView;
+import com.bjsj.budget.util.NumberUtils;
 import com.bjsj.budget.util.TransforUtil;
 @Controller
 @RequestMapping(value="/yca")
@@ -52,15 +53,17 @@ public class YCAController {
 	
 	@RequestMapping(value = "/saveOrUpdateValue")
 	@ResponseBody
-	public String saveOrUpdateValue (HttpServletRequest request,
+	public JSONObject saveOrUpdateValue (HttpServletRequest request,
 			HttpServletResponse response){
 		YCAModel record = new YCAModel();
-		
+		JSONObject resultJson = new JSONObject();
+		resultJson.put("success", true);
 		try
 		{
 			TransforUtil.transFromMapToBean(request.getParameterMap(), record);
 			
 			if("edit".equals(request.getParameter("cmd"))){
+				record.setNoPrice(NumberUtils.degree(NumberUtils.divive(record.getPrice(), 1 + NumberUtils.divive(record.getRate(), 100d))));
 				yCAService.updateValue(record);
 			}else{
 				Map<String, String> queryMap = TransforUtil.transRMapToMap(request.getParameterMap());
@@ -69,15 +72,15 @@ public class YCAController {
 					LookValue tt = lookValue.get(0);
 					String code = record.getCode();
 					record.setCode(tt.getLookvalueCode() + "-" + code);
+					record.setNoPrice(NumberUtils.degree(NumberUtils.divive(record.getPrice(), 1 + NumberUtils.divive(record.getRate(), 100d))));
 					yCAService.insertValue(record);
 				}
 			}
-			
-			
 		}catch (Exception ex) {
-			return "{success:false,msg:" + ex.getMessage() + "}";
+			resultJson.put("success", false);
+			resultJson.put("msg", ex.getMessage());
 		}
-		return "{success:true}";
+		return resultJson;
 	}
 	/**
 	 * 查询 字典类型
